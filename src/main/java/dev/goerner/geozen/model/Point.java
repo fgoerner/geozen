@@ -1,6 +1,6 @@
 package dev.goerner.geozen.model;
 
-public class Point extends Geometry {
+public class Point implements Geometry {
 	private Position coordinates;
 
 	public Point(Position coordinates) {

@@ -1,6 +1,6 @@
 package dev.goerner.geozen.model;
 
-public class LineString extends Geometry {
+public class LineString implements Geometry {
 	private Position[] coordinates;
 
 	public LineString(Position[] coordinates) {

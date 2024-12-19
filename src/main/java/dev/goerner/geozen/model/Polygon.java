@@ -1,6 +1,6 @@
 package dev.goerner.geozen.model;
 
-public class Polygon extends Geometry {
+public class Polygon implements Geometry {
 	private Position[][] coordinates;
 
 	public Polygon(Position[][] coordinates) {

@@ -1,6 +1,6 @@
 package dev.goerner.geozen.model;
 
-public class MultiPolygon extends Geometry {
+public class MultiPolygon implements Geometry {
 	private Position[][][] coordinates;
 
 	public MultiPolygon(Position[][][] coordinates) {

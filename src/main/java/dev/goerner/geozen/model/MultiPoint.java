@@ -1,6 +1,6 @@
 package dev.goerner.geozen.model;
 
-public class MultiPoint extends Geometry{
+public class MultiPoint implements Geometry{
 	private Position[] coordinates;
 
 	public MultiPoint(Position[] coordinates) {
