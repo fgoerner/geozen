@@ -6,7 +6,12 @@ plugins {
 }
 
 group = "dev.goerner.geozen"
-version = "0.0.1"
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(23)
+	}
+}
 
 repositories {
 	mavenCentral()
