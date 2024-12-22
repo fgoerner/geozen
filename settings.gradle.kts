@@ -1,2 +1,2 @@
-rootProject.name = "geozen_core"
+rootProject.name = "geozen-core"
 

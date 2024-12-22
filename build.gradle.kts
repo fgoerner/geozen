@@ -1,72 +1,53 @@
+import com.vanniktech.maven.publish.SonatypeHost
+
 plugins {
-    id("java-library")
-    id("maven-publish")
-    id("signing")
+	id("java-library")
+	id("com.vanniktech.maven.publish") version "0.30.0"
 }
 
 group = "dev.goerner.geozen"
 version = "0.0.1"
 
 repositories {
-    mavenCentral()
+	mavenCentral()
 }
 
 dependencies {
-    testImplementation(platform("org.junit:junit-bom:5.10.0"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
+	testImplementation(platform("org.junit:junit-bom:5.10.0"))
+	testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
 tasks.test {
-    useJUnitPlatform()
+	useJUnitPlatform()
 }
 
-java {
-    withSourcesJar()
-    withJavadocJar()
-}
+mavenPublishing {
+	publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
 
-publishing {
-    publications {
-        create<MavenPublication>("mavenJava") {
-            from(components["java"])
-            pom {
-                name = "GeoZen"
-                description = "A Java library for working with geospatial data."
-                url = "https://github.com/fgoerner/geozen"
+	signAllPublications()
 
-                licenses {
-                    license {
-                        name = "MIT License"
-                        url = "https://github.com/fgoerner/geozen/blob/main/LICENSE"
-                    }
-                }
-
-                scm {
-                    connection = "scm:git:git://github.com/fgoerner/geozen.git"
-                    developerConnection = "scm:git:ssh://github.com/fgoerner/geozen.git"
-                    url = "https://github.com/fgoerner/geozen"
-                }
-
-                developers {
-                    developer {
-                        id = "fgoerner"
-                        name = "Felix Görner"
-                        email = "felix@goerner.dev"
-                    }
-                }
-            }
-        }
-    }
-}
-
-signing {
-    useInMemoryPgpKeys(
-        findProperty("signingKey") as String?,
-        findProperty("signingPassword") as String?
-    )
-    sign(publishing.publications["mavenJava"])
-}
-
-tasks.withType<Javadoc> {
-    (options as StandardJavadocDocletOptions).addStringOption("Xdoclint:none", "-quiet")
+	pom {
+		name = "GeoZen Core"
+		description = "A library for working with geospatial data"
+		inceptionYear = "2024"
+		url = "https://github.com/fgoerner/geozen"
+		licenses {
+			license {
+				name = "MIT License"
+				url = "https://github.com/fgoerner/geozen/blob/main/LICENSE"
+			}
+		}
+		developers {
+			developer {
+				id = "fgoerner"
+				name = "Felix Görner"
+				email = "felix@goerner.dev"
+			}
+		}
+		scm {
+			url = "https://github.com/fgoerner/geozen"
+			connection = "scm:git:git://github.com/fgoerner/geozen.git"
+			developerConnection = "scm:git:ssh://git@github.com/fgoerner/geozen.git"
+		}
+	}
 }
