@@ -6,6 +6,7 @@ plugins {
 }
 
 group = "dev.goerner.geozen"
+version = project.findProperty("version") as String? ?: "0.0.0-SNAPSHOT"
 
 java {
 	toolchain {
