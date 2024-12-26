@@ -1,17 +1,49 @@
 package dev.goerner.geozen.model;
 
-public class LineString implements Geometry {
-	private Position[] coordinates;
+import java.util.ArrayList;
+import java.util.Collections;
 
-	public LineString(Position[] coordinates) {
-		this.coordinates = coordinates;
+/**
+ * A {@link LineString} is a {@link Geometry} that represents a sequence of {@link Position Positions} in space. It is
+ * defined by a list of {@link Position Positions} and a {@link CoordinateReferenceSystem}.
+ */
+public class LineString extends Geometry<ArrayList<Position>> {
+
+	/**
+	 * Creates a new {@link LineString} with an empty list of {@link Position Positions} and the default WGS 84
+	 * {@link CoordinateReferenceSystem}.
+	 */
+	public LineString() {
+		this(new ArrayList<>());
 	}
 
-	public Position[] getCoordinates() {
-		return coordinates;
+	/**
+	 * Creates a new {@link LineString} with the given list of {@link Position Positions} and the default WGS 84
+	 * {@link CoordinateReferenceSystem}.
+	 *
+	 * @param coordinates The list of {@link Position Positions} representing the {@link LineString}.
+	 */
+	public LineString(ArrayList<Position> coordinates) {
+		this(coordinates, CoordinateReferenceSystem.WGS_84);
 	}
 
-	public void setCoordinates(Position[] coordinates) {
-		this.coordinates = coordinates;
+	/**
+	 * Creates a new {@link LineString} with the given list of {@link Position Positions} and the given
+	 * {@link CoordinateReferenceSystem}.
+	 *
+	 * @param coordinates               The list of {@link Position Positions} representing the {@link LineString}.
+	 * @param coordinateReferenceSystem The {@link CoordinateReferenceSystem} of the {@link LineString}.
+	 */
+	public LineString(ArrayList<Position> coordinates, CoordinateReferenceSystem coordinateReferenceSystem) {
+		super(coordinateReferenceSystem, coordinates);
+	}
+
+	public void addCoordinate(Position coordinate) {
+		this.coordinates.add(coordinate);
+	}
+
+	public void addCoordinates(Position... coordinates) {
+		this.coordinates.ensureCapacity(this.coordinates.size() + coordinates.length);
+		Collections.addAll(this.coordinates, coordinates);
 	}
 }
