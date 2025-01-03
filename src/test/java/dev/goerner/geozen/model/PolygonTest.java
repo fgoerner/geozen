@@ -21,7 +21,9 @@ public class PolygonTest {
 		ArrayList<Position> exteriorRing = new ArrayList<>();
 		exteriorRing.add(new Position(1.0, 2.0, 3.0));
 		exteriorRing.add(new Position(4.0, 5.0, 6.0));
-		Polygon polygon = new Polygon(exteriorRing);
+		ArrayList<ArrayList<Position>> coordinates = new ArrayList<>();
+		coordinates.add(exteriorRing);
+		Polygon polygon = new Polygon(coordinates);
 
 		assertEquals(1, polygon.getCoordinates().size());
 		assertEquals(exteriorRing, polygon.getCoordinates().getFirst());
@@ -40,7 +42,9 @@ public class PolygonTest {
 		ArrayList<Position> exteriorRing = new ArrayList<>();
 		exteriorRing.add(new Position(1.0, 2.0, 3.0));
 		exteriorRing.add(new Position(4.0, 5.0, 6.0));
-		Polygon polygon = new Polygon(exteriorRing, CoordinateReferenceSystem.WEB_MERCATOR);
+		ArrayList<ArrayList<Position>> coordinates = new ArrayList<>();
+		coordinates.add(exteriorRing);
+		Polygon polygon = new Polygon(coordinates, CoordinateReferenceSystem.WEB_MERCATOR);
 
 		assertEquals(1, polygon.getCoordinates().size());
 		assertEquals(exteriorRing, polygon.getCoordinates().getFirst());
@@ -66,7 +70,9 @@ public class PolygonTest {
 		ArrayList<Position> exteriorRing = new ArrayList<>();
 		exteriorRing.add(new Position(1.0, 2.0, 3.0));
 		exteriorRing.add(new Position(4.0, 5.0, 6.0));
-		Polygon polygon = new Polygon(exteriorRing);
+		ArrayList<ArrayList<Position>> coordinates = new ArrayList<>();
+		coordinates.add(exteriorRing);
+		Polygon polygon = new Polygon(coordinates);
 
 		assertEquals(exteriorRing, polygon.getExteriorRing());
 	}

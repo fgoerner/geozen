@@ -4,7 +4,9 @@ package dev.goerner.geozen.model;
  * A {@link Point} is a {@link Geometry} that represents a single position in space. It is defined by a single
  * {@link Position} and a {@link CoordinateReferenceSystem}.
  */
-public class Point extends Geometry<Position> {
+public class Point extends Geometry {
+
+	private Position coordinates;
 
 	/**
 	 * Creates a new {@link Point} at the origin coordinates with the default WGS 84 {@link CoordinateReferenceSystem}.
@@ -73,7 +75,8 @@ public class Point extends Geometry<Position> {
 	 * @param coordinateReferenceSystem The {@link CoordinateReferenceSystem} of the {@link Point}.
 	 */
 	public Point(Position coordinates, CoordinateReferenceSystem coordinateReferenceSystem) {
-		super(coordinateReferenceSystem, coordinates);
+		super(coordinateReferenceSystem);
+		this.coordinates = coordinates;
 	}
 
 	public double getLongitude() {
@@ -98,5 +101,13 @@ public class Point extends Geometry<Position> {
 
 	public void setAltitude(double altitude) {
 		this.coordinates.setAltitude(altitude);
+	}
+
+	public Position getCoordinates() {
+		return this.coordinates;
+	}
+
+	public void setCoordinates(Position coordinates) {
+		this.coordinates = coordinates;
 	}
 }

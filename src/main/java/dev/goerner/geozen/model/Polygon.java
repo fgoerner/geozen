@@ -10,7 +10,9 @@ import java.util.ArrayList;
  * The first ring is the exterior ring, defining the outer boundary of the polygon. Any subsequent rings are interior
  * rings, defining holes within the polygon.
  */
-public class Polygon extends Geometry<ArrayList<ArrayList<Position>>> {
+public class Polygon extends Geometry {
+
+	private ArrayList<ArrayList<Position>> coordinates;
 
 	/**
 	 * Creates a new empty {@link Polygon} with the default WGS 84 {@link CoordinateReferenceSystem}.
@@ -20,13 +22,13 @@ public class Polygon extends Geometry<ArrayList<ArrayList<Position>>> {
 	}
 
 	/**
-	 * Creates a new {@link Polygon} with the given exterior ring and the default WGS 84
+	 * Creates a new {@link Polygon} with the given exterior and interior rings and the default WGS 84
 	 * {@link CoordinateReferenceSystem}.
 	 *
-	 * @param exteriorRing A list of {@link Position Positions}, defining the exterior ring of the {@link Polygon}.
+	 * @param coordinates A list of exterior and interior rings of the {@link Polygon}.
 	 */
-	public Polygon(ArrayList<Position> exteriorRing) {
-		this(exteriorRing, CoordinateReferenceSystem.WGS_84);
+	public Polygon(ArrayList<ArrayList<Position>> coordinates) {
+		this(coordinates, CoordinateReferenceSystem.WGS_84);
 	}
 
 	/**
@@ -35,18 +37,19 @@ public class Polygon extends Geometry<ArrayList<ArrayList<Position>>> {
 	 * @param coordinateReferenceSystem The {@link CoordinateReferenceSystem} of the {@link Polygon}.
 	 */
 	public Polygon(CoordinateReferenceSystem coordinateReferenceSystem) {
-		super(coordinateReferenceSystem, new ArrayList<>());
+		super(coordinateReferenceSystem);
+		this.coordinates = new ArrayList<>();
 	}
 
 	/**
-	 * Creates a new {@link Polygon} with the given exterior ring and the given {@link CoordinateReferenceSystem}.
+	 * Creates a new {@link Polygon} with the given exterior and interior rings and the given {@link CoordinateReferenceSystem}.
 	 *
-	 * @param exteriorRing              A list of {@link Position Positions}, defining the exterior ring of the {@link Polygon}.
+	 * @param coordinates               A list of exterior and interior rings of the {@link Polygon}.
 	 * @param coordinateReferenceSystem The {@link CoordinateReferenceSystem} of the {@link Polygon}.
 	 */
-	public Polygon(ArrayList<Position> exteriorRing, CoordinateReferenceSystem coordinateReferenceSystem) {
-		super(coordinateReferenceSystem, new ArrayList<>());
-		this.coordinates.add(exteriorRing);
+	public Polygon(ArrayList<ArrayList<Position>> coordinates, CoordinateReferenceSystem coordinateReferenceSystem) {
+		super(coordinateReferenceSystem);
+		this.coordinates = coordinates;
 	}
 
 	public ArrayList<Position> getExteriorRing() {
@@ -62,5 +65,13 @@ public class Polygon extends Geometry<ArrayList<ArrayList<Position>>> {
 		} else {
 			this.coordinates.set(0, exteriorRing);
 		}
+	}
+
+	public ArrayList<ArrayList<Position>> getCoordinates() {
+		return this.coordinates;
+	}
+
+	public void setCoordinates(ArrayList<ArrayList<Position>> coordinates) {
+		this.coordinates = coordinates;
 	}
 }
