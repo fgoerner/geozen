@@ -8,22 +8,23 @@ import dev.goerner.geozen.model.Position;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 public class PolygonDeserializer extends AbstractGeometryDeserializer<Polygon> {
+
 	@Override
 	public Polygon deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
 		JsonNode rootNode = p.getCodec().readTree(p);
 
 		checkType(rootNode, "Polygon");
 
-		ArrayList<ArrayList<Position>> coordinates = StreamSupport.stream(rootNode.get("coordinates")
-																										  .spliterator(), false).map(ringNode ->
-				StreamSupport.stream(ringNode.spliterator(), false)
-								 .map(this::parsePosition)
-								 .collect(Collectors.toCollection(ArrayList::new))
-		).collect(Collectors.toCollection(ArrayList::new));
+		ArrayList<ArrayList<Position>> coordinates = new ArrayList<>();
+		for (JsonNode ringNode : rootNode.get("coordinates")) {
+			ArrayList<Position> ring = new ArrayList<>();
+			for (JsonNode coordinateNode : ringNode) {
+				ring.add(parsePosition(coordinateNode));
+			}
+			coordinates.add(ring);
+		}
 
 		return new Polygon(coordinates);
 	}

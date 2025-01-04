@@ -1,13 +1,12 @@
 package dev.goerner.geozen.model.jackson.serializer;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import dev.goerner.geozen.model.Point;
 
 import java.io.IOException;
 
-public class PointSerializer extends JsonSerializer<Point> {
+public class PointSerializer extends AbstractGeometrySerializer<Point> {
 
 	@Override
 	public void serialize(Point point, JsonGenerator gen, SerializerProvider serializerProvider) throws IOException {
@@ -15,13 +14,8 @@ public class PointSerializer extends JsonSerializer<Point> {
 
 		gen.writeStringField("type", "Point");
 
-		gen.writeArrayFieldStart("coordinates");
-		gen.writeNumber(point.getLongitude());
-		gen.writeNumber(point.getLatitude());
-		if (point.getAltitude() != 0) {
-			gen.writeNumber(point.getAltitude());
-		}
-		gen.writeEndArray();
+		gen.writeFieldName("coordinates");
+		writePosition(point.getCoordinates(), gen);
 
 		gen.writeEndObject();
 	}
