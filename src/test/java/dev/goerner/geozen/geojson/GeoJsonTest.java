@@ -3,6 +3,7 @@ package dev.goerner.geozen.geojson;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.goerner.geozen.model.Geometry;
+import dev.goerner.geozen.model.GeometryCollection;
 import dev.goerner.geozen.model.LineString;
 import dev.goerner.geozen.model.MultiLineString;
 import dev.goerner.geozen.model.MultiPoint;
@@ -138,6 +139,23 @@ public class GeoJsonTest {
 		String geoJsonString = objectMapper.writeValueAsString(multiPolygon);
 
 		assertEquals("{\"type\":\"MultiPolygon\",\"coordinates\":[[[[1.0,2.0,3.0],[4.0,5.0,6.0],[7.0,8.0,9.0],[1.0,2.0,3.0]],[[10.0,11.0,12.0],[13.0,14.0,15.0],[16.0,17.0,18.0],[10.0,11.0,12.0]]],[[[19.0,20.0,21.0],[22.0,23.0,24.0],[25.0,26.0,27.0],[19.0,20.0,21.0]],[[28.0,29.0,30.0],[31.0,32.0,33.0],[34.0,35.0,36.0],[28.0,29.0,30.0]]]]}", geoJsonString);
+	}
+
+	@Test
+	public void testGeometryCollectionSerialization() throws JsonProcessingException {
+		Geometry point = new Point(1.0, 2.0);
+		ArrayList<Position> coordinates = new ArrayList<>();
+		coordinates.add(new Position(3.0, 4.0));
+		coordinates.add(new Position(5.0, 6.0));
+		Geometry lineString = new LineString(coordinates);
+		ArrayList<Geometry> geometries = new ArrayList<>();
+		geometries.add(point);
+		geometries.add(lineString);
+		GeometryCollection geometryCollection = new GeometryCollection(geometries);
+
+		String geoJsonString = objectMapper.writeValueAsString(geometryCollection);
+
+		assertEquals("{\"type\":\"GeometryCollection\",\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1.0,2.0]},{\"type\":\"LineString\",\"coordinates\":[[3.0,4.0],[5.0,6.0]]}]}", geoJsonString);
 	}
 
 	@Test
@@ -343,5 +361,28 @@ public class GeoJsonTest {
 		assertEquals(28.0, interiorRingPosition7.getLongitude());
 		assertEquals(29.0, interiorRingPosition7.getLatitude());
 		assertEquals(30.0, interiorRingPosition7.getAltitude());
+	}
+
+	@Test
+	public void testGeometryCollectionDeserialization() throws JsonProcessingException {
+		String geoJsonString = "{\"type\":\"GeometryCollection\",\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1.0,2.0]},{\"type\":\"LineString\",\"coordinates\":[[3.0,4.0],[5.0,6.0]]}]}";
+
+		GeometryCollection geometryCollection = objectMapper.readValue(geoJsonString, GeometryCollection.class);
+
+		Geometry point = geometryCollection.getGeometries().getFirst();
+		assertInstanceOf(Point.class, point);
+		Point point1 = (Point) point;
+		assertEquals(1.0, point1.getLongitude());
+		assertEquals(2.0, point1.getLatitude());
+		Geometry lineString = geometryCollection.getGeometries().get(1);
+		assertInstanceOf(LineString.class, lineString);
+		LineString lineString1 = (LineString) lineString;
+		assertEquals(2, lineString1.getCoordinates().size());
+		Position position0 = lineString1.getCoordinates().getFirst();
+		assertEquals(3.0, position0.getLongitude());
+		assertEquals(4.0, position0.getLatitude());
+		Position position1 = lineString1.getCoordinates().get(1);
+		assertEquals(5.0, position1.getLongitude());
+		assertEquals(6.0, position1.getLatitude());
 	}
 }

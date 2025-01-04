@@ -2,12 +2,14 @@ package dev.goerner.geozen.model.jackson;
 
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import dev.goerner.geozen.model.Geometry;
+import dev.goerner.geozen.model.GeometryCollection;
 import dev.goerner.geozen.model.LineString;
 import dev.goerner.geozen.model.MultiLineString;
 import dev.goerner.geozen.model.MultiPoint;
 import dev.goerner.geozen.model.MultiPolygon;
 import dev.goerner.geozen.model.Point;
 import dev.goerner.geozen.model.Polygon;
+import dev.goerner.geozen.model.jackson.deserializer.GeometryCollectionDeserializer;
 import dev.goerner.geozen.model.jackson.deserializer.GeometryDeserializer;
 import dev.goerner.geozen.model.jackson.deserializer.LineStringDeserializer;
 import dev.goerner.geozen.model.jackson.deserializer.MultiLineStringDeserializer;
@@ -15,6 +17,7 @@ import dev.goerner.geozen.model.jackson.deserializer.MultiPointDeserializer;
 import dev.goerner.geozen.model.jackson.deserializer.MultiPolygonDeserializer;
 import dev.goerner.geozen.model.jackson.deserializer.PointDeserializer;
 import dev.goerner.geozen.model.jackson.deserializer.PolygonDeserializer;
+import dev.goerner.geozen.model.jackson.serializer.GeometryCollectionSerializer;
 import dev.goerner.geozen.model.jackson.serializer.LineStringSerializer;
 import dev.goerner.geozen.model.jackson.serializer.MultiLineStringSerializer;
 import dev.goerner.geozen.model.jackson.serializer.MultiPointSerializer;
@@ -33,6 +36,7 @@ public class GeoZenModule extends SimpleModule {
 		addSerializer(MultiPoint.class, new MultiPointSerializer());
 		addSerializer(MultiLineString.class, new MultiLineStringSerializer());
 		addSerializer(MultiPolygon.class, new MultiPolygonSerializer());
+		addSerializer(GeometryCollection.class, new GeometryCollectionSerializer());
 
 		addDeserializer(Point.class, new PointDeserializer());
 		addDeserializer(LineString.class, new LineStringDeserializer());
@@ -41,5 +45,6 @@ public class GeoZenModule extends SimpleModule {
 		addDeserializer(MultiLineString.class, new MultiLineStringDeserializer());
 		addDeserializer(MultiPolygon.class, new MultiPolygonDeserializer());
 		addDeserializer(Geometry.class, new GeometryDeserializer());
+		addDeserializer(GeometryCollection.class, new GeometryCollectionDeserializer());
 	}
 }
