@@ -3,6 +3,7 @@ package dev.goerner.geozen.geojson;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.goerner.geozen.model.Feature;
+import dev.goerner.geozen.model.FeatureCollection;
 import dev.goerner.geozen.model.Geometry;
 import dev.goerner.geozen.model.GeometryCollection;
 import dev.goerner.geozen.model.LineString;
@@ -172,6 +173,22 @@ public class GeoJsonTest {
 		String geoJsonString = objectMapper.writeValueAsString(feature);
 
 		assertEquals("{\"type\":\"Feature\",\"id\":\"123\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[1.0,2.0]},\"properties\":{\"name\":\"John Doe\"}}", geoJsonString);
+	}
+
+	@Test
+	public void testFeatureCollectionSerialization() throws JsonProcessingException {
+		String id = "123";
+		Geometry point = new Point(1.0, 2.0);
+		Map<String, String> properties = new HashMap<>();
+		properties.put("name", "John Doe");
+		Feature feature = new Feature(id, point, properties);
+		ArrayList<Feature> features = new ArrayList<>();
+		features.add(feature);
+		FeatureCollection featureCollection = new FeatureCollection(features);
+
+		String geoJsonString = objectMapper.writeValueAsString(featureCollection);
+
+		assertEquals("{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"id\":\"123\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[1.0,2.0]},\"properties\":{\"name\":\"John Doe\"}}]}", geoJsonString);
 	}
 
 	@Test
@@ -408,6 +425,22 @@ public class GeoJsonTest {
 
 		Feature feature = objectMapper.readValue(geoJsonString, Feature.class);
 
+		assertEquals("123", feature.getId());
+		assertInstanceOf(Point.class, feature.getGeometry());
+		Point point = (Point) feature.getGeometry();
+		assertEquals(1.0, point.getLongitude());
+		assertEquals(2.0, point.getLatitude());
+		assertEquals("John Doe", feature.getProperties().get("name"));
+	}
+
+	@Test
+	public void testFeatureCollectionDeserialization() throws JsonProcessingException {
+		String geoJsonString = "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"id\":\"123\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[1.0,2.0]},\"properties\":{\"name\":\"John Doe\"}}]}";
+
+		FeatureCollection featureCollection = objectMapper.readValue(geoJsonString, FeatureCollection.class);
+
+		assertEquals(1, featureCollection.getFeatures().size());
+		Feature feature = featureCollection.getFeatures().getFirst();
 		assertEquals("123", feature.getId());
 		assertInstanceOf(Point.class, feature.getGeometry());
 		Point point = (Point) feature.getGeometry();
