@@ -6,6 +6,7 @@ package dev.goerner.geozen.model;
  * object.
  */
 public abstract class Geometry {
+
 	private final CoordinateReferenceSystem coordinateReferenceSystem;
 
 	public Geometry(CoordinateReferenceSystem coordinateReferenceSystem) {
@@ -15,4 +16,32 @@ public abstract class Geometry {
 	public CoordinateReferenceSystem getCoordinateReferenceSystem() {
 		return coordinateReferenceSystem;
 	}
+
+	public double getMinDistanceTo(Geometry geometry) {
+		return getMinDistanceTo(geometry, false);
+	}
+
+	public double getMinDistanceTo(Geometry geometry, boolean exact) {
+		return switch (geometry) {
+			case Point point -> getMinDistanceTo(point, exact);
+			case LineString lineString -> getMinDistanceTo(lineString, exact);
+			case Polygon polygon -> getMinDistanceTo(polygon, exact);
+			case MultiPoint multiPoint -> getMinDistanceTo(multiPoint, exact);
+			case MultiLineString multiLineString -> getMinDistanceTo(multiLineString, exact);
+			case MultiPolygon multiPolygon -> getMinDistanceTo(multiPolygon, exact);
+			default -> 0;
+		};
+	}
+
+	public abstract double getMinDistanceTo(Point point, boolean exact);
+
+	public abstract double getMinDistanceTo(LineString lineString, boolean exact);
+
+	public abstract double getMinDistanceTo(Polygon polygon, boolean exact);
+
+	public abstract double getMinDistanceTo(MultiPoint multiPoint, boolean exact);
+
+	public abstract double getMinDistanceTo(MultiLineString multiLineString, boolean exact);
+
+	public abstract double getMinDistanceTo(MultiPolygon multiPolygon, boolean exact);
 }

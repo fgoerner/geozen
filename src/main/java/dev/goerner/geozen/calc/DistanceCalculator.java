@@ -1,18 +1,18 @@
 package dev.goerner.geozen.calc;
 
-import dev.goerner.geozen.model.Point;
+import dev.goerner.geozen.model.Position;
 import net.sf.geographiclib.Geodesic;
 import net.sf.geographiclib.GeodesicData;
 import net.sf.geographiclib.GeodesicMask;
 
 public class DistanceCalculator {
 
-	public static double karneyDistance(Point p1, Point p2) {
+	public static double karneyDistance(Position p1, Position p2) {
 		final GeodesicData geodesicData = Geodesic.WGS84.Inverse(p1.getLatitude(), p1.getLongitude(), p2.getLatitude(), p2.getLongitude(), GeodesicMask.DISTANCE);
 		return geodesicData.s12;
 	}
 
-	public static double haversineDistance(Point p1, Point p2) {
+	public static double haversineDistance(Position p1, Position p2) {
 		final double lat1 = Math.toRadians(p1.getLatitude());
 		final double lat2 = Math.toRadians(p2.getLatitude());
 

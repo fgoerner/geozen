@@ -52,6 +52,36 @@ public class Polygon extends Geometry {
 		this.coordinates = coordinates;
 	}
 
+	@Override
+	public double getMinDistanceTo(Point point, boolean exact) {
+		return 0;
+	}
+
+	@Override
+	public double getMinDistanceTo(LineString lineString, boolean exact) {
+		return 0;
+	}
+
+	@Override
+	public double getMinDistanceTo(Polygon polygon, boolean exact) {
+		return 0;
+	}
+
+	@Override
+	public double getMinDistanceTo(MultiPoint multiPoint, boolean exact) {
+		return 0;
+	}
+
+	@Override
+	public double getMinDistanceTo(MultiLineString multiLineString, boolean exact) {
+		return 0;
+	}
+
+	@Override
+	public double getMinDistanceTo(MultiPolygon multiPolygon, boolean exact) {
+		return 0;
+	}
+
 	public ArrayList<Position> getExteriorRing() {
 		if (this.coordinates.isEmpty()) {
 			return null;

@@ -89,6 +89,14 @@ public class Feature {
 		this.properties = properties;
 	}
 
+	public double getMinDistanceTo(Feature feature) {
+		return getMinDistanceTo(feature, false);
+	}
+
+	public double getMinDistanceTo(Feature feature, boolean exact) {
+		return getGeometry().getMinDistanceTo(feature.getGeometry(), exact);
+	}
+
 	public String getId() {
 		return id;
 	}

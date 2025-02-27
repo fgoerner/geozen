@@ -1,5 +1,7 @@
 package dev.goerner.geozen.model;
 
+import dev.goerner.geozen.calc.DistanceCalculator;
+
 /**
  * A {@link Point} is a {@link Geometry} that represents a single position in space. It is defined by a single
  * {@link Position} and a {@link CoordinateReferenceSystem}.
@@ -77,6 +79,40 @@ public class Point extends Geometry {
 	public Point(Position coordinates, CoordinateReferenceSystem coordinateReferenceSystem) {
 		super(coordinateReferenceSystem);
 		this.coordinates = coordinates;
+	}
+
+	@Override
+	public double getMinDistanceTo(Point point, boolean exact) {
+		if (exact) {
+			return DistanceCalculator.karneyDistance(this.getCoordinates(), point.getCoordinates());
+		} else {
+			return DistanceCalculator.haversineDistance(this.getCoordinates(), point.getCoordinates());
+		}
+	}
+
+	@Override
+	public double getMinDistanceTo(LineString lineString, boolean exact) {
+		return 0;
+	}
+
+	@Override
+	public double getMinDistanceTo(Polygon polygon, boolean exact) {
+		return 0;
+	}
+
+	@Override
+	public double getMinDistanceTo(MultiPoint multiPoint, boolean exact) {
+		return 0;
+	}
+
+	@Override
+	public double getMinDistanceTo(MultiLineString multiLineString, boolean exact) {
+		return 0;
+	}
+
+	@Override
+	public double getMinDistanceTo(MultiPolygon multiPolygon, boolean exact) {
+		return 0;
 	}
 
 	public double getLongitude() {
