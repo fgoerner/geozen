@@ -8,7 +8,7 @@ import net.sf.geographiclib.GeodesicMask;
 public class DistanceCalculator {
 
 	/**
-	 * Calculates the distance between two geographical points using the Karney algorithm.
+	 * Calculates the distance between two geographical points using Karney's algorithm.
 	 *
 	 * <p>This method utilizes the GeographicLib library by calling
 	 * {@code Geodesic.WGS84.Inverse} with the latitude and longitude of the provided points,
