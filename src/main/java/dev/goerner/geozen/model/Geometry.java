@@ -5,7 +5,8 @@ package dev.goerner.geozen.model;
  * some data structure of {@link Position Positions} provided by its descendants, that define the shape of the spatial
  * object.
  */
-public abstract class Geometry {
+public abstract sealed class Geometry
+		permits Point, LineString, Polygon, MultiPoint, MultiLineString, MultiPolygon, GeometryCollection {
 	private final CoordinateReferenceSystem coordinateReferenceSystem;
 
 	public Geometry(CoordinateReferenceSystem coordinateReferenceSystem) {

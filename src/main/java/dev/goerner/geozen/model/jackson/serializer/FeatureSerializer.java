@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import dev.goerner.geozen.model.Feature;
+import dev.goerner.geozen.model.GeometryCollection;
 import dev.goerner.geozen.model.LineString;
 import dev.goerner.geozen.model.MultiLineString;
 import dev.goerner.geozen.model.MultiPoint;
@@ -33,8 +34,8 @@ public class FeatureSerializer extends JsonSerializer<Feature> {
 			case MultiPoint multiPoint -> serializers.findValueSerializer(MultiPoint.class).serialize(multiPoint, gen, serializers);
 			case MultiLineString multiLineString -> serializers.findValueSerializer(MultiLineString.class).serialize(multiLineString, gen, serializers);
 			case MultiPolygon multiPolygon -> serializers.findValueSerializer(MultiPolygon.class).serialize(multiPolygon, gen, serializers);
+			case GeometryCollection geometryCollection -> serializers.findValueSerializer(GeometryCollection.class).serialize(geometryCollection, gen, serializers);
 			case null -> gen.writeNull();
-			default -> throw new IllegalArgumentException("Invalid Geometry type: " + value.getGeometry().getClass().getSimpleName());
 		}
 
 		gen.writeFieldName("properties");

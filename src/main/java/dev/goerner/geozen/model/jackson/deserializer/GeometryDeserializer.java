@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import dev.goerner.geozen.model.Geometry;
+import dev.goerner.geozen.model.GeometryCollection;
 import dev.goerner.geozen.model.LineString;
 import dev.goerner.geozen.model.MultiLineString;
 import dev.goerner.geozen.model.MultiPoint;
@@ -29,6 +30,7 @@ public class GeometryDeserializer extends AbstractGeometryDeserializer<Geometry>
 			case "MultiPoint" -> ctxt.constructType(MultiPoint.class);
 			case "MultiLineString" -> ctxt.constructType(MultiLineString.class);
 			case "MultiPolygon" -> ctxt.constructType(MultiPolygon.class);
+			case "GeometryCollection" -> ctxt.constructType(GeometryCollection.class);
 			default -> throw new IllegalArgumentException("Invalid GeoJSON type: " + type + ".");
 		};
 		JsonDeserializer<?> deserializer = ctxt.findRootValueDeserializer(javaType);
