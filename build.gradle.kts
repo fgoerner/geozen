@@ -1,8 +1,6 @@
-import com.vanniktech.maven.publish.SonatypeHost
-
 plugins {
 	id("java-library")
-	id("com.vanniktech.maven.publish") version "0.30.0"
+	id("com.vanniktech.maven.publish") version "0.34.0"
 }
 
 group = "dev.goerner.geozen"
@@ -10,7 +8,7 @@ version = project.findProperty("version") as String? ?: "0.0.0-SNAPSHOT"
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(23)
+		languageVersion = JavaLanguageVersion.of(24)
 	}
 }
 
@@ -19,10 +17,11 @@ repositories {
 }
 
 dependencies {
-	testImplementation(platform("org.junit:junit-bom:5.10.0"))
+	testImplementation(platform("org.junit:junit-bom:5.13.4"))
 	testImplementation("org.junit.jupiter:junit-jupiter")
-	implementation("com.fasterxml.jackson.core:jackson-databind:2.18.2")
-	implementation("net.sf.geographiclib:GeographicLib-Java:2.0")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+	implementation("com.fasterxml.jackson.core:jackson-databind:2.19.2")
+	implementation("net.sf.geographiclib:GeographicLib-Java:2.1")
 }
 
 tasks.test {
@@ -30,7 +29,7 @@ tasks.test {
 }
 
 mavenPublishing {
-	publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+	publishToMavenCentral()
 
 	signAllPublications()
 

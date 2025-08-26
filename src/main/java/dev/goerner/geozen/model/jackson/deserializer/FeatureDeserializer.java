@@ -9,7 +9,6 @@ import dev.goerner.geozen.model.Geometry;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 public class FeatureDeserializer extends JsonDeserializer<Feature> {
@@ -29,11 +28,9 @@ public class FeatureDeserializer extends JsonDeserializer<Feature> {
 		Geometry geometry = (Geometry) geometryDeserializer.deserialize(rootNode.get("geometry").traverse(p.getCodec()), ctxt);
 
 		Map<String, String> properties = new HashMap<>();
-		Iterator<Map.Entry<String, JsonNode>> propertiesIterator = rootNode.get("properties").fields();
-		while (propertiesIterator.hasNext()) {
-			Map.Entry<String, JsonNode> property = propertiesIterator.next();
-			properties.put(property.getKey(), property.getValue().asText());
-		}
+        for (Map.Entry<String, JsonNode> property : rootNode.get("properties").properties()) {
+            properties.put(property.getKey(), property.getValue().asText());
+        }
 
 		return new Feature(id, geometry, properties);
 	}

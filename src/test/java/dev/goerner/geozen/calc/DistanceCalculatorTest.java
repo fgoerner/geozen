@@ -14,7 +14,7 @@ public class DistanceCalculatorTest {
 
 		double distance = DistanceCalculator.karneyDistance(p1, p2);
 
-		assertEquals(34782.42347014982, distance);
+		assertEquals(34782.423470150534, distance);
 	}
 
 	@Test
