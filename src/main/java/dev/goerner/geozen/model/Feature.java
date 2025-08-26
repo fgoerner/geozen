@@ -8,25 +8,9 @@ import java.util.Map;
  */
 public class Feature {
 
-	private String id;
-	private Geometry geometry;
-	private Map<String, String> properties;
-
-	/**
-	 * Creates a new empty {@link Feature}.
-	 */
-	public Feature() {
-		this(null, null, null);
-	}
-
-	/**
-	 * Creates a new {@link Feature} with the given {@link #id}.
-	 *
-	 * @param id The {@link #id} of the {@link Feature}.
-	 */
-	public Feature(String id) {
-		this(id, null, null);
-	}
+	private final String id;
+	private final Geometry geometry;
+	private final Map<String, String> properties;
 
 	/**
 	 * Creates a new {@link Feature} with the given {@link #geometry}.
@@ -86,30 +70,18 @@ public class Feature {
 	public Feature(String id, Geometry geometry, Map<String, String> properties) {
 		this.id = id;
 		this.geometry = geometry;
-		this.properties = properties;
+		this.properties = properties == null ? null : Map.copyOf(properties);
 	}
 
 	public String getId() {
 		return id;
 	}
 
-	public void setId(String id) {
-		this.id = id;
-	}
-
 	public Geometry getGeometry() {
 		return geometry;
 	}
 
-	public void setGeometry(Geometry geometry) {
-		this.geometry = geometry;
-	}
-
 	public Map<String, String> getProperties() {
 		return properties;
-	}
-
-	public void setProperties(Map<String, String> properties) {
-		this.properties = properties;
 	}
 }

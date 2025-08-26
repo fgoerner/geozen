@@ -1,5 +1,6 @@
 package dev.goerner.geozen.model;
 
+import dev.goerner.geozen.model.simple_geometry.Point;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -11,26 +12,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 public class FeatureTest {
 
 	@Test
-	public void testEmptyConstructor() {
-		Feature feature = new Feature();
-
-		assertNull(feature.getId());
-		assertNull(feature.getGeometry());
-		assertNull(feature.getProperties());
-	}
-
-	@Test
-	public void testIdConstructor() {
-		Feature feature = new Feature("123");
-
-		assertEquals("123", feature.getId());
-		assertNull(feature.getGeometry());
-		assertNull(feature.getProperties());
-	}
-
-	@Test
 	public void testGeometryConstructor() {
-		Geometry geometry = new Point();
+		Geometry geometry = new Point(0.0, 0.0);
 		Feature feature = new Feature(geometry);
 
 		assertNull(feature.getId());
@@ -62,7 +45,7 @@ public class FeatureTest {
 
 	@Test
 	public void testIdAndGeometryConstructor() {
-		Geometry geometry = new Point();
+		Geometry geometry = new Point(0.0, 0.0);
 		Feature feature = new Feature("123", geometry);
 
 		assertEquals("123", feature.getId());
@@ -72,7 +55,7 @@ public class FeatureTest {
 
 	@Test
 	public void testGeometryAndPropertiesConstructor() {
-		Geometry geometry = new Point();
+		Geometry geometry = new Point(0.0, 0.0);
 		Map<String, String> properties = new HashMap<>();
 		properties.put("key", "value");
 		Feature feature = new Feature(geometry, properties);
@@ -84,43 +67,13 @@ public class FeatureTest {
 
 	@Test
 	public void testIdAndGeometryAndPropertiesConstructor() {
-		Geometry geometry = new Point();
+		Geometry geometry = new Point(0.0, 0.0);
 		Map<String, String> properties = new HashMap<>();
 		properties.put("key", "value");
 		Feature feature = new Feature("123", geometry, properties);
 
 		assertEquals("123", feature.getId());
 		assertEquals(geometry, feature.getGeometry());
-		assertEquals(properties, feature.getProperties());
-	}
-
-	@Test
-	public void testSetId() {
-		Feature feature = new Feature();
-
-		feature.setId("123");
-
-		assertEquals("123", feature.getId());
-	}
-
-	@Test
-	public void testSetGeometry() {
-		Feature feature = new Feature();
-		Geometry geometry = new Point();
-
-		feature.setGeometry(geometry);
-
-		assertEquals(geometry, feature.getGeometry());
-	}
-
-	@Test
-	public void testSetProperties() {
-		Feature feature = new Feature();
-		Map<String, String> properties = new HashMap<>();
-		properties.put("key", "value");
-
-		feature.setProperties(properties);
-
 		assertEquals(properties, feature.getProperties());
 	}
 }

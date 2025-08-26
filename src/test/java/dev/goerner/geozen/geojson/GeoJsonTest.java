@@ -3,22 +3,23 @@ package dev.goerner.geozen.geojson;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.goerner.geozen.model.Feature;
-import dev.goerner.geozen.model.FeatureCollection;
+import dev.goerner.geozen.model.collections.FeatureCollection;
 import dev.goerner.geozen.model.Geometry;
-import dev.goerner.geozen.model.GeometryCollection;
-import dev.goerner.geozen.model.LineString;
-import dev.goerner.geozen.model.MultiLineString;
-import dev.goerner.geozen.model.MultiPoint;
-import dev.goerner.geozen.model.MultiPolygon;
-import dev.goerner.geozen.model.Point;
-import dev.goerner.geozen.model.Polygon;
+import dev.goerner.geozen.model.collections.GeometryCollection;
+import dev.goerner.geozen.model.simple_geometry.LineString;
+import dev.goerner.geozen.model.multi_geometry.MultiLineString;
+import dev.goerner.geozen.model.multi_geometry.MultiPoint;
+import dev.goerner.geozen.model.multi_geometry.MultiPolygon;
+import dev.goerner.geozen.model.simple_geometry.Point;
+import dev.goerner.geozen.model.simple_geometry.Polygon;
 import dev.goerner.geozen.model.Position;
-import dev.goerner.geozen.model.jackson.GeoZenModule;
+import dev.goerner.geozen.jackson.GeoZenModule;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -45,7 +46,7 @@ public class GeoJsonTest {
 
 	@Test
 	public void testLineStringSerialization() throws JsonProcessingException {
-		ArrayList<Position> coordinates = new ArrayList<>();
+        List<Position> coordinates = new ArrayList<>();
 		coordinates.add(new Position(1.0, 2.0, 3.0));
 		coordinates.add(new Position(4.0, 5.0, 6.0));
 		Geometry lineString = new LineString(coordinates);
@@ -57,14 +58,14 @@ public class GeoJsonTest {
 
 	@Test
 	public void testPolygonSerialization() throws JsonProcessingException {
-		ArrayList<ArrayList<Position>> coordinates = new ArrayList<>();
-		ArrayList<Position> exteriorRing = new ArrayList<>();
+		List<List<Position>> coordinates = new ArrayList<>();
+        List<Position> exteriorRing = new ArrayList<>();
 		exteriorRing.add(new Position(1.0, 2.0, 3.0));
 		exteriorRing.add(new Position(4.0, 5.0, 6.0));
 		exteriorRing.add(new Position(7.0, 8.0, 9.0));
 		exteriorRing.add(new Position(1.0, 2.0, 3.0));
 		coordinates.add(exteriorRing);
-		ArrayList<Position> interiorRing = new ArrayList<>();
+        List<Position> interiorRing = new ArrayList<>();
 		interiorRing.add(new Position(10.0, 11.0, 12.0));
 		interiorRing.add(new Position(13.0, 14.0, 15.0));
 		interiorRing.add(new Position(16.0, 17.0, 18.0));
@@ -79,7 +80,7 @@ public class GeoJsonTest {
 
 	@Test
 	public void testMultiPointSerialization() throws JsonProcessingException {
-		ArrayList<Position> coordinates = new ArrayList<>();
+        List<Position> coordinates = new ArrayList<>();
 		coordinates.add(new Position(1.0, 2.0, 3.0));
 		coordinates.add(new Position(4.0, 5.0, 6.0));
 		Geometry multiPoint = new MultiPoint(coordinates);
@@ -91,11 +92,11 @@ public class GeoJsonTest {
 
 	@Test
 	public void testMultiLineStringSerialization() throws JsonProcessingException {
-		ArrayList<ArrayList<Position>> coordinates = new ArrayList<>();
-		ArrayList<Position> lineString1 = new ArrayList<>();
+        List<List<Position>> coordinates = new ArrayList<>();
+        List<Position> lineString1 = new ArrayList<>();
 		lineString1.add(new Position(1.0, 2.0, 3.0));
 		lineString1.add(new Position(4.0, 5.0, 6.0));
-		ArrayList<Position> lineString2 = new ArrayList<>();
+        List<Position> lineString2 = new ArrayList<>();
 		lineString2.add(new Position(7.0, 8.0, 9.0));
 		lineString2.add(new Position(10.0, 11.0, 12.0));
 		coordinates.add(lineString1);
@@ -109,29 +110,29 @@ public class GeoJsonTest {
 
 	@Test
 	public void testMultiPolygonSerialization() throws JsonProcessingException {
-		ArrayList<ArrayList<ArrayList<Position>>> coordinates = new ArrayList<>();
-		ArrayList<ArrayList<Position>> polygon1 = new ArrayList<>();
-		ArrayList<Position> exteriorRing1 = new ArrayList<>();
+        List<List<List<Position>>> coordinates = new ArrayList<>();
+        List<List<Position>> polygon1 = new ArrayList<>();
+        List<Position> exteriorRing1 = new ArrayList<>();
 		exteriorRing1.add(new Position(1.0, 2.0, 3.0));
 		exteriorRing1.add(new Position(4.0, 5.0, 6.0));
 		exteriorRing1.add(new Position(7.0, 8.0, 9.0));
 		exteriorRing1.add(new Position(1.0, 2.0, 3.0));
 		polygon1.add(exteriorRing1);
-		ArrayList<Position> interiorRing1 = new ArrayList<>();
+        List<Position> interiorRing1 = new ArrayList<>();
 		interiorRing1.add(new Position(10.0, 11.0, 12.0));
 		interiorRing1.add(new Position(13.0, 14.0, 15.0));
 		interiorRing1.add(new Position(16.0, 17.0, 18.0));
 		interiorRing1.add(new Position(10.0, 11.0, 12.0));
 		polygon1.add(interiorRing1);
 		coordinates.add(polygon1);
-		ArrayList<ArrayList<Position>> polygon2 = new ArrayList<>();
-		ArrayList<Position> exteriorRing2 = new ArrayList<>();
+        List<List<Position>> polygon2 = new ArrayList<>();
+        List<Position> exteriorRing2 = new ArrayList<>();
 		exteriorRing2.add(new Position(19.0, 20.0, 21.0));
 		exteriorRing2.add(new Position(22.0, 23.0, 24.0));
 		exteriorRing2.add(new Position(25.0, 26.0, 27.0));
 		exteriorRing2.add(new Position(19.0, 20.0, 21.0));
 		polygon2.add(exteriorRing2);
-		ArrayList<Position> interiorRing2 = new ArrayList<>();
+        List<Position> interiorRing2 = new ArrayList<>();
 		interiorRing2.add(new Position(28.0, 29.0, 30.0));
 		interiorRing2.add(new Position(31.0, 32.0, 33.0));
 		interiorRing2.add(new Position(34.0, 35.0, 36.0));
@@ -148,11 +149,11 @@ public class GeoJsonTest {
 	@Test
 	public void testGeometryCollectionSerialization() throws JsonProcessingException {
 		Geometry point = new Point(1.0, 2.0);
-		ArrayList<Position> coordinates = new ArrayList<>();
+        List<Position> coordinates = new ArrayList<>();
 		coordinates.add(new Position(3.0, 4.0));
 		coordinates.add(new Position(5.0, 6.0));
 		Geometry lineString = new LineString(coordinates);
-		ArrayList<Geometry> geometries = new ArrayList<>();
+        List<Geometry> geometries = new ArrayList<>();
 		geometries.add(point);
 		geometries.add(lineString);
 		GeometryCollection geometryCollection = new GeometryCollection(geometries);
@@ -182,7 +183,7 @@ public class GeoJsonTest {
 		Map<String, String> properties = new HashMap<>();
 		properties.put("name", "John Doe");
 		Feature feature = new Feature(id, point, properties);
-		ArrayList<Feature> features = new ArrayList<>();
+        List<Feature> features = new ArrayList<>();
 		features.add(feature);
 		FeatureCollection featureCollection = new FeatureCollection(features);
 
@@ -232,7 +233,7 @@ public class GeoJsonTest {
 		assertInstanceOf(Polygon.class, geometry);
 		Polygon polygon = (Polygon) geometry;
 		assertEquals(2, polygon.getCoordinates().size());
-		ArrayList<Position> exteriorRing = polygon.getCoordinates().getFirst();
+        List<Position> exteriorRing = polygon.getCoordinates().getFirst();
 		Position exteriorRingPosition0 = exteriorRing.getFirst();
 		assertEquals(1.0, exteriorRingPosition0.getLongitude());
 		assertEquals(2.0, exteriorRingPosition0.getLatitude());
@@ -249,7 +250,7 @@ public class GeoJsonTest {
 		assertEquals(1.0, exteriorRingPosition3.getLongitude());
 		assertEquals(2.0, exteriorRingPosition3.getLatitude());
 		assertEquals(3.0, exteriorRingPosition3.getAltitude());
-		ArrayList<Position> interiorRing = polygon.getCoordinates().get(1);
+        List<Position> interiorRing = polygon.getCoordinates().get(1);
 		Position interiorRingPosition0 = interiorRing.getFirst();
 		assertEquals(10.0, interiorRingPosition0.getLongitude());
 		assertEquals(11.0, interiorRingPosition0.getLatitude());
@@ -296,7 +297,7 @@ public class GeoJsonTest {
 		assertInstanceOf(MultiLineString.class, geometry);
 		MultiLineString multiLineString = (MultiLineString) geometry;
 		assertEquals(2, multiLineString.getCoordinates().size());
-		ArrayList<Position> lineString1 = multiLineString.getCoordinates().getFirst();
+        List<Position> lineString1 = multiLineString.getCoordinates().getFirst();
 		Position position0 = lineString1.getFirst();
 		assertEquals(1.0, position0.getLongitude());
 		assertEquals(2.0, position0.getLatitude());
@@ -305,7 +306,7 @@ public class GeoJsonTest {
 		assertEquals(4.0, position1.getLongitude());
 		assertEquals(5.0, position1.getLatitude());
 		assertEquals(6.0, position1.getAltitude());
-		ArrayList<Position> lineString2 = multiLineString.getCoordinates().get(1);
+        List<Position> lineString2 = multiLineString.getCoordinates().get(1);
 		Position position2 = lineString2.getFirst();
 		assertEquals(7.0, position2.getLongitude());
 		assertEquals(8.0, position2.getLatitude());
@@ -325,7 +326,7 @@ public class GeoJsonTest {
 		assertInstanceOf(MultiPolygon.class, geometry);
 		MultiPolygon multiPolygon = (MultiPolygon) geometry;
 		assertEquals(2, multiPolygon.getCoordinates().size());
-		ArrayList<ArrayList<Position>> polygon1 = multiPolygon.getCoordinates().getFirst();
+        List<List<Position>> polygon1 = multiPolygon.getCoordinates().getFirst();
 		Position exteriorRingPosition0 = polygon1.getFirst().getFirst();
 		assertEquals(1.0, exteriorRingPosition0.getLongitude());
 		assertEquals(2.0, exteriorRingPosition0.getLatitude());
@@ -342,7 +343,7 @@ public class GeoJsonTest {
 		assertEquals(1.0, exteriorRingPosition3.getLongitude());
 		assertEquals(2.0, exteriorRingPosition3.getLatitude());
 		assertEquals(3.0, exteriorRingPosition3.getAltitude());
-		ArrayList<Position> interiorRing1 = polygon1.get(1);
+        List<Position> interiorRing1 = polygon1.get(1);
 		Position interiorRingPosition0 = interiorRing1.getFirst();
 		assertEquals(10.0, interiorRingPosition0.getLongitude());
 		assertEquals(11.0, interiorRingPosition0.getLatitude());
@@ -359,8 +360,8 @@ public class GeoJsonTest {
 		assertEquals(10.0, interiorRingPosition3.getLongitude());
 		assertEquals(11.0, interiorRingPosition3.getLatitude());
 		assertEquals(12.0, interiorRingPosition3.getAltitude());
-		ArrayList<ArrayList<Position>> polygon2 = multiPolygon.getCoordinates().get(1);
-		ArrayList<Position> exteriorRing2 = polygon2.getFirst();
+        List<List<Position>> polygon2 = multiPolygon.getCoordinates().get(1);
+        List<Position> exteriorRing2 = polygon2.getFirst();
 		Position exteriorRingPosition4 = exteriorRing2.getFirst();
 		assertEquals(19.0, exteriorRingPosition4.getLongitude());
 		assertEquals(20.0, exteriorRingPosition4.getLatitude());
@@ -377,7 +378,7 @@ public class GeoJsonTest {
 		assertEquals(19.0, exteriorRingPosition7.getLongitude());
 		assertEquals(20.0, exteriorRingPosition7.getLatitude());
 		assertEquals(21.0, exteriorRingPosition7.getAltitude());
-		ArrayList<Position> interiorRing2 = polygon2.get(1);
+        List<Position> interiorRing2 = polygon2.get(1);
 		Position interiorRingPosition4 = interiorRing2.getFirst();
 		assertEquals(28.0, interiorRingPosition4.getLongitude());
 		assertEquals(29.0, interiorRingPosition4.getLatitude());

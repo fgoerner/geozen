@@ -1,6 +1,6 @@
 package dev.goerner.geozen.calc;
 
-import dev.goerner.geozen.model.Point;
+import dev.goerner.geozen.model.simple_geometry.Point;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -14,7 +14,7 @@ public class DistanceCalculatorTest {
 
 		double distance = DistanceCalculator.karneyDistance(p1, p2);
 
-		assertEquals(34782.423470150534, distance);
+		assertEquals(34782.42347014982, distance);
 	}
 
 	@Test

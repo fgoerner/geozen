@@ -1,6 +1,6 @@
 package dev.goerner.geozen.calc;
 
-import dev.goerner.geozen.model.Point;
+import dev.goerner.geozen.model.simple_geometry.Point;
 import net.sf.geographiclib.Geodesic;
 import net.sf.geographiclib.GeodesicData;
 import net.sf.geographiclib.GeodesicMask;

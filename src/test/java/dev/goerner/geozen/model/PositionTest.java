@@ -7,15 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class PositionTest {
 
 	@Test
-	public void testEmptyConstructor() {
-		Position position = new Position();
-
-		assertEquals(0, position.getLongitude());
-		assertEquals(0, position.getLatitude());
-		assertEquals(0, position.getAltitude());
-	}
-
-	@Test
 	public void testLongitudeAndLatitudeConstructor() {
 		Position position = new Position(1.0, 2.0);
 
@@ -52,32 +43,5 @@ public class PositionTest {
 		Position position = new Position(1.0, 2.0, 3.0);
 
 		assertEquals(3.0, position.getAltitude());
-	}
-
-	@Test
-	public void testSetLongitude() {
-		Position position = new Position();
-
-		position.setLongitude(4.0);
-
-		assertEquals(4.0, position.getLongitude());
-	}
-
-	@Test
-	public void testSetLatitude() {
-		Position position = new Position();
-
-		position.setLatitude(5.0);
-
-		assertEquals(5.0, position.getLatitude());
-	}
-
-	@Test
-	public void testSetAltitude() {
-		Position position = new Position();
-
-		position.setAltitude(6.0);
-
-		assertEquals(6.0, position.getAltitude());
 	}
 }
