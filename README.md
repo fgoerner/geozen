@@ -1,7 +1,7 @@
 # GeoZen
 
 [![Maven Central](https://img.shields.io/maven-central/v/dev.goerner.geozen/geozen-core)](https://central.sonatype.com/artifact/dev.goerner.geozen/geozen-core)
-[![Java](https://img.shields.io/badge/Java-23%2B-blue)](https://www.oracle.com/java/technologies/javase/jdk23-archive-downloads.html)
+[![Java](https://img.shields.io/badge/Java-24%2B-blue)](https://www.oracle.com/java/technologies/javase/jdk24-archive-downloads.html)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 GeoZen is a Java library for working with geodata, providing a robust data model compatible with GeoJSON and seamless
@@ -18,7 +18,7 @@ systems and includes utilities for geometric calculations.
 
 ## Requirements
 
-- Java 23 or higher
+- Java 24 or higher
 
 ## Installation
 
