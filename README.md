@@ -28,9 +28,9 @@ GeoZen is available on Maven Central. Add the following dependency to your proje
 
 ```xml
 <dependency>
-	<groupId>dev.goerner.geozen</groupId>
-	<artifactId>geozen-core</artifactId>
-	<version>0.3.0</version>
+   <groupId>dev.goerner.geozen</groupId>
+   <artifactId>geozen-core</artifactId>
+   <version>0.3.0</version>
 </dependency>
 ```
 
@@ -80,11 +80,11 @@ altitude is provided, it defaults to 0.
 
 ## Current Status
 
-GeoZen is under active development. The current version (0.3.0) focuses on:
+GeoZen is under active development. The project currently focuses on:
 
 - Core data model implementation
 - GeoJSON serialization and deserialization via Jackson
-- Distance calculations
+- Distance calculations (in progress)
 
 Additional features, including coordinate reference system conversions and geometric calculations, are planned for
 future releases.
