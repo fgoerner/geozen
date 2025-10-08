@@ -18,7 +18,7 @@ systems and includes utilities for geometric calculations.
 
 ## Requirements
 
-- Java 24 or higher
+- Java 21 or higher
 
 ## Installation
 
@@ -27,18 +27,17 @@ GeoZen is available on Maven Central. Add the following dependency to your proje
 ### Maven
 
 ```xml
-
 <dependency>
-	<groupId>dev.goerner.geozen</groupId>
-	<artifactId>geozen-core</artifactId>
-	<version>0.2.0</version>
+   <groupId>dev.goerner.geozen</groupId>
+   <artifactId>geozen-core</artifactId>
+   <version>0.3.0</version>
 </dependency>
 ```
 
 ### Gradle
 
 ```groovy
-implementation 'dev.goerner.geozen:geozen-core:0.2.0'
+implementation 'dev.goerner.geozen:geozen-core:0.3.0'
 ```
 
 ## Usage
@@ -81,10 +80,11 @@ altitude is provided, it defaults to 0.
 
 ## Current Status
 
-GeoZen is under active development. The current version (0.2.0) focuses on:
+GeoZen is under active development. The project currently focuses on:
 
 - Core data model implementation
 - GeoJSON serialization and deserialization via Jackson
+- Distance calculations (in progress)
 
 Additional features, including coordinate reference system conversions and geometric calculations, are planned for
 future releases.
