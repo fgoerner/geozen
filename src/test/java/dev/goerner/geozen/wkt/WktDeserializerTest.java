@@ -348,9 +348,52 @@ class WktDeserializerTest {
 				"SRID=3857;GEOMETRYCOLLECTION (POINT (10.0 20.0), LINESTRING (30.0 40.0, 50.0 60.0))"
 		);
 		assertEquals(2, collection.getGeometries().size());
+		// Verify that all member geometries have the correct CRS from EWKT SRID
+		assertEquals(CoordinateReferenceSystem.WEB_MERCATOR, collection.getGeometries().getFirst().getCoordinateReferenceSystem());
+		assertEquals(CoordinateReferenceSystem.WEB_MERCATOR, collection.getGeometries().get(1).getCoordinateReferenceSystem());
 	}
 
-	// Round-Trip Tests
+	@Test
+	void testDeserializeGeometryCollectionEwktWgs84() {
+		GeometryCollection collection = deserializer.fromWktAsCollection(
+				"SRID=4326;GEOMETRYCOLLECTION (POINT (10.0 20.0), POLYGON ((0.0 0.0, 5.0 0.0, 5.0 5.0, 0.0 5.0, 0.0 0.0)))"
+		);
+		assertEquals(2, collection.getGeometries().size());
+		// Verify that all member geometries have WGS_84 CRS
+		assertEquals(CoordinateReferenceSystem.WGS_84, collection.getGeometries().getFirst().getCoordinateReferenceSystem());
+		assertEquals(CoordinateReferenceSystem.WGS_84, collection.getGeometries().get(1).getCoordinateReferenceSystem());
+	}
+
+	@Test
+	void testDeserializeGeometryCollectionEwktWithMultiGeometries() {
+		GeometryCollection collection = deserializer.fromWktAsCollection(
+				"SRID=3857;GEOMETRYCOLLECTION (MULTIPOINT ((1.0 2.0), (3.0 4.0)), " +
+						"MULTILINESTRING ((10.0 20.0, 30.0 40.0)), " +
+						"MULTIPOLYGON (((0.0 0.0, 10.0 0.0, 10.0 10.0, 0.0 0.0))))"
+		);
+		assertEquals(3, collection.getGeometries().size());
+		// Verify that all multi-geometries have the correct CRS from EWKT SRID
+		assertInstanceOf(MultiPoint.class, collection.getGeometries().getFirst());
+		assertEquals(CoordinateReferenceSystem.WEB_MERCATOR, collection.getGeometries().getFirst().getCoordinateReferenceSystem());
+
+		assertInstanceOf(MultiLineString.class, collection.getGeometries().get(1));
+		assertEquals(CoordinateReferenceSystem.WEB_MERCATOR, collection.getGeometries().get(1).getCoordinateReferenceSystem());
+
+		assertInstanceOf(MultiPolygon.class, collection.getGeometries().get(2));
+		assertEquals(CoordinateReferenceSystem.WEB_MERCATOR, collection.getGeometries().get(2).getCoordinateReferenceSystem());
+	}
+
+	@Test
+	void testDeserializeGeometryCollectionWithoutSrid() {
+		GeometryCollection collection = deserializer.fromWktAsCollection(
+				"GEOMETRYCOLLECTION (POINT (10.0 20.0), LINESTRING (30.0 40.0, 50.0 60.0))"
+		);
+		assertEquals(2, collection.getGeometries().size());
+		// Without SRID, should default to WGS_84
+		assertEquals(CoordinateReferenceSystem.WGS_84, collection.getGeometries().getFirst().getCoordinateReferenceSystem());
+		assertEquals(CoordinateReferenceSystem.WGS_84, collection.getGeometries().get(1).getCoordinateReferenceSystem());
+	}
+
 	@Test
 	void testRoundTripPoint() {
 		WktSerializer serializer = new WktSerializer();

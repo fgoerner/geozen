@@ -70,10 +70,13 @@ public class WktDeserializer {
 		}
 
 		String trimmed = wkt.trim();
+		CoordinateReferenceSystem crs = CoordinateReferenceSystem.WGS_84;
 
 		// Check for SRID prefix (EWKT)
 		Matcher sridMatcher = SRID_PATTERN.matcher(trimmed);
 		if (sridMatcher.matches()) {
+			int srid = Integer.parseInt(sridMatcher.group(1));
+			crs = getCrsFromSrid(srid);
 			trimmed = sridMatcher.group(2).trim();
 		}
 
@@ -89,7 +92,7 @@ public class WktDeserializer {
 			throw new WktException("Expected GEOMETRYCOLLECTION but got " + type);
 		}
 
-		return parseGeometryCollection(coordinates);
+		return parseGeometryCollection(coordinates, crs);
 	}
 
 	private Geometry parseGeometry(String wkt, CoordinateReferenceSystem crs) {
@@ -172,7 +175,7 @@ public class WktDeserializer {
 		return new MultiPolygon(polygons, crs);
 	}
 
-	private GeometryCollection parseGeometryCollection(String coords) {
+	private GeometryCollection parseGeometryCollection(String coords, CoordinateReferenceSystem crs) {
 		if (coords.equalsIgnoreCase("EMPTY")) {
 			return new GeometryCollection(List.of());
 		}
@@ -191,7 +194,7 @@ public class WktDeserializer {
 				depth--;
 			} else if (c == ',' && depth == 0) {
 				String geomWkt = coords.substring(start, i).trim();
-				geometries.add(parseGeometry(geomWkt, CoordinateReferenceSystem.WGS_84));
+				geometries.add(parseGeometry(geomWkt, crs));
 				start = i + 1;
 			}
 		}
@@ -199,7 +202,7 @@ public class WktDeserializer {
 		// Add the last geometry
 		if (start < coords.length()) {
 			String geomWkt = coords.substring(start).trim();
-			geometries.add(parseGeometry(geomWkt, CoordinateReferenceSystem.WGS_84));
+			geometries.add(parseGeometry(geomWkt, crs));
 		}
 
 		return new GeometryCollection(geometries);
@@ -326,4 +329,3 @@ public class WktDeserializer {
 		};
 	}
 }
-
