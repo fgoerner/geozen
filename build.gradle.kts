@@ -17,10 +17,11 @@ repositories {
 }
 
 dependencies {
-	testImplementation(platform("org.junit:junit-bom:5.13.4"))
+	testImplementation(platform("org.junit:junit-bom:5.14.0"))
 	testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-	implementation("com.fasterxml.jackson.core:jackson-databind:2.19.2")
+    implementation(platform("tools.jackson:jackson-bom:3.0.0"))
+    implementation("tools.jackson.core:jackson-databind")
 	implementation("net.sf.geographiclib:GeographicLib-Java:2.1")
 }
 

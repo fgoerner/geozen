@@ -1,17 +1,20 @@
 package dev.goerner.geozen.jackson.deserializer;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonNode;
 import dev.goerner.geozen.model.simple_geometry.Point;
-
-import java.io.IOException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 public class PointDeserializer extends AbstractGeometryDeserializer<Point> {
 
-	@Override
-	public Point deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-		JsonNode rootNode = p.getCodec().readTree(p);
+    public PointDeserializer(ObjectMapper objectMapper) {
+        super(objectMapper);
+    }
+
+    @Override
+	public Point deserialize(JsonParser p, DeserializationContext ctxt) {
+		JsonNode rootNode = objectMapper.readTree(p);
 
 		checkType(rootNode, "Point");
 

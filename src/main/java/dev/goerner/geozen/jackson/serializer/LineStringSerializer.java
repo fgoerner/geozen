@@ -1,21 +1,19 @@
 package dev.goerner.geozen.jackson.serializer;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
 import dev.goerner.geozen.model.simple_geometry.LineString;
 import dev.goerner.geozen.model.Position;
-
-import java.io.IOException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
 
 public class LineStringSerializer extends AbstractGeometrySerializer<LineString> {
 
 	@Override
-	public void serialize(LineString lineString, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+	public void serialize(LineString lineString, JsonGenerator gen, SerializationContext ctxt) {
 		gen.writeStartObject();
 
-		gen.writeStringField("type", "LineString");
+		gen.writeStringProperty("type", "LineString");
 
-		gen.writeArrayFieldStart("coordinates");
+		gen.writeArrayPropertyStart("coordinates");
 		for (Position position : lineString.getCoordinates()) {
 			writePosition(position, gen);
 		}

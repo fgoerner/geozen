@@ -1,35 +1,41 @@
 package dev.goerner.geozen.jackson.deserializer;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
 import dev.goerner.geozen.model.Feature;
 import dev.goerner.geozen.model.Geometry;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ValueDeserializer;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FeatureDeserializer extends JsonDeserializer<Feature> {
+public class FeatureDeserializer extends ValueDeserializer<Feature> {
 
-	@Override
-	public Feature deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-		JsonNode rootNode = p.getCodec().readTree(p);
+    private final ObjectMapper objectMapper;
 
-		String type = rootNode.get("type").asText();
+    public FeatureDeserializer(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
+    @Override
+	public Feature deserialize(JsonParser p, DeserializationContext ctxt) {
+		JsonNode rootNode = objectMapper.readTree(p);
+
+		String type = rootNode.get("type").asString();
 		if (!type.equalsIgnoreCase("Feature")) {
 			throw new IllegalArgumentException("Invalid GeoJSON type: " + type + ". Expected 'Feature'.");
 		}
 
-		String id = rootNode.get("id").asText();
+		String id = rootNode.get("id").asString();
 
-		JsonDeserializer<?> geometryDeserializer = ctxt.findRootValueDeserializer(ctxt.constructType(Geometry.class));
-		Geometry geometry = (Geometry) geometryDeserializer.deserialize(rootNode.get("geometry").traverse(p.getCodec()), ctxt);
+		ValueDeserializer<?> geometryDeserializer = ctxt.findRootValueDeserializer(ctxt.constructType(Geometry.class));
+		Geometry geometry = (Geometry) geometryDeserializer.deserialize(rootNode.get("geometry").traverse(objectMapper._deserializationContext()), ctxt);
 
 		Map<String, String> properties = new HashMap<>();
         for (Map.Entry<String, JsonNode> property : rootNode.get("properties").properties()) {
-            properties.put(property.getKey(), property.getValue().asText());
+            properties.put(property.getKey(), property.getValue().asString());
         }
 
 		return new Feature(id, geometry, properties);

@@ -1,8 +1,5 @@
 package dev.goerner.geozen.jackson.serializer;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
 import dev.goerner.geozen.model.Feature;
 import dev.goerner.geozen.model.simple_geometry.LineString;
 import dev.goerner.geozen.model.multi_geometry.MultiLineString;
@@ -10,34 +7,35 @@ import dev.goerner.geozen.model.multi_geometry.MultiPoint;
 import dev.goerner.geozen.model.multi_geometry.MultiPolygon;
 import dev.goerner.geozen.model.simple_geometry.Point;
 import dev.goerner.geozen.model.simple_geometry.Polygon;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 
-import java.io.IOException;
-
-public class FeatureSerializer extends JsonSerializer<Feature> {
+public class FeatureSerializer extends ValueSerializer<Feature> {
 
 	@Override
-	public void serialize(Feature value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+	public void serialize(Feature value, JsonGenerator gen, SerializationContext ctxt) {
 		gen.writeStartObject();
 
-		gen.writeStringField("type", "Feature");
+		gen.writeStringProperty("type", "Feature");
 
 		if (value.getId() != null) {
-			gen.writeStringField("id", value.getId());
+			gen.writeStringProperty("id", value.getId());
 		}
 
-		gen.writeFieldName("geometry");
+		gen.writeName("geometry");
 		switch (value.getGeometry()) {
-			case Point point -> serializers.findValueSerializer(Point.class).serialize(point, gen, serializers);
-			case LineString lineString -> serializers.findValueSerializer(LineString.class).serialize(lineString, gen, serializers);
-			case Polygon polygon -> serializers.findValueSerializer(Polygon.class).serialize(polygon, gen, serializers);
-			case MultiPoint multiPoint -> serializers.findValueSerializer(MultiPoint.class).serialize(multiPoint, gen, serializers);
-			case MultiLineString multiLineString -> serializers.findValueSerializer(MultiLineString.class).serialize(multiLineString, gen, serializers);
-			case MultiPolygon multiPolygon -> serializers.findValueSerializer(MultiPolygon.class).serialize(multiPolygon, gen, serializers);
+			case Point point -> ctxt.findValueSerializer(Point.class).serialize(point, gen, ctxt);
+			case LineString lineString -> ctxt.findValueSerializer(LineString.class).serialize(lineString, gen, ctxt);
+			case Polygon polygon -> ctxt.findValueSerializer(Polygon.class).serialize(polygon, gen, ctxt);
+			case MultiPoint multiPoint -> ctxt.findValueSerializer(MultiPoint.class).serialize(multiPoint, gen, ctxt);
+			case MultiLineString multiLineString -> ctxt.findValueSerializer(MultiLineString.class).serialize(multiLineString, gen, ctxt);
+			case MultiPolygon multiPolygon -> ctxt.findValueSerializer(MultiPolygon.class).serialize(multiPolygon, gen, ctxt);
 			case null -> gen.writeNull();
 			default -> throw new IllegalArgumentException("Invalid Geometry type: " + value.getGeometry().getClass().getSimpleName());
 		}
 
-		gen.writeFieldName("properties");
+		gen.writeName("properties");
 		if (value.getProperties() != null) {
 			gen.writePOJO(value.getProperties());
 		} else {

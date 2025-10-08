@@ -1,6 +1,5 @@
 package dev.goerner.geozen.jackson;
 
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import dev.goerner.geozen.model.Feature;
 import dev.goerner.geozen.model.collections.FeatureCollection;
 import dev.goerner.geozen.model.Geometry;
@@ -30,10 +29,12 @@ import dev.goerner.geozen.jackson.serializer.MultiPointSerializer;
 import dev.goerner.geozen.jackson.serializer.MultiPolygonSerializer;
 import dev.goerner.geozen.jackson.serializer.PointSerializer;
 import dev.goerner.geozen.jackson.serializer.PolygonSerializer;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.module.SimpleModule;
 
 public class GeoZenModule extends SimpleModule {
 
-	public GeoZenModule() {
+	public GeoZenModule(ObjectMapper objectMapper) {
 		super("GeoZenModule");
 
 		addSerializer(Point.class, new PointSerializer());
@@ -46,15 +47,15 @@ public class GeoZenModule extends SimpleModule {
 		addSerializer(Feature.class, new FeatureSerializer());
 		addSerializer(FeatureCollection.class, new FeatureCollectionSerializer());
 
-		addDeserializer(Point.class, new PointDeserializer());
-		addDeserializer(LineString.class, new LineStringDeserializer());
-		addDeserializer(Polygon.class, new PolygonDeserializer());
-		addDeserializer(MultiPoint.class, new MultiPointDeserializer());
-		addDeserializer(MultiLineString.class, new MultiLineStringDeserializer());
-		addDeserializer(MultiPolygon.class, new MultiPolygonDeserializer());
-		addDeserializer(Geometry.class, new GeometryDeserializer());
-		addDeserializer(GeometryCollection.class, new GeometryCollectionDeserializer());
-		addDeserializer(Feature.class, new FeatureDeserializer());
-		addDeserializer(FeatureCollection.class, new FeatureCollectionDeserializer());
+		addDeserializer(Point.class, new PointDeserializer(objectMapper));
+		addDeserializer(LineString.class, new LineStringDeserializer(objectMapper));
+		addDeserializer(Polygon.class, new PolygonDeserializer(objectMapper));
+		addDeserializer(MultiPoint.class, new MultiPointDeserializer(objectMapper));
+		addDeserializer(MultiLineString.class, new MultiLineStringDeserializer(objectMapper));
+		addDeserializer(MultiPolygon.class, new MultiPolygonDeserializer(objectMapper));
+		addDeserializer(Geometry.class, new GeometryDeserializer(objectMapper));
+		addDeserializer(GeometryCollection.class, new GeometryCollectionDeserializer(objectMapper));
+		addDeserializer(Feature.class, new FeatureDeserializer(objectMapper));
+		addDeserializer(FeatureCollection.class, new FeatureCollectionDeserializer(objectMapper));
 	}
 }

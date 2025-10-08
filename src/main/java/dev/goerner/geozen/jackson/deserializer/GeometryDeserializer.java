@@ -1,10 +1,5 @@
 package dev.goerner.geozen.jackson.deserializer;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
 import dev.goerner.geozen.model.Geometry;
 import dev.goerner.geozen.model.simple_geometry.LineString;
 import dev.goerner.geozen.model.multi_geometry.MultiLineString;
@@ -12,15 +7,23 @@ import dev.goerner.geozen.model.multi_geometry.MultiPoint;
 import dev.goerner.geozen.model.multi_geometry.MultiPolygon;
 import dev.goerner.geozen.model.simple_geometry.Point;
 import dev.goerner.geozen.model.simple_geometry.Polygon;
-
-import java.io.IOException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ValueDeserializer;
 
 public class GeometryDeserializer extends AbstractGeometryDeserializer<Geometry> {
 
-	@Override
-	public Geometry deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-		JsonNode rootNode = p.getCodec().readTree(p);
-		String type = rootNode.get("type").asText();
+    public GeometryDeserializer(ObjectMapper objectMapper) {
+        super(objectMapper);
+    }
+
+    @Override
+	public Geometry deserialize(JsonParser p, DeserializationContext ctxt) {
+		JsonNode rootNode = objectMapper.readTree(p);
+		String type = rootNode.get("type").asString();
 
 		JavaType javaType = switch (type) {
 			case "Point" -> ctxt.constructType(Point.class);
@@ -31,8 +34,8 @@ public class GeometryDeserializer extends AbstractGeometryDeserializer<Geometry>
 			case "MultiPolygon" -> ctxt.constructType(MultiPolygon.class);
 			default -> throw new IllegalArgumentException("Invalid GeoJSON type: " + type + ".");
 		};
-		JsonDeserializer<?> deserializer = ctxt.findRootValueDeserializer(javaType);
+		ValueDeserializer<?> deserializer = ctxt.findRootValueDeserializer(javaType);
 
-		return (Geometry) deserializer.deserialize(rootNode.traverse(p.getCodec()), ctxt);
+		return (Geometry) deserializer.deserialize(rootNode.traverse(objectMapper._deserializationContext()), ctxt);
 	}
 }

@@ -1,22 +1,21 @@
 package dev.goerner.geozen.jackson.serializer;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
 import dev.goerner.geozen.model.multi_geometry.MultiLineString;
 import dev.goerner.geozen.model.Position;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
 
-import java.io.IOException;
 import java.util.List;
 
 public class MultiLineStringSerializer extends AbstractGeometrySerializer<MultiLineString> {
 
 	@Override
-	public void serialize(MultiLineString value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+	public void serialize(MultiLineString value, JsonGenerator gen, SerializationContext ctxt) {
 		gen.writeStartObject();
 
-		gen.writeStringField("type", "MultiLineString");
+		gen.writeStringProperty("type", "MultiLineString");
 
-		gen.writeArrayFieldStart("coordinates");
+		gen.writeArrayPropertyStart("coordinates");
 		for (List<Position> lineString : value.getCoordinates()) {
 			gen.writeStartArray();
 			for (Position position : lineString) {

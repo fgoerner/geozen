@@ -1,7 +1,5 @@
 package dev.goerner.geozen.geojson;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.goerner.geozen.model.Feature;
 import dev.goerner.geozen.model.collections.FeatureCollection;
 import dev.goerner.geozen.model.Geometry;
@@ -16,6 +14,8 @@ import dev.goerner.geozen.model.Position;
 import dev.goerner.geozen.jackson.GeoZenModule;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,12 +31,13 @@ public class GeoJsonTest {
 
 	@BeforeAll
 	static void setup() {
-		objectMapper = new ObjectMapper();
-		objectMapper.registerModule(new GeoZenModule());
+        objectMapper = JsonMapper.builder()
+                .addModule(new GeoZenModule(new ObjectMapper()))
+                .build();
 	}
 
 	@Test
-	public void testPointSerialization() throws JsonProcessingException {
+	public void testPointSerialization() {
 		Geometry point = new Point(1.0, 2.0, 3.0);
 
 		String geoJsonString = objectMapper.writeValueAsString(point);
@@ -45,7 +46,7 @@ public class GeoJsonTest {
 	}
 
 	@Test
-	public void testLineStringSerialization() throws JsonProcessingException {
+	public void testLineStringSerialization() {
         List<Position> coordinates = new ArrayList<>();
 		coordinates.add(new Position(1.0, 2.0, 3.0));
 		coordinates.add(new Position(4.0, 5.0, 6.0));
@@ -57,7 +58,7 @@ public class GeoJsonTest {
 	}
 
 	@Test
-	public void testPolygonSerialization() throws JsonProcessingException {
+	public void testPolygonSerialization() {
 		List<List<Position>> coordinates = new ArrayList<>();
         List<Position> exteriorRing = new ArrayList<>();
 		exteriorRing.add(new Position(1.0, 2.0, 3.0));
@@ -79,7 +80,7 @@ public class GeoJsonTest {
 	}
 
 	@Test
-	public void testMultiPointSerialization() throws JsonProcessingException {
+	public void testMultiPointSerialization() {
         List<Position> coordinates = new ArrayList<>();
 		coordinates.add(new Position(1.0, 2.0, 3.0));
 		coordinates.add(new Position(4.0, 5.0, 6.0));
@@ -91,7 +92,7 @@ public class GeoJsonTest {
 	}
 
 	@Test
-	public void testMultiLineStringSerialization() throws JsonProcessingException {
+	public void testMultiLineStringSerialization() {
         List<List<Position>> coordinates = new ArrayList<>();
         List<Position> lineString1 = new ArrayList<>();
 		lineString1.add(new Position(1.0, 2.0, 3.0));
@@ -109,7 +110,7 @@ public class GeoJsonTest {
 	}
 
 	@Test
-	public void testMultiPolygonSerialization() throws JsonProcessingException {
+	public void testMultiPolygonSerialization() {
         List<List<List<Position>>> coordinates = new ArrayList<>();
         List<List<Position>> polygon1 = new ArrayList<>();
         List<Position> exteriorRing1 = new ArrayList<>();
@@ -147,7 +148,7 @@ public class GeoJsonTest {
 	}
 
 	@Test
-	public void testGeometryCollectionSerialization() throws JsonProcessingException {
+	public void testGeometryCollectionSerialization() {
 		Geometry point = new Point(1.0, 2.0);
         List<Position> coordinates = new ArrayList<>();
 		coordinates.add(new Position(3.0, 4.0));
@@ -164,7 +165,7 @@ public class GeoJsonTest {
 	}
 
 	@Test
-	public void testFeatureSerialization() throws JsonProcessingException {
+	public void testFeatureSerialization() {
 		String id = "123";
 		Geometry point = new Point(1.0, 2.0);
 		Map<String, String> properties = new HashMap<>();
@@ -177,7 +178,7 @@ public class GeoJsonTest {
 	}
 
 	@Test
-	public void testFeatureCollectionSerialization() throws JsonProcessingException {
+	public void testFeatureCollectionSerialization() {
 		String id = "123";
 		Geometry point = new Point(1.0, 2.0);
 		Map<String, String> properties = new HashMap<>();
@@ -193,7 +194,7 @@ public class GeoJsonTest {
 	}
 
 	@Test
-	void testPointDeserialization() throws JsonProcessingException {
+	void testPointDeserialization() {
 		String geoJsonString = "{\"type\":\"Point\",\"coordinates\":[1.0,2.0,3.0]}";
 
 		Geometry geometry = objectMapper.readValue(geoJsonString, Geometry.class);
@@ -206,7 +207,7 @@ public class GeoJsonTest {
 	}
 
 	@Test
-	void testLineStringDeserialization() throws JsonProcessingException {
+	void testLineStringDeserialization() {
 		String geoJsonString = "{\"type\":\"LineString\",\"coordinates\":[[1.0,2.0,3.0],[4.0,5.0,6.0]]}";
 
 		Geometry geometry = objectMapper.readValue(geoJsonString, Geometry.class);
@@ -225,7 +226,7 @@ public class GeoJsonTest {
 	}
 
 	@Test
-	void testPolygonDeserialization() throws JsonProcessingException {
+	void testPolygonDeserialization() {
 		String geoJsonString = "{\"type\":\"Polygon\",\"coordinates\":[[[1.0,2.0,3.0],[4.0,5.0,6.0],[7.0,8.0,9.0],[1.0,2.0,3.0]],[[10.0,11.0,12.0],[13.0,14.0,15.0],[16.0,17.0,18.0],[10.0,11.0,12.0]]]}";
 
 		Geometry geometry = objectMapper.readValue(geoJsonString, Geometry.class);
@@ -270,7 +271,7 @@ public class GeoJsonTest {
 	}
 
 	@Test
-	public void testMultiPointDeserialization() throws JsonProcessingException {
+	public void testMultiPointDeserialization() {
 		String geoJsonString = "{\"type\":\"MultiPoint\",\"coordinates\":[[1.0,2.0,3.0],[4.0,5.0,6.0]]}";
 
 		Geometry geometry = objectMapper.readValue(geoJsonString, Geometry.class);
@@ -289,7 +290,7 @@ public class GeoJsonTest {
 	}
 
 	@Test
-	public void testMultiLineStringDeserialization() throws JsonProcessingException {
+	public void testMultiLineStringDeserialization() {
 		String geoJsonString = "{\"type\":\"MultiLineString\",\"coordinates\":[[[1.0,2.0,3.0],[4.0,5.0,6.0]],[[7.0,8.0,9.0],[10.0,11.0,12.0]]]}";
 
 		Geometry geometry = objectMapper.readValue(geoJsonString, Geometry.class);
@@ -318,7 +319,7 @@ public class GeoJsonTest {
 	}
 
 	@Test
-	public void testMultiPolygonDeserialization() throws JsonProcessingException {
+	public void testMultiPolygonDeserialization() {
 		String geoJsonString = "{\"type\":\"MultiPolygon\",\"coordinates\":[[[[1.0,2.0,3.0],[4.0,5.0,6.0],[7.0,8.0,9.0],[1.0,2.0,3.0]],[[10.0,11.0,12.0],[13.0,14.0,15.0],[16.0,17.0,18.0],[10.0,11.0,12.0]]],[[[19.0,20.0,21.0],[22.0,23.0,24.0],[25.0,26.0,27.0],[19.0,20.0,21.0]],[[28.0,29.0,30.0],[31.0,32.0,33.0],[34.0,35.0,36.0],[28.0,29.0,30.0]]]]}";
 
 		Geometry geometry = objectMapper.readValue(geoJsonString, Geometry.class);
@@ -398,7 +399,7 @@ public class GeoJsonTest {
 	}
 
 	@Test
-	public void testGeometryCollectionDeserialization() throws JsonProcessingException {
+	public void testGeometryCollectionDeserialization() {
 		String geoJsonString = "{\"type\":\"GeometryCollection\",\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1.0,2.0]},{\"type\":\"LineString\",\"coordinates\":[[3.0,4.0],[5.0,6.0]]}]}";
 
 		GeometryCollection geometryCollection = objectMapper.readValue(geoJsonString, GeometryCollection.class);
@@ -421,7 +422,7 @@ public class GeoJsonTest {
 	}
 
 	@Test
-	public void testFeatureDeserialization() throws JsonProcessingException {
+	public void testFeatureDeserialization() {
 		String geoJsonString = "{\"type\":\"Feature\",\"id\":\"123\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[1.0,2.0]},\"properties\":{\"name\":\"John Doe\"}}";
 
 		Feature feature = objectMapper.readValue(geoJsonString, Feature.class);
@@ -435,7 +436,7 @@ public class GeoJsonTest {
 	}
 
 	@Test
-	public void testFeatureCollectionDeserialization() throws JsonProcessingException {
+	public void testFeatureCollectionDeserialization() {
 		String geoJsonString = "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"id\":\"123\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[1.0,2.0]},\"properties\":{\"name\":\"John Doe\"}}]}";
 
 		FeatureCollection featureCollection = objectMapper.readValue(geoJsonString, FeatureCollection.class);

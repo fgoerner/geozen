@@ -1,22 +1,21 @@
 package dev.goerner.geozen.jackson.serializer;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
 import dev.goerner.geozen.model.multi_geometry.MultiPolygon;
 import dev.goerner.geozen.model.Position;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
 
-import java.io.IOException;
 import java.util.List;
 
 public class MultiPolygonSerializer extends AbstractGeometrySerializer<MultiPolygon> {
 
 	@Override
-	public void serialize(MultiPolygon value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+	public void serialize(MultiPolygon value, JsonGenerator gen, SerializationContext ctxt) {
 		gen.writeStartObject();
 
-		gen.writeStringField("type", "MultiPolygon");
+		gen.writeStringProperty("type", "MultiPolygon");
 
-		gen.writeArrayFieldStart("coordinates");
+		gen.writeArrayPropertyStart("coordinates");
 		for (List<List<Position>> polygon : value.getCoordinates()) {
 			gen.writeStartArray();
 			for (List<Position> ring : polygon) {

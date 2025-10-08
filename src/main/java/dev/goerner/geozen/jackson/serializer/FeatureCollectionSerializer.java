@@ -1,25 +1,23 @@
 package dev.goerner.geozen.jackson.serializer;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
 import dev.goerner.geozen.model.Feature;
 import dev.goerner.geozen.model.collections.FeatureCollection;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 
-import java.io.IOException;
-
-public class FeatureCollectionSerializer extends JsonSerializer<FeatureCollection> {
+public class FeatureCollectionSerializer extends ValueSerializer<FeatureCollection> {
 
 	@Override
-	public void serialize(FeatureCollection value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+	public void serialize(FeatureCollection value, JsonGenerator gen, SerializationContext ctxt) {
 		gen.writeStartObject();
 
-		gen.writeStringField("type", "FeatureCollection");
+		gen.writeStringProperty("type", "FeatureCollection");
 
-		gen.writeArrayFieldStart("features");
-		JsonSerializer<Object> featureSerializer = serializers.findValueSerializer(Feature.class);
+		gen.writeArrayPropertyStart("features");
+		ValueSerializer<Object> featureSerializer = ctxt.findValueSerializer(Feature.class);
 		for (Feature feature : value.getFeatures()) {
-			featureSerializer.serialize(feature, gen, serializers);
+			featureSerializer.serialize(feature, gen, ctxt);
 		}
 		gen.writeEndArray();
 

@@ -1,20 +1,18 @@
 package dev.goerner.geozen.jackson.serializer;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
 import dev.goerner.geozen.model.simple_geometry.Point;
-
-import java.io.IOException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
 
 public class PointSerializer extends AbstractGeometrySerializer<Point> {
 
 	@Override
-	public void serialize(Point point, JsonGenerator gen, SerializerProvider serializerProvider) throws IOException {
+	public void serialize(Point point, JsonGenerator gen, SerializationContext ctxt) {
 		gen.writeStartObject();
 
-		gen.writeStringField("type", "Point");
+		gen.writeStringProperty("type", "Point");
 
-		gen.writeFieldName("coordinates");
+		gen.writeName("coordinates");
 		writePosition(point.getCoordinates(), gen);
 
 		gen.writeEndObject();
