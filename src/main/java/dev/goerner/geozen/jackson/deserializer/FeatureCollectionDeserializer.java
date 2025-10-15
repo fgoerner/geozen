@@ -5,7 +5,6 @@ import dev.goerner.geozen.model.collections.FeatureCollection;
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.ValueDeserializer;
 
 import java.util.ArrayList;
@@ -13,15 +12,9 @@ import java.util.List;
 
 public class FeatureCollectionDeserializer extends ValueDeserializer<FeatureCollection> {
 
-    private final ObjectMapper objectMapper;
-
-    public FeatureCollectionDeserializer(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
-
     @Override
 	public FeatureCollection deserialize(JsonParser p, DeserializationContext ctxt) {
-		JsonNode rootNode = objectMapper.readTree(p);
+		JsonNode rootNode = p.readValueAsTree();
 
 		String type = rootNode.get("type").asString();
 		if (!type.equalsIgnoreCase("FeatureCollection")) {
@@ -32,7 +25,7 @@ public class FeatureCollectionDeserializer extends ValueDeserializer<FeatureColl
 
 		List<Feature> features = new ArrayList<>();
 		for (JsonNode featureNode : rootNode.get("features")) {
-			features.add((Feature) featureDeserializer.deserialize(featureNode.traverse(objectMapper._deserializationContext()), ctxt));
+			features.add((Feature) featureDeserializer.deserialize(featureNode.traverse(ctxt), ctxt));
 		}
 
 		return new FeatureCollection(features);
