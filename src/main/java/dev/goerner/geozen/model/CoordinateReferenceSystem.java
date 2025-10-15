@@ -5,6 +5,6 @@ package dev.goerner.geozen.model;
  * and accurate geodetic calculations.
  */
 public enum CoordinateReferenceSystem {
-	WGS_84,
-	WEB_MERCATOR
+    WGS_84,
+    WEB_MERCATOR
 }

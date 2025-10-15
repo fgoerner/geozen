@@ -11,14 +11,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FeatureCollectionTest {
 
-	@Test
-	public void testFeaturesConstructor() {
-		Feature feature = new Feature(new Point(0.0, 0.0));
+    @Test
+    public void testFeaturesConstructor() {
+        Feature feature = new Feature(new Point(0.0, 0.0));
         List<Feature> features = new ArrayList<>();
-		features.add(feature);
+        features.add(feature);
 
-		FeatureCollection featureCollection = new FeatureCollection(features);
+        FeatureCollection featureCollection = new FeatureCollection(features);
 
-		assertEquals(1, featureCollection.getFeatures().size());
-	}
+        assertEquals(1, featureCollection.getFeatures().size());
+    }
 }

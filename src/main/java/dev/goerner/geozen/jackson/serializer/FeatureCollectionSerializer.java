@@ -8,19 +8,19 @@ import tools.jackson.databind.ValueSerializer;
 
 public class FeatureCollectionSerializer extends ValueSerializer<FeatureCollection> {
 
-	@Override
-	public void serialize(FeatureCollection value, JsonGenerator gen, SerializationContext ctxt) {
-		gen.writeStartObject();
+    @Override
+    public void serialize(FeatureCollection value, JsonGenerator gen, SerializationContext ctxt) {
+        gen.writeStartObject();
 
-		gen.writeStringProperty("type", "FeatureCollection");
+        gen.writeStringProperty("type", "FeatureCollection");
 
-		gen.writeArrayPropertyStart("features");
-		ValueSerializer<Object> featureSerializer = ctxt.findValueSerializer(Feature.class);
-		for (Feature feature : value.getFeatures()) {
-			featureSerializer.serialize(feature, gen, ctxt);
-		}
-		gen.writeEndArray();
+        gen.writeArrayPropertyStart("features");
+        ValueSerializer<Object> featureSerializer = ctxt.findValueSerializer(Feature.class);
+        for (Feature feature : value.getFeatures()) {
+            featureSerializer.serialize(feature, gen, ctxt);
+        }
+        gen.writeEndArray();
 
-		gen.writeEndObject();
-	}
+        gen.writeEndObject();
+    }
 }

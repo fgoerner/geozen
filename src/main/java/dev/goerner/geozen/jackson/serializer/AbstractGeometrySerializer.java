@@ -7,13 +7,13 @@ import tools.jackson.databind.ValueSerializer;
 
 public abstract class AbstractGeometrySerializer<T extends Geometry> extends ValueSerializer<T> {
 
-	protected void writePosition(Position position, JsonGenerator gen) {
-		gen.writeStartArray();
-		gen.writeNumber(position.getLongitude());
-		gen.writeNumber(position.getLatitude());
-		if (position.getAltitude() != 0) {
-			gen.writeNumber(position.getAltitude());
-		}
-		gen.writeEndArray();
-	}
+    protected void writePosition(Position position, JsonGenerator gen) {
+        gen.writeStartArray();
+        gen.writeNumber(position.getLongitude());
+        gen.writeNumber(position.getLatitude());
+        if (position.getAltitude() != 0) {
+            gen.writeNumber(position.getAltitude());
+        }
+        gen.writeEndArray();
+    }
 }

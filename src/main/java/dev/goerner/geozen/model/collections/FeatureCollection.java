@@ -9,18 +9,18 @@ import java.util.List;
  */
 public class FeatureCollection {
 
-	private final List<Feature> features;
+    private final List<Feature> features;
 
-	/**
-	 * Creates a new {@link FeatureCollection} with the given list of {@link Feature Features}.
-	 *
-	 * @param features The list of {@link Feature Features} representing the {@link FeatureCollection}.
-	 */
-	public FeatureCollection(List<Feature> features) {
-		this.features = List.copyOf(features);
-	}
+    /**
+     * Creates a new {@link FeatureCollection} with the given list of {@link Feature Features}.
+     *
+     * @param features The list of {@link Feature Features} representing the {@link FeatureCollection}.
+     */
+    public FeatureCollection(List<Feature> features) {
+        this.features = List.copyOf(features);
+    }
 
-	public List<Feature> getFeatures() {
-		return features;
-	}
+    public List<Feature> getFeatures() {
+        return features;
+    }
 }

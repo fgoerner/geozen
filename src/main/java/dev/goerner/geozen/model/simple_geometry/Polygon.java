@@ -17,41 +17,41 @@ import java.util.List;
  */
 public class Polygon extends Geometry {
 
-	private final List<List<Position>> coordinates;
+    private final List<List<Position>> coordinates;
 
-	/**
-	 * Creates a new {@link Polygon} with the given exterior and interior rings and the default WGS 84
-	 * {@link CoordinateReferenceSystem}.
-	 *
-	 * @param coordinates A list of exterior and interior rings of the {@link Polygon}.
-	 */
-	public Polygon(List<List<Position>> coordinates) {
-		this(coordinates, CoordinateReferenceSystem.WGS_84);
-	}
+    /**
+     * Creates a new {@link Polygon} with the given exterior and interior rings and the default WGS 84
+     * {@link CoordinateReferenceSystem}.
+     *
+     * @param coordinates A list of exterior and interior rings of the {@link Polygon}.
+     */
+    public Polygon(List<List<Position>> coordinates) {
+        this(coordinates, CoordinateReferenceSystem.WGS_84);
+    }
 
-	/**
-	 * Creates a new {@link Polygon} with the given exterior and interior rings and the given {@link CoordinateReferenceSystem}.
-	 *
-	 * @param coordinates               A list of exterior and interior rings of the {@link Polygon}.
-	 * @param coordinateReferenceSystem The {@link CoordinateReferenceSystem} of the {@link Polygon}.
-	 */
-	public Polygon(List<List<Position>> coordinates, CoordinateReferenceSystem coordinateReferenceSystem) {
-		super(coordinateReferenceSystem);
+    /**
+     * Creates a new {@link Polygon} with the given exterior and interior rings and the given {@link CoordinateReferenceSystem}.
+     *
+     * @param coordinates               A list of exterior and interior rings of the {@link Polygon}.
+     * @param coordinateReferenceSystem The {@link CoordinateReferenceSystem} of the {@link Polygon}.
+     */
+    public Polygon(List<List<Position>> coordinates, CoordinateReferenceSystem coordinateReferenceSystem) {
+        super(coordinateReferenceSystem);
         List<List<Position>> coordsCopy = new ArrayList<>();
         for (List<Position> ring : coordinates) {
             coordsCopy.add(List.copyOf(ring));
         }
-		this.coordinates = List.copyOf(coordsCopy);
-	}
+        this.coordinates = List.copyOf(coordsCopy);
+    }
 
-	public List<Position> getExteriorRing() {
-		if (this.coordinates.isEmpty()) {
-			return null;
-		}
-		return this.coordinates.getFirst();
-	}
+    public List<Position> getExteriorRing() {
+        if (this.coordinates.isEmpty()) {
+            return null;
+        }
+        return this.coordinates.getFirst();
+    }
 
-	public List<List<Position>> getCoordinates() {
-		return this.coordinates;
-	}
+    public List<List<Position>> getCoordinates() {
+        return this.coordinates;
+    }
 }

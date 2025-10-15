@@ -5,12 +5,12 @@ package dev.goerner.geozen.wkt;
  */
 public class WktException extends RuntimeException {
 
-	public WktException(String message) {
-		super(message);
-	}
+    public WktException(String message) {
+        super(message);
+    }
 
-	public WktException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public WktException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }
 

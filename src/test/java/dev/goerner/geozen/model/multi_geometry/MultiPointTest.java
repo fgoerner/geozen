@@ -11,27 +11,27 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MultiPointTest {
 
-	@Test
-	public void testCoordinatesConstructor() {
-		List<Position> coordinates = new ArrayList<>();
-		coordinates.add(new Position(1.0, 2.0, 3.0));
-		coordinates.add(new Position(4.0, 5.0, 6.0));
-
-		MultiPoint multiPoint = new MultiPoint(coordinates);
-
-		assertEquals(2, multiPoint.getCoordinates().size());
-		assertEquals(CoordinateReferenceSystem.WGS_84, multiPoint.getCoordinateReferenceSystem());
-	}
-
-	@Test
-	public void testCoordinatesAndReferenceSystemConstructor() {
+    @Test
+    public void testCoordinatesConstructor() {
         List<Position> coordinates = new ArrayList<>();
-		coordinates.add(new Position(1.0, 2.0, 3.0));
-		coordinates.add(new Position(4.0, 5.0, 6.0));
+        coordinates.add(new Position(1.0, 2.0, 3.0));
+        coordinates.add(new Position(4.0, 5.0, 6.0));
 
-		MultiPoint multiPoint = new MultiPoint(coordinates, CoordinateReferenceSystem.WEB_MERCATOR);
+        MultiPoint multiPoint = new MultiPoint(coordinates);
 
-		assertEquals(2, multiPoint.getCoordinates().size());
-		assertEquals(CoordinateReferenceSystem.WEB_MERCATOR, multiPoint.getCoordinateReferenceSystem());
-	}
+        assertEquals(2, multiPoint.getCoordinates().size());
+        assertEquals(CoordinateReferenceSystem.WGS_84, multiPoint.getCoordinateReferenceSystem());
+    }
+
+    @Test
+    public void testCoordinatesAndReferenceSystemConstructor() {
+        List<Position> coordinates = new ArrayList<>();
+        coordinates.add(new Position(1.0, 2.0, 3.0));
+        coordinates.add(new Position(4.0, 5.0, 6.0));
+
+        MultiPoint multiPoint = new MultiPoint(coordinates, CoordinateReferenceSystem.WEB_MERCATOR);
+
+        assertEquals(2, multiPoint.getCoordinates().size());
+        assertEquals(CoordinateReferenceSystem.WEB_MERCATOR, multiPoint.getCoordinateReferenceSystem());
+    }
 }

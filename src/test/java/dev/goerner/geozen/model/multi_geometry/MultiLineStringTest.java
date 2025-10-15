@@ -11,31 +11,31 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MultiLineStringTest {
 
-	@Test
-	public void testCoordinatesConstructor() {
-		List<List<Position>> coordinates = new ArrayList<>();
-        List<Position> lineString = new ArrayList<>();
-		lineString.add(new Position(1.0, 2.0, 3.0));
-		lineString.add(new Position(4.0, 5.0, 6.0));
-		coordinates.add(lineString);
-
-		MultiLineString multiLineString = new MultiLineString(coordinates);
-
-		assertEquals(1, multiLineString.getCoordinates().size());
-		assertEquals(CoordinateReferenceSystem.WGS_84, multiLineString.getCoordinateReferenceSystem());
-	}
-
-	@Test
-	public void testCoordinatesAndReferenceSystemConstructor() {
+    @Test
+    public void testCoordinatesConstructor() {
         List<List<Position>> coordinates = new ArrayList<>();
         List<Position> lineString = new ArrayList<>();
-		lineString.add(new Position(1.0, 2.0, 3.0));
-		lineString.add(new Position(4.0, 5.0, 6.0));
-		coordinates.add(lineString);
+        lineString.add(new Position(1.0, 2.0, 3.0));
+        lineString.add(new Position(4.0, 5.0, 6.0));
+        coordinates.add(lineString);
 
-		MultiLineString multiLineString = new MultiLineString(coordinates, CoordinateReferenceSystem.WEB_MERCATOR);
+        MultiLineString multiLineString = new MultiLineString(coordinates);
 
-		assertEquals(1, multiLineString.getCoordinates().size());
-		assertEquals(CoordinateReferenceSystem.WEB_MERCATOR, multiLineString.getCoordinateReferenceSystem());
-	}
+        assertEquals(1, multiLineString.getCoordinates().size());
+        assertEquals(CoordinateReferenceSystem.WGS_84, multiLineString.getCoordinateReferenceSystem());
+    }
+
+    @Test
+    public void testCoordinatesAndReferenceSystemConstructor() {
+        List<List<Position>> coordinates = new ArrayList<>();
+        List<Position> lineString = new ArrayList<>();
+        lineString.add(new Position(1.0, 2.0, 3.0));
+        lineString.add(new Position(4.0, 5.0, 6.0));
+        coordinates.add(lineString);
+
+        MultiLineString multiLineString = new MultiLineString(coordinates, CoordinateReferenceSystem.WEB_MERCATOR);
+
+        assertEquals(1, multiLineString.getCoordinates().size());
+        assertEquals(CoordinateReferenceSystem.WEB_MERCATOR, multiLineString.getCoordinateReferenceSystem());
+    }
 }
