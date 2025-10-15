@@ -12,31 +12,31 @@ import java.util.List;
  */
 public class MultiPoint extends Geometry {
 
-	private final List<Position> coordinates;
+    private final List<Position> coordinates;
 
-	/**
-	 * Creates a new {@link MultiPoint} with the given list of {@link Position Positions} and the default WGS 84
-	 * {@link CoordinateReferenceSystem}.
-	 *
-	 * @param coordinates The list of {@link Position Positions} representing the {@link MultiPoint}.
-	 */
-	public MultiPoint(List<Position> coordinates) {
-		this(coordinates, CoordinateReferenceSystem.WGS_84);
-	}
+    /**
+     * Creates a new {@link MultiPoint} with the given list of {@link Position Positions} and the default WGS 84
+     * {@link CoordinateReferenceSystem}.
+     *
+     * @param coordinates The list of {@link Position Positions} representing the {@link MultiPoint}.
+     */
+    public MultiPoint(List<Position> coordinates) {
+        this(coordinates, CoordinateReferenceSystem.WGS_84);
+    }
 
-	/**
-	 * Creates a new {@link MultiPoint} with the given list of {@link Position Positions} and the given
-	 * {@link CoordinateReferenceSystem}.
-	 *
-	 * @param coordinates               The list of {@link Position Positions} representing the {@link MultiPoint}.
-	 * @param coordinateReferenceSystem The {@link CoordinateReferenceSystem} of the {@link MultiPoint}.
-	 */
-	public MultiPoint(List<Position> coordinates, CoordinateReferenceSystem coordinateReferenceSystem) {
-		super(coordinateReferenceSystem);
-		this.coordinates = List.copyOf(coordinates);
-	}
+    /**
+     * Creates a new {@link MultiPoint} with the given list of {@link Position Positions} and the given
+     * {@link CoordinateReferenceSystem}.
+     *
+     * @param coordinates               The list of {@link Position Positions} representing the {@link MultiPoint}.
+     * @param coordinateReferenceSystem The {@link CoordinateReferenceSystem} of the {@link MultiPoint}.
+     */
+    public MultiPoint(List<Position> coordinates, CoordinateReferenceSystem coordinateReferenceSystem) {
+        super(coordinateReferenceSystem);
+        this.coordinates = List.copyOf(coordinates);
+    }
 
-	public List<Position> getCoordinates() {
-		return coordinates;
-	}
+    public List<Position> getCoordinates() {
+        return coordinates;
+    }
 }

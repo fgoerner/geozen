@@ -6,13 +6,13 @@ package dev.goerner.geozen.model;
  * object.
  */
 public abstract class Geometry {
-	private final CoordinateReferenceSystem coordinateReferenceSystem;
+    private final CoordinateReferenceSystem coordinateReferenceSystem;
 
-	public Geometry(CoordinateReferenceSystem coordinateReferenceSystem) {
-		this.coordinateReferenceSystem = coordinateReferenceSystem;
-	}
+    public Geometry(CoordinateReferenceSystem coordinateReferenceSystem) {
+        this.coordinateReferenceSystem = coordinateReferenceSystem;
+    }
 
-	public CoordinateReferenceSystem getCoordinateReferenceSystem() {
-		return coordinateReferenceSystem;
-	}
+    public CoordinateReferenceSystem getCoordinateReferenceSystem() {
+        return coordinateReferenceSystem;
+    }
 }

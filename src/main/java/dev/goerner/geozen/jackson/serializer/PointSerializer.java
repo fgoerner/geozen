@@ -6,15 +6,15 @@ import tools.jackson.databind.SerializationContext;
 
 public class PointSerializer extends AbstractGeometrySerializer<Point> {
 
-	@Override
-	public void serialize(Point point, JsonGenerator gen, SerializationContext ctxt) {
-		gen.writeStartObject();
+    @Override
+    public void serialize(Point point, JsonGenerator gen, SerializationContext ctxt) {
+        gen.writeStartObject();
 
-		gen.writeStringProperty("type", "Point");
+        gen.writeStringProperty("type", "Point");
 
-		gen.writeName("coordinates");
-		writePosition(point.getCoordinates(), gen);
+        gen.writeName("coordinates");
+        writePosition(point.getCoordinates(), gen);
 
-		gen.writeEndObject();
-	}
+        gen.writeEndObject();
+    }
 }

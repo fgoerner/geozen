@@ -11,43 +11,43 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PolygonTest {
 
-	@Test
-	public void testExteriorRingConstructor() {
-		List<Position> exteriorRing = new ArrayList<>();
-		exteriorRing.add(new Position(1.0, 2.0, 3.0));
-		exteriorRing.add(new Position(4.0, 5.0, 6.0));
-        List<List<Position>> coordinates = new ArrayList<>();
-		coordinates.add(exteriorRing);
-		Polygon polygon = new Polygon(coordinates);
-
-		assertEquals(1, polygon.getCoordinates().size());
-		assertEquals(exteriorRing, polygon.getCoordinates().getFirst());
-		assertEquals(CoordinateReferenceSystem.WGS_84, polygon.getCoordinateReferenceSystem());
-	}
-
-	@Test
-	public void testExteriorRingAndReferenceSystemConstructor() {
+    @Test
+    public void testExteriorRingConstructor() {
         List<Position> exteriorRing = new ArrayList<>();
-		exteriorRing.add(new Position(1.0, 2.0, 3.0));
-		exteriorRing.add(new Position(4.0, 5.0, 6.0));
+        exteriorRing.add(new Position(1.0, 2.0, 3.0));
+        exteriorRing.add(new Position(4.0, 5.0, 6.0));
         List<List<Position>> coordinates = new ArrayList<>();
-		coordinates.add(exteriorRing);
-		Polygon polygon = new Polygon(coordinates, CoordinateReferenceSystem.WEB_MERCATOR);
+        coordinates.add(exteriorRing);
+        Polygon polygon = new Polygon(coordinates);
 
-		assertEquals(1, polygon.getCoordinates().size());
-		assertEquals(exteriorRing, polygon.getCoordinates().getFirst());
-		assertEquals(CoordinateReferenceSystem.WEB_MERCATOR, polygon.getCoordinateReferenceSystem());
-	}
+        assertEquals(1, polygon.getCoordinates().size());
+        assertEquals(exteriorRing, polygon.getCoordinates().getFirst());
+        assertEquals(CoordinateReferenceSystem.WGS_84, polygon.getCoordinateReferenceSystem());
+    }
 
-	@Test
-	public void testGetExteriorRing() {
+    @Test
+    public void testExteriorRingAndReferenceSystemConstructor() {
         List<Position> exteriorRing = new ArrayList<>();
-		exteriorRing.add(new Position(1.0, 2.0, 3.0));
-		exteriorRing.add(new Position(4.0, 5.0, 6.0));
+        exteriorRing.add(new Position(1.0, 2.0, 3.0));
+        exteriorRing.add(new Position(4.0, 5.0, 6.0));
         List<List<Position>> coordinates = new ArrayList<>();
-		coordinates.add(exteriorRing);
-		Polygon polygon = new Polygon(coordinates);
+        coordinates.add(exteriorRing);
+        Polygon polygon = new Polygon(coordinates, CoordinateReferenceSystem.WEB_MERCATOR);
 
-		assertEquals(exteriorRing, polygon.getExteriorRing());
-	}
+        assertEquals(1, polygon.getCoordinates().size());
+        assertEquals(exteriorRing, polygon.getCoordinates().getFirst());
+        assertEquals(CoordinateReferenceSystem.WEB_MERCATOR, polygon.getCoordinateReferenceSystem());
+    }
+
+    @Test
+    public void testGetExteriorRing() {
+        List<Position> exteriorRing = new ArrayList<>();
+        exteriorRing.add(new Position(1.0, 2.0, 3.0));
+        exteriorRing.add(new Position(4.0, 5.0, 6.0));
+        List<List<Position>> coordinates = new ArrayList<>();
+        coordinates.add(exteriorRing);
+        Polygon polygon = new Polygon(coordinates);
+
+        assertEquals(exteriorRing, polygon.getExteriorRing());
+    }
 }

@@ -8,11 +8,11 @@ import tools.jackson.databind.JsonNode;
 public class PointDeserializer extends AbstractGeometryDeserializer<Point> {
 
     @Override
-	public Point deserialize(JsonParser p, DeserializationContext ctxt) {
-		JsonNode rootNode = p.readValueAsTree();
+    public Point deserialize(JsonParser p, DeserializationContext ctxt) {
+        JsonNode rootNode = p.readValueAsTree();
 
-		checkType(rootNode, "Point");
+        checkType(rootNode, "Point");
 
-		return new Point(parsePosition(rootNode.get("coordinates")));
-	}
+        return new Point(parsePosition(rootNode.get("coordinates")));
+    }
 }

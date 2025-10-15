@@ -12,16 +12,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class GeometryCollectionTest {
 
-	@Test
-	public void testGeometriesConstructor() {
-		Geometry point = new Point(0.0, 0.0);
-		Geometry lineString = new LineString(List.of());
-		List<Geometry> geometries = new ArrayList<>();
-		geometries.add(point);
-		geometries.add(lineString);
+    @Test
+    public void testGeometriesConstructor() {
+        Geometry point = new Point(0.0, 0.0);
+        Geometry lineString = new LineString(List.of());
+        List<Geometry> geometries = new ArrayList<>();
+        geometries.add(point);
+        geometries.add(lineString);
 
-		GeometryCollection geometryCollection = new GeometryCollection(geometries);
+        GeometryCollection geometryCollection = new GeometryCollection(geometries);
 
-		assertEquals(2, geometryCollection.getGeometries().size());
-	}
+        assertEquals(2, geometryCollection.getGeometries().size());
+    }
 }

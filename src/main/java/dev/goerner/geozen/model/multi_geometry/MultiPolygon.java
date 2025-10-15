@@ -14,27 +14,27 @@ import java.util.List;
  */
 public class MultiPolygon extends Geometry {
 
-	private final List<List<List<Position>>> coordinates;
+    private final List<List<List<Position>>> coordinates;
 
-	/**
-	 * Creates a new {@link MultiPolygon} with the given list of {@link Polygon Polygons} and the default WGS 84
-	 * {@link CoordinateReferenceSystem}.
-	 *
-	 * @param coordinates The list of {@link Polygon Polygons} representing the {@link MultiPolygon}.
-	 */
-	public MultiPolygon(List<List<List<Position>>> coordinates) {
-		this(coordinates, CoordinateReferenceSystem.WGS_84);
-	}
+    /**
+     * Creates a new {@link MultiPolygon} with the given list of {@link Polygon Polygons} and the default WGS 84
+     * {@link CoordinateReferenceSystem}.
+     *
+     * @param coordinates The list of {@link Polygon Polygons} representing the {@link MultiPolygon}.
+     */
+    public MultiPolygon(List<List<List<Position>>> coordinates) {
+        this(coordinates, CoordinateReferenceSystem.WGS_84);
+    }
 
-	/**
-	 * Creates a new {@link MultiPolygon} with the given list of {@link Polygon Polygons} and the given
-	 * {@link CoordinateReferenceSystem}.
-	 *
-	 * @param coordinates               The list of {@link Polygon Polygons} representing the {@link MultiPolygon}.
-	 * @param coordinateReferenceSystem The {@link CoordinateReferenceSystem} of the {@link MultiPolygon}.
-	 */
-	public MultiPolygon(List<List<List<Position>>> coordinates, CoordinateReferenceSystem coordinateReferenceSystem) {
-		super(coordinateReferenceSystem);
+    /**
+     * Creates a new {@link MultiPolygon} with the given list of {@link Polygon Polygons} and the given
+     * {@link CoordinateReferenceSystem}.
+     *
+     * @param coordinates               The list of {@link Polygon Polygons} representing the {@link MultiPolygon}.
+     * @param coordinateReferenceSystem The {@link CoordinateReferenceSystem} of the {@link MultiPolygon}.
+     */
+    public MultiPolygon(List<List<List<Position>>> coordinates, CoordinateReferenceSystem coordinateReferenceSystem) {
+        super(coordinateReferenceSystem);
         List<List<List<Position>>> coordsCopy = new ArrayList<>();
         for (List<List<Position>> polygon : coordinates) {
             List<List<Position>> polygonCopy = new ArrayList<>();
@@ -44,9 +44,9 @@ public class MultiPolygon extends Geometry {
             coordsCopy.add(List.copyOf(polygonCopy));
         }
         this.coordinates = List.copyOf(coordsCopy);
-	}
+    }
 
-	public List<List<List<Position>>> getCoordinates() {
-		return coordinates;
-	}
+    public List<List<List<Position>>> getCoordinates() {
+        return coordinates;
+    }
 }
