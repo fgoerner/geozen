@@ -11,7 +11,6 @@ import dev.goerner.geozen.model.simple_geometry.Polygon;
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.ValueDeserializer;
 
 import java.util.ArrayList;
@@ -19,15 +18,9 @@ import java.util.List;
 
 public class GeometryCollectionDeserializer extends ValueDeserializer<GeometryCollection> {
 
-    private final ObjectMapper objectMapper;
-
-    public GeometryCollectionDeserializer(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
-
     @Override
 	public GeometryCollection deserialize(JsonParser p, DeserializationContext ctxt) {
-		JsonNode rootNode = objectMapper.readTree(p);
+		JsonNode rootNode = p.readValueAsTree();
 
 		String type = rootNode.get("type").asString();
 		if (!type.equalsIgnoreCase("GeometryCollection")) {
@@ -53,7 +46,7 @@ public class GeometryCollectionDeserializer extends ValueDeserializer<GeometryCo
 				case "MultiPolygon" -> multiPolygonSerializer;
 				default -> throw new IllegalArgumentException("Invalid GeoJSON type: " + type + ".");
 			};
-			geometries.add((Geometry) geometryDeserializer.deserialize(geometryNode.traverse(objectMapper._deserializationContext()), ctxt));
+			geometries.add((Geometry) geometryDeserializer.deserialize(geometryNode.traverse(ctxt), ctxt));
 		}
 
 		return new GeometryCollection(geometries);

@@ -27,13 +27,43 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 public class GeoJsonTest {
 
+	// DTO record for testing nested geometry deserialization
+	public record LocationDTO(
+		String name,
+		Geometry location,
+		String dataSource
+	) {}
+
 	private static ObjectMapper objectMapper;
 
 	@BeforeAll
 	static void setup() {
         objectMapper = JsonMapper.builder()
-                .addModule(new GeoZenModule(new ObjectMapper()))
+                .addModule(new GeoZenModule())
                 .build();
+	}
+
+	@Test
+	public void testNestedPointDeserialization() {
+		String json = """
+			{
+			    "name": "Some JSON Object",
+			    "location": {
+			        "type": "Point",
+			        "coordinates": [9.123456, 45.987654]
+			    },
+			    "dataSource": "MANUAL"
+			}
+			""";
+
+		LocationDTO locationDTO = objectMapper.readValue(json, LocationDTO.class);
+
+		assertEquals("Some JSON Object", locationDTO.name());
+		assertInstanceOf(Point.class, locationDTO.location());
+		Point point = (Point) locationDTO.location();
+		assertEquals(9.123456, point.getLongitude());
+		assertEquals(45.987654, point.getLatitude());
+		assertEquals("MANUAL", locationDTO.dataSource());
 	}
 
 	@Test

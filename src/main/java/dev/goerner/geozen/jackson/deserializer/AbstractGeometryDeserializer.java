@@ -3,16 +3,9 @@ package dev.goerner.geozen.jackson.deserializer;
 import dev.goerner.geozen.model.Geometry;
 import dev.goerner.geozen.model.Position;
 import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.ValueDeserializer;
 
 public abstract class AbstractGeometryDeserializer<T extends Geometry> extends ValueDeserializer<T> {
-
-    protected final ObjectMapper objectMapper;
-
-    protected AbstractGeometryDeserializer(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
 
     protected void checkType(JsonNode rootNode, String expectedType) {
 		String type = rootNode.get("type").asString();

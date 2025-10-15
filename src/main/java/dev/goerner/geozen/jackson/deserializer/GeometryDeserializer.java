@@ -11,18 +11,13 @@ import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.JavaType;
 import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.ValueDeserializer;
 
 public class GeometryDeserializer extends AbstractGeometryDeserializer<Geometry> {
 
-    public GeometryDeserializer(ObjectMapper objectMapper) {
-        super(objectMapper);
-    }
-
     @Override
 	public Geometry deserialize(JsonParser p, DeserializationContext ctxt) {
-		JsonNode rootNode = objectMapper.readTree(p);
+		JsonNode rootNode = p.readValueAsTree();
 		String type = rootNode.get("type").asString();
 
 		JavaType javaType = switch (type) {
@@ -36,6 +31,6 @@ public class GeometryDeserializer extends AbstractGeometryDeserializer<Geometry>
 		};
 		ValueDeserializer<?> deserializer = ctxt.findRootValueDeserializer(javaType);
 
-		return (Geometry) deserializer.deserialize(rootNode.traverse(objectMapper._deserializationContext()), ctxt);
+		return (Geometry) deserializer.deserialize(rootNode.traverse(ctxt), ctxt);
 	}
 }

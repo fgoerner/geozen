@@ -5,7 +5,6 @@ import dev.goerner.geozen.model.Geometry;
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.ValueDeserializer;
 
 import java.util.HashMap;
@@ -13,15 +12,9 @@ import java.util.Map;
 
 public class FeatureDeserializer extends ValueDeserializer<Feature> {
 
-    private final ObjectMapper objectMapper;
-
-    public FeatureDeserializer(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
-
     @Override
 	public Feature deserialize(JsonParser p, DeserializationContext ctxt) {
-		JsonNode rootNode = objectMapper.readTree(p);
+		JsonNode rootNode = p.readValueAsTree();
 
 		String type = rootNode.get("type").asString();
 		if (!type.equalsIgnoreCase("Feature")) {
@@ -31,7 +24,7 @@ public class FeatureDeserializer extends ValueDeserializer<Feature> {
 		String id = rootNode.get("id").asString();
 
 		ValueDeserializer<?> geometryDeserializer = ctxt.findRootValueDeserializer(ctxt.constructType(Geometry.class));
-		Geometry geometry = (Geometry) geometryDeserializer.deserialize(rootNode.get("geometry").traverse(objectMapper._deserializationContext()), ctxt);
+		Geometry geometry = (Geometry) geometryDeserializer.deserialize(rootNode.get("geometry").traverse(ctxt), ctxt);
 
 		Map<String, String> properties = new HashMap<>();
         for (Map.Entry<String, JsonNode> property : rootNode.get("properties").properties()) {

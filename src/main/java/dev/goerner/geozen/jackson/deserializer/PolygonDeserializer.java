@@ -5,20 +5,15 @@ import dev.goerner.geozen.model.Position;
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class PolygonDeserializer extends AbstractGeometryDeserializer<Polygon> {
 
-    public PolygonDeserializer(ObjectMapper objectMapper) {
-        super(objectMapper);
-    }
-
     @Override
 	public Polygon deserialize(JsonParser p, DeserializationContext ctxt) {
-		JsonNode rootNode = objectMapper.readTree(p);
+		JsonNode rootNode = p.readValueAsTree();
 
 		checkType(rootNode, "Polygon");
 

@@ -4,17 +4,12 @@ import dev.goerner.geozen.model.simple_geometry.Point;
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
 
 public class PointDeserializer extends AbstractGeometryDeserializer<Point> {
 
-    public PointDeserializer(ObjectMapper objectMapper) {
-        super(objectMapper);
-    }
-
     @Override
 	public Point deserialize(JsonParser p, DeserializationContext ctxt) {
-		JsonNode rootNode = objectMapper.readTree(p);
+		JsonNode rootNode = p.readValueAsTree();
 
 		checkType(rootNode, "Point");
 
