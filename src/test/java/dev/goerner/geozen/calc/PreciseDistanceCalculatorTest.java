@@ -16,7 +16,7 @@ public class PreciseDistanceCalculatorTest {
         Position p1 = new Position(11.4694, 49.2965);
         Position p2 = new Position(11.0549, 49.4532);
 
-        double distance = PreciseDistanceCalculator.karneyDistance(p1, p2);
+        double distance = PreciseDistanceCalculator.INSTANCE.karneyDistance(p1, p2);
 
         assertEquals(34782.42347014982, distance);
     }
@@ -26,7 +26,7 @@ public class PreciseDistanceCalculatorTest {
         Point p1 = new Point(11.4694, 49.2965);
         Point p2 = new Point(11.0549, 49.4532);
 
-        double preciseDistance = PreciseDistanceCalculator.calculate(p1, p2);
+        double preciseDistance = PreciseDistanceCalculator.INSTANCE.calculate(p1, p2);
 
         assertEquals(34782.42347014982, preciseDistance);
     }
@@ -42,7 +42,7 @@ public class PreciseDistanceCalculatorTest {
                 )
         );
 
-        double preciseDistance = PreciseDistanceCalculator.calculate(p1, lineString);
+        double preciseDistance = PreciseDistanceCalculator.INSTANCE.calculate(p1, lineString);
 
         assertEquals(1837.9808887665006, preciseDistance);
     }

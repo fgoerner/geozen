@@ -16,7 +16,7 @@ public class ApproximateDistanceCalculatorTest {
         Position p1 = new Position(11.4694, 49.2965);
         Position p2 = new Position(11.0549, 49.4532);
 
-        double haversineDistance = ApproximateDistanceCalculator.haversineDistance(p1, p2);
+        double haversineDistance = ApproximateDistanceCalculator.INSTANCE.haversineDistance(p1, p2);
 
         assertEquals(34701.39385602524, haversineDistance);
     }
@@ -26,7 +26,7 @@ public class ApproximateDistanceCalculatorTest {
         Point p1 = new Point(11.4694, 49.2965);
         Point p2 = new Point(11.0549, 49.4532);
 
-        double approximateDistance = ApproximateDistanceCalculator.calculate(p1, p2);
+        double approximateDistance = ApproximateDistanceCalculator.INSTANCE.calculate(p1, p2);
 
         assertEquals(34701.39385602524, approximateDistance);
     }
@@ -42,7 +42,7 @@ public class ApproximateDistanceCalculatorTest {
                 )
         );
 
-        double approximateDistance = ApproximateDistanceCalculator.calculate(p1, lineString);
+        double approximateDistance = ApproximateDistanceCalculator.INSTANCE.calculate(p1, lineString);
 
         assertEquals(1832.5414860629317, approximateDistance);
     }

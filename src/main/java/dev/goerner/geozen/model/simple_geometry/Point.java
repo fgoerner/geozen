@@ -82,10 +82,10 @@ public class Point extends Geometry {
     public double getFastDistanceTo(Geometry other) {
         switch (other) {
             case Point otherPoint -> {
-                return ApproximateDistanceCalculator.calculate(this, otherPoint);
+                return ApproximateDistanceCalculator.INSTANCE.calculate(this, otherPoint);
             }
             case LineString otherLineString -> {
-                return ApproximateDistanceCalculator.calculate(this, otherLineString);
+                return ApproximateDistanceCalculator.INSTANCE.calculate(this, otherLineString);
             }
             default ->
                     throw new UnsupportedOperationException("Fast distance calculation is not supported for geometry type: " + other.getClass().getSimpleName());
@@ -96,10 +96,10 @@ public class Point extends Geometry {
     public double getExactDistanceTo(Geometry other) {
         switch (other) {
             case Point otherPoint -> {
-                return PreciseDistanceCalculator.calculate(this, otherPoint);
+                return PreciseDistanceCalculator.INSTANCE.calculate(this, otherPoint);
             }
             case LineString otherLineString -> {
-                return PreciseDistanceCalculator.calculate(this, otherLineString);
+                return PreciseDistanceCalculator.INSTANCE.calculate(this, otherLineString);
             }
             default ->
                     throw new UnsupportedOperationException("Exact distance calculation is not supported for geometry type: " + other.getClass().getSimpleName());
