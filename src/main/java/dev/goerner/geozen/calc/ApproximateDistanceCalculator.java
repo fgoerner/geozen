@@ -68,7 +68,10 @@ public class ApproximateDistanceCalculator {
         List<Position> positions = lineString.getCoordinates();
 
         if (positions == null || positions.isEmpty()) {
-            return 0.0;
+            throw new IllegalArgumentException("LineString must contain at least one position.");
+        }
+        if (positions.size() == 1) {
+            return haversineDistance(p.getCoordinates(), positions.getFirst());
         }
 
         for (int i = 0; i < positions.size() - 1; i++) {
