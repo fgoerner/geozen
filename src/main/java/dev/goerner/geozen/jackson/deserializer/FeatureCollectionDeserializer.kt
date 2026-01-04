@@ -12,7 +12,9 @@ class FeatureCollectionDeserializer : ValueDeserializer<FeatureCollection>() {
     override fun deserialize(p: JsonParser, ctxt: DeserializationContext): FeatureCollection {
         val rootNode = p.readValueAsTree<JsonNode>()
 
-        val type = rootNode["type"].asString()
+        val typeNode = rootNode["type"]
+        require(typeNode != null && typeNode.isString) { "Missing or invalid 'type' field in GeoJSON." }
+        val type = typeNode.asString()
         require(
             type.equals(
                 "FeatureCollection",
@@ -22,7 +24,9 @@ class FeatureCollectionDeserializer : ValueDeserializer<FeatureCollection>() {
 
         val featureDeserializer = ctxt.findRootValueDeserializer(ctxt.constructType(Feature::class.java))
 
-        val features = rootNode["features"].map { featureDeserializer.deserialize(it.traverse(ctxt), ctxt) as Feature }
+        val featuresNode = rootNode["features"]
+        require(featuresNode != null && featuresNode.isArray) { "Missing or invalid 'features' field in FeatureCollection." }
+        val features = featuresNode.map { featureDeserializer.deserialize(it.traverse(ctxt), ctxt) as Feature }
 
         return FeatureCollection(features)
     }

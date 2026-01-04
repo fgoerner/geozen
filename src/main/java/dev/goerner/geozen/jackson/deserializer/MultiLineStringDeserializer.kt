@@ -12,7 +12,12 @@ class MultiLineStringDeserializer : AbstractGeometryDeserializer<MultiLineString
 
         checkType(rootNode, "MultiLineString")
 
-        val coordinates = rootNode["coordinates"].map { lineStringNode -> lineStringNode.map { parsePosition(it) } }
+        val coordinatesNode = rootNode["coordinates"]
+        require(coordinatesNode != null && coordinatesNode.isArray) { "Invalid or missing 'coordinates' field for MultiLineString geometry." }
+        val coordinates = coordinatesNode.map { lineStringNode ->
+            require(lineStringNode != null && lineStringNode.isArray) { "Invalid LineString in 'coordinates' field for MultiLineString geometry." }
+            lineStringNode.map { parsePosition(it) }
+        }
 
         return MultiLineString(coordinates)
     }

@@ -12,7 +12,12 @@ class PolygonDeserializer : AbstractGeometryDeserializer<Polygon>() {
 
         checkType(rootNode, "Polygon")
 
-        val coordinates = rootNode["coordinates"].map { ringNode -> ringNode.map { parsePosition(it) } }
+        val coordinatesNode = rootNode["coordinates"]
+        require(coordinatesNode != null && coordinatesNode.isArray) { "Invalid or missing 'coordinates' field for Polygon geometry." }
+        val coordinates = coordinatesNode.map { ringNode ->
+            require(ringNode != null && ringNode.isArray) { "Invalid linear ring in 'coordinates' field for Polygon geometry." }
+            ringNode.map { parsePosition(it) }
+        }
 
         return Polygon(coordinates)
     }

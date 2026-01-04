@@ -16,7 +16,10 @@ class GeometryDeserializer : AbstractGeometryDeserializer<Geometry>() {
     override fun deserialize(p: JsonParser, ctxt: DeserializationContext): Geometry {
         val rootNode = p.readValueAsTree<JsonNode>()
 
-        val javaType = when (val type = rootNode["type"].asString()) {
+        val typeNode = rootNode["type"]
+        require(typeNode != null && typeNode.isString) { "Geometry must have a valid 'type' field." }
+
+        val javaType = when (val type = typeNode.asString()) {
             "Point" -> ctxt.constructType(Point::class.java)
             "LineString" -> ctxt.constructType(LineString::class.java)
             "Polygon" -> ctxt.constructType(Polygon::class.java)

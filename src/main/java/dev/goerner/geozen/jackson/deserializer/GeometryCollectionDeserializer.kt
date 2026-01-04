@@ -18,7 +18,9 @@ class GeometryCollectionDeserializer : ValueDeserializer<GeometryCollection>() {
     override fun deserialize(p: JsonParser, ctxt: DeserializationContext): GeometryCollection {
         val rootNode = p.readValueAsTree<JsonNode>()
 
-        val type = rootNode["type"].asString()
+        val typeNode = rootNode["type"]
+        require(typeNode != null && typeNode.isString) { "GeometryCollection must have a valid 'type' field." }
+        val type = typeNode.asString()
         require(
             type.equals(
                 "GeometryCollection",
@@ -33,16 +35,19 @@ class GeometryCollectionDeserializer : ValueDeserializer<GeometryCollection>() {
         val multiLineStringSerializer = ctxt.findRootValueDeserializer(ctxt.constructType(MultiLineString::class.java))
         val multiPolygonSerializer = ctxt.findRootValueDeserializer(ctxt.constructType(MultiPolygon::class.java))
 
-        val geometries = rootNode["geometries"].map {
-            val localType = it["type"].asString()
-            val geometryDeserializer = when (localType) {
+        val geometriesNode = rootNode["geometries"]
+        require(geometriesNode != null && geometriesNode.isArray) { "Invalid or missing 'geometries' field for GeometryCollection." }
+        val geometries = geometriesNode.map {
+            val localTypeNode = it["type"]
+            require(localTypeNode != null && localTypeNode.isString) { "Each geometry in 'geometries' must have a valid 'type' field." }
+            val geometryDeserializer = when (val localType = localTypeNode.asString()) {
                 "Point" -> pointSerializer
                 "LineString" -> lineStringSerializer
                 "Polygon" -> polygonSerializer
                 "MultiPoint" -> multiPointSerializer
                 "MultiLineString" -> multiLineStringSerializer
                 "MultiPolygon" -> multiPolygonSerializer
-                else -> throw java.lang.IllegalArgumentException("Invalid GeoJSON type: $type.")
+                else -> throw java.lang.IllegalArgumentException("Invalid GeoJSON type: $localType.")
             }
 
             geometryDeserializer.deserialize(it.traverse(ctxt), ctxt) as Geometry

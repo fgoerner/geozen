@@ -12,7 +12,9 @@ class MultiPointDeserializer : AbstractGeometryDeserializer<MultiPoint>() {
 
         checkType(rootNode, "MultiPoint")
 
-        val coordinates = rootNode["coordinates"].map { parsePosition(it) }
+        val coordinatesNode = rootNode["coordinates"]
+        require(coordinatesNode != null && coordinatesNode.isArray) { "Invalid or missing 'coordinates' field for MultiPoint geometry." }
+        val coordinates = coordinatesNode.map { parsePosition(it) }
 
         return MultiPoint(coordinates)
     }
