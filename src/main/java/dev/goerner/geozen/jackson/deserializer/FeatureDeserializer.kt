@@ -1,36 +1,27 @@
-package dev.goerner.geozen.jackson.deserializer;
+package dev.goerner.geozen.jackson.deserializer
 
-import dev.goerner.geozen.model.Feature;
-import dev.goerner.geozen.model.Geometry;
-import tools.jackson.core.JsonParser;
-import tools.jackson.databind.DeserializationContext;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ValueDeserializer;
+import dev.goerner.geozen.model.Feature
+import dev.goerner.geozen.model.Geometry
+import tools.jackson.core.JsonParser
+import tools.jackson.databind.DeserializationContext
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.ValueDeserializer
 
-import java.util.HashMap;
-import java.util.Map;
+class FeatureDeserializer : ValueDeserializer<Feature>() {
 
-public class FeatureDeserializer extends ValueDeserializer<Feature> {
+    override fun deserialize(p: JsonParser, ctxt: DeserializationContext): Feature {
+        val rootNode = p.readValueAsTree<JsonNode>()
 
-    @Override
-    public Feature deserialize(JsonParser p, DeserializationContext ctxt) {
-        JsonNode rootNode = p.readValueAsTree();
+        val type = rootNode["type"].asString()
+        require(type.equals("Feature", ignoreCase = true)) { "Invalid GeoJSON type: $type. Expected 'Feature'." }
 
-        String type = rootNode.get("type").asString();
-        if (!type.equalsIgnoreCase("Feature")) {
-            throw new IllegalArgumentException("Invalid GeoJSON type: " + type + ". Expected 'Feature'.");
-        }
+        val id = rootNode["id"].asString()
 
-        String id = rootNode.get("id").asString();
+        val geometryDeserializer = ctxt.findRootValueDeserializer(ctxt.constructType(Geometry::class.java))
+        val geometry = geometryDeserializer.deserialize(rootNode.get("geometry").traverse(ctxt), ctxt) as Geometry
 
-        ValueDeserializer<?> geometryDeserializer = ctxt.findRootValueDeserializer(ctxt.constructType(Geometry.class));
-        Geometry geometry = (Geometry) geometryDeserializer.deserialize(rootNode.get("geometry").traverse(ctxt), ctxt);
+        val properties = rootNode["properties"].properties().associate { it.key to it.value.asString() }
 
-        Map<String, String> properties = new HashMap<>();
-        for (Map.Entry<String, JsonNode> property : rootNode.get("properties").properties()) {
-            properties.put(property.getKey(), property.getValue().asString());
-        }
-
-        return new Feature(id, geometry, properties);
+        return Feature(id, geometry, properties)
     }
 }

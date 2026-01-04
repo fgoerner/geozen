@@ -1,27 +1,19 @@
-package dev.goerner.geozen.jackson.deserializer;
+package dev.goerner.geozen.jackson.deserializer
 
-import dev.goerner.geozen.model.Position;
-import dev.goerner.geozen.model.multi_geometry.MultiPoint;
-import tools.jackson.core.JsonParser;
-import tools.jackson.databind.DeserializationContext;
-import tools.jackson.databind.JsonNode;
+import dev.goerner.geozen.model.multi_geometry.MultiPoint
+import tools.jackson.core.JsonParser
+import tools.jackson.databind.DeserializationContext
+import tools.jackson.databind.JsonNode
 
-import java.util.ArrayList;
-import java.util.List;
+class MultiPointDeserializer : AbstractGeometryDeserializer<MultiPoint>() {
 
-public class MultiPointDeserializer extends AbstractGeometryDeserializer<MultiPoint> {
+    override fun deserialize(p: JsonParser, ctxt: DeserializationContext): MultiPoint {
+        val rootNode = p.readValueAsTree<JsonNode>()
 
-    @Override
-    public MultiPoint deserialize(JsonParser p, DeserializationContext ctxt) {
-        JsonNode rootNode = p.readValueAsTree();
+        checkType(rootNode, "MultiPoint")
 
-        checkType(rootNode, "MultiPoint");
+        val coordinates = rootNode["coordinates"].map { parsePosition(it) }
 
-        List<Position> coordinates = new ArrayList<>();
-        for (JsonNode coordinateNode : rootNode.get("coordinates")) {
-            coordinates.add(parsePosition(coordinateNode));
-        }
-
-        return new MultiPoint(coordinates);
+        return MultiPoint(coordinates)
     }
 }

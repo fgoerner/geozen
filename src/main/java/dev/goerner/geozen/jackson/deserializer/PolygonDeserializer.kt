@@ -1,31 +1,19 @@
-package dev.goerner.geozen.jackson.deserializer;
+package dev.goerner.geozen.jackson.deserializer
 
-import dev.goerner.geozen.model.Position;
-import dev.goerner.geozen.model.simple_geometry.Polygon;
-import tools.jackson.core.JsonParser;
-import tools.jackson.databind.DeserializationContext;
-import tools.jackson.databind.JsonNode;
+import dev.goerner.geozen.model.simple_geometry.Polygon
+import tools.jackson.core.JsonParser
+import tools.jackson.databind.DeserializationContext
+import tools.jackson.databind.JsonNode
 
-import java.util.ArrayList;
-import java.util.List;
+class PolygonDeserializer : AbstractGeometryDeserializer<Polygon>() {
 
-public class PolygonDeserializer extends AbstractGeometryDeserializer<Polygon> {
+    override fun deserialize(p: JsonParser, ctxt: DeserializationContext): Polygon {
+        val rootNode = p.readValueAsTree<JsonNode>()
 
-    @Override
-    public Polygon deserialize(JsonParser p, DeserializationContext ctxt) {
-        JsonNode rootNode = p.readValueAsTree();
+        checkType(rootNode, "Polygon")
 
-        checkType(rootNode, "Polygon");
+        val coordinates = rootNode["coordinates"].map { ringNode -> ringNode.map { parsePosition(it) } }
 
-        List<List<Position>> coordinates = new ArrayList<>();
-        for (JsonNode ringNode : rootNode.get("coordinates")) {
-            List<Position> ring = new ArrayList<>();
-            for (JsonNode coordinateNode : ringNode) {
-                ring.add(parsePosition(coordinateNode));
-            }
-            coordinates.add(ring);
-        }
-
-        return new Polygon(coordinates);
+        return Polygon(coordinates)
     }
 }

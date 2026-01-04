@@ -1,18 +1,17 @@
-package dev.goerner.geozen.jackson.deserializer;
+package dev.goerner.geozen.jackson.deserializer
 
-import dev.goerner.geozen.model.simple_geometry.Point;
-import tools.jackson.core.JsonParser;
-import tools.jackson.databind.DeserializationContext;
-import tools.jackson.databind.JsonNode;
+import dev.goerner.geozen.model.simple_geometry.Point
+import tools.jackson.core.JsonParser
+import tools.jackson.databind.DeserializationContext
+import tools.jackson.databind.JsonNode
 
-public class PointDeserializer extends AbstractGeometryDeserializer<Point> {
+class PointDeserializer : AbstractGeometryDeserializer<Point>() {
 
-    @Override
-    public Point deserialize(JsonParser p, DeserializationContext ctxt) {
-        JsonNode rootNode = p.readValueAsTree();
+    override fun deserialize(p: JsonParser, ctxt: DeserializationContext): Point {
+        val rootNode = p.readValueAsTree<JsonNode>()
 
-        checkType(rootNode, "Point");
+        checkType(rootNode, "Point")
 
-        return new Point(parsePosition(rootNode.get("coordinates")));
+        return Point(parsePosition(rootNode["coordinates"]))
     }
 }

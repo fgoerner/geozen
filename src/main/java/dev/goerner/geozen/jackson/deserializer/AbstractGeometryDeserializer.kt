@@ -1,26 +1,26 @@
-package dev.goerner.geozen.jackson.deserializer;
+package dev.goerner.geozen.jackson.deserializer
 
-import dev.goerner.geozen.model.Geometry;
-import dev.goerner.geozen.model.Position;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ValueDeserializer;
+import dev.goerner.geozen.model.Geometry
+import dev.goerner.geozen.model.Position
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.ValueDeserializer
 
-public abstract class AbstractGeometryDeserializer<T extends Geometry> extends ValueDeserializer<T> {
+abstract class AbstractGeometryDeserializer<T : Geometry> : ValueDeserializer<T>() {
 
-    protected void checkType(JsonNode rootNode, String expectedType) {
-        String type = rootNode.get("type").asString();
-        if (!expectedType.equalsIgnoreCase(type)) {
-            throw new IllegalArgumentException("Invalid GeoJSON type: " + type + ". Expected '" + expectedType + "'.");
-        }
+    protected fun checkType(rootNode: JsonNode, expectedType: String) {
+        val type = rootNode["type"].asString()
+        require(
+            expectedType.equals(type, ignoreCase = true)
+        ) { "Invalid GeoJSON type: $type. Expected '$expectedType'." }
     }
 
-    protected Position parsePosition(JsonNode coordinates) {
-        double longitude = coordinates.get(0).asDouble();
-        double latitude = coordinates.get(1).asDouble();
-        double altitude = 0;
+    protected fun parsePosition(coordinates: JsonNode): Position {
+        val longitude = coordinates[0].asDouble()
+        val latitude = coordinates[1].asDouble()
+        var altitude = 0.0
         if (coordinates.size() > 2) {
-            altitude = coordinates.get(2).asDouble();
+            altitude = coordinates[2].asDouble()
         }
-        return new Position(longitude, latitude, altitude);
+        return Position(longitude, latitude, altitude)
     }
 }

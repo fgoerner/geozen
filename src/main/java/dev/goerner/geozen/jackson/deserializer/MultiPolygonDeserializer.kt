@@ -1,35 +1,20 @@
-package dev.goerner.geozen.jackson.deserializer;
+package dev.goerner.geozen.jackson.deserializer
 
-import dev.goerner.geozen.model.Position;
-import dev.goerner.geozen.model.multi_geometry.MultiPolygon;
-import tools.jackson.core.JsonParser;
-import tools.jackson.databind.DeserializationContext;
-import tools.jackson.databind.JsonNode;
+import dev.goerner.geozen.model.multi_geometry.MultiPolygon
+import tools.jackson.core.JsonParser
+import tools.jackson.databind.DeserializationContext
+import tools.jackson.databind.JsonNode
 
-import java.util.ArrayList;
-import java.util.List;
+class MultiPolygonDeserializer : AbstractGeometryDeserializer<MultiPolygon>() {
 
-public class MultiPolygonDeserializer extends AbstractGeometryDeserializer<MultiPolygon> {
+    override fun deserialize(p: JsonParser, ctxt: DeserializationContext): MultiPolygon {
+        val rootNode = p.readValueAsTree<JsonNode>()
 
-    @Override
-    public MultiPolygon deserialize(JsonParser p, DeserializationContext ctxt) {
-        JsonNode rootNode = p.readValueAsTree();
+        checkType(rootNode, "MultiPolygon")
 
-        checkType(rootNode, "MultiPolygon");
+        val coordinates =
+            rootNode["coordinates"].map { polygonNode -> polygonNode.map { ringNode -> ringNode.map { parsePosition(it) } } }
 
-        List<List<List<Position>>> coordinates = new ArrayList<>();
-        for (JsonNode polygonNode : rootNode.get("coordinates")) {
-            List<List<Position>> polygon = new ArrayList<>();
-            for (JsonNode ringNode : polygonNode) {
-                List<Position> ring = new ArrayList<>();
-                for (JsonNode coordinateNode : ringNode) {
-                    ring.add(parsePosition(coordinateNode));
-                }
-                polygon.add(ring);
-            }
-            coordinates.add(polygon);
-        }
-
-        return new MultiPolygon(coordinates);
+        return MultiPolygon(coordinates)
     }
 }
