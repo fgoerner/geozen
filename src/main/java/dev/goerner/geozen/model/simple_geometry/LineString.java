@@ -36,6 +36,16 @@ public class LineString extends Geometry {
         this.coordinates = List.copyOf(coordinates);
     }
 
+    @Override
+    public double getFastDistanceTo(Geometry other) {
+        throw new UnsupportedOperationException("Fast distance calculation not implemented yet");
+    }
+
+    @Override
+    public double getExactDistanceTo(Geometry other) {
+        throw new UnsupportedOperationException("Exact distance calculation not implemented yet");
+    }
+
     public List<Position> getCoordinates() {
         return this.coordinates;
     }
