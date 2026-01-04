@@ -66,7 +66,7 @@ object PreciseDistanceCalculator {
         var minDistance = Double.MAX_VALUE
         val positions = lineString.coordinates
 
-        require(positions != null && positions.isNotEmpty()) { "LineString must contain at least one position." }
+        require(positions.isNotEmpty()) { "LineString must contain at least one position." }
         if (positions.size == 1) {
             return karneyDistance(p.coordinates, positions[0])
         }
