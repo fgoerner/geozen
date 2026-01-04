@@ -1,6 +1,5 @@
 package dev.goerner.geozen.calc
 
-import dev.goerner.geozen.calc.PreciseDistanceCalculator.karneyDistance
 import dev.goerner.geozen.model.Position
 import dev.goerner.geozen.model.simple_geometry.LineString
 import dev.goerner.geozen.model.simple_geometry.Point
