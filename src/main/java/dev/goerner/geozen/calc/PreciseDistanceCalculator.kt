@@ -1,5 +1,6 @@
 package dev.goerner.geozen.calc
 
+import dev.goerner.geozen.calc.PreciseDistanceCalculator.karneyDistance
 import dev.goerner.geozen.model.Position
 import dev.goerner.geozen.model.simple_geometry.LineString
 import dev.goerner.geozen.model.simple_geometry.Point
@@ -41,7 +42,7 @@ object PreciseDistanceCalculator {
      * Calculates a precise geodesic distance between two [Point] instances.
      * 
      * 
-     * This method delegates to [.karneyDistance] by using the
+     * This method delegates to [karneyDistance] by using the
      * underlying [Position] coordinates of the provided points. It is intended for
      * scenarios where high accuracy in distance calculation is required.
      * 
@@ -70,7 +71,7 @@ object PreciseDistanceCalculator {
         var minDistance = Double.MAX_VALUE
         val positions = lineString.coordinates
 
-        require(!(positions == null || positions.isEmpty())) { "LineString must contain at least one position." }
+        require(positions != null && positions.isNotEmpty()) { "LineString must contain at least one position." }
         if (positions.size == 1) {
             return karneyDistance(p.coordinates, positions[0])
         }

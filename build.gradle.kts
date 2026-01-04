@@ -24,7 +24,7 @@ dependencies {
     implementation(platform("tools.jackson:jackson-bom:3.0.0"))
     implementation("tools.jackson.core:jackson-databind")
     implementation("net.sf.geographiclib:GeographicLib-Java:2.1")
-    implementation(kotlin("stdlib-jdk8"))
+    implementation(kotlin("stdlib"))
 }
 
 tasks.test {
