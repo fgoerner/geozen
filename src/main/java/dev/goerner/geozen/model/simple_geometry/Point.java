@@ -76,6 +76,16 @@ public class Point extends Geometry {
         this.coordinates = coordinates;
     }
 
+    @Override
+    public double getFastDistanceTo(Geometry other) {
+        throw new UnsupportedOperationException("Fast distance calculation is not supported yet.");
+    }
+
+    @Override
+    public double getExactDistanceTo(Geometry other) {
+        throw new UnsupportedOperationException("Exact distance calculation is not supported yet.");
+    }
+
     public double getLongitude() {
         return this.coordinates.getLongitude();
     }
