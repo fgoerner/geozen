@@ -1,17 +1,14 @@
 package dev.goerner.geozen.calc
 
+import dev.goerner.geozen.calc.PreciseDistanceCalculator.karneyDistance
 import dev.goerner.geozen.model.Position
 import dev.goerner.geozen.model.simple_geometry.LineString
 import dev.goerner.geozen.model.simple_geometry.Point
 import net.sf.geographiclib.Geodesic
 import net.sf.geographiclib.GeodesicMask
 import kotlin.math.abs
-import kotlin.math.asin
-import kotlin.math.sin
 
 object PreciseDistanceCalculator {
-
-    const val WGS84_SEMI_MAJOR_AXIS: Double = 6378137.0
 
     /**
      * Calculates the distance between two geographical positions using Karney's algorithm.
@@ -84,7 +81,7 @@ object PreciseDistanceCalculator {
                 p1.longitude,
                 p.latitude,
                 p.longitude,
-                GeodesicMask.DISTANCE or GeodesicMask.AZIMUTH
+                GeodesicMask.DISTANCE or GeodesicMask.AZIMUTH or GeodesicMask.REDUCEDLENGTH
             )
             val gAB = Geodesic.WGS84.Inverse(
                 p1.latitude,
@@ -120,14 +117,13 @@ object PreciseDistanceCalculator {
                 var azDiffB = abs(gBP.azi1 - gBA.azi1)
                 if (azDiffB > 180) azDiffB = 360 - azDiffB
 
-                if (azDiffB > 90) {
+                dist = if (azDiffB > 90) {
                     // Closest is p2
-                    dist = gBP.s12
+                    gBP.s12
                 } else {
-                    // Closest is on the segment. Use spherical cross-track approximation with ellipsoidal radius.
-                    // WGS84 semi-major axis (equatorial radius) in meters
-                    val r = WGS84_SEMI_MAJOR_AXIS
-                    dist = abs(asin(sin(gAP.s12 / r) * sin(Math.toRadians(azDiffA)))) * r
+                    // Closest is on the segment. Use reduced length method for ellipsoidal cross-track distance.
+                    // The reduced length m12 relates azimuth perturbations to perpendicular displacement.
+                    abs(Math.toRadians(azDiffA) * gAP.m12)
                 }
             }
 
