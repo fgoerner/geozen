@@ -21,12 +21,7 @@ class GeometryCollectionDeserializer : ValueDeserializer<GeometryCollection>() {
         val typeNode = rootNode["type"]
         require(typeNode != null && typeNode.isString) { "GeometryCollection must have a valid 'type' field." }
         val type = typeNode.asString()
-        require(
-            type.equals(
-                "GeometryCollection",
-                ignoreCase = true
-            )
-        ) { "Invalid GeoJSON type: $type. Expected 'GeometryCollection'." }
+        require(type == "GeometryCollection") { "Invalid GeoJSON type: $type. Expected 'GeometryCollection'." }
 
         val pointDeserializer = ctxt.findRootValueDeserializer(ctxt.constructType(Point::class.java))
         val lineStringDeserializer = ctxt.findRootValueDeserializer(ctxt.constructType(LineString::class.java))

@@ -15,12 +15,7 @@ class FeatureCollectionDeserializer : ValueDeserializer<FeatureCollection>() {
         val typeNode = rootNode["type"]
         require(typeNode != null && typeNode.isString) { "Missing or invalid 'type' field in GeoJSON." }
         val type = typeNode.asString()
-        require(
-            type.equals(
-                "FeatureCollection",
-                ignoreCase = true
-            )
-        ) { "Invalid GeoJSON type: $type. Expected 'FeatureCollection'." }
+        require(type == "FeatureCollection") { "Invalid GeoJSON type: $type. Expected 'FeatureCollection'." }
 
         val featureDeserializer = ctxt.findRootValueDeserializer(ctxt.constructType(Feature::class.java))
 

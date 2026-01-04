@@ -11,9 +11,7 @@ abstract class AbstractGeometryDeserializer<T : Geometry> : ValueDeserializer<T>
         val typeNode = rootNode["type"]
         require(typeNode != null && typeNode.isString) { "Missing or invalid 'type' field in GeoJSON object." }
         val type = typeNode.asString()
-        require(
-            expectedType.equals(type, ignoreCase = true)
-        ) { "Invalid GeoJSON type: $type. Expected '$expectedType'." }
+        require(expectedType == type) { "Invalid GeoJSON type: $type. Expected '$expectedType'." }
     }
 
     protected fun parsePosition(coordinates: JsonNode): Position {

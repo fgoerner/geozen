@@ -15,7 +15,7 @@ class FeatureDeserializer : ValueDeserializer<Feature>() {
         val typeNode = rootNode["type"]
         require(typeNode != null && typeNode.isString) { "Missing or invalid 'type' field in GeoJSON Feature." }
         val type = typeNode.asString()
-        require(type.equals("Feature", ignoreCase = true)) { "Invalid GeoJSON type: $type. Expected 'Feature'." }
+        require(type == "Feature") { "Invalid GeoJSON type: $type. Expected 'Feature'." }
 
         val idNode = rootNode["id"]
         require(idNode != null && idNode.isString) { "Missing or invalid 'id' field in GeoJSON Feature." }
