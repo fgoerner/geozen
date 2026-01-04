@@ -1,6 +1,7 @@
 package dev.goerner.geozen.model.simple_geometry;
 
-import dev.goerner.geozen.calc.DistanceCalculator;
+import dev.goerner.geozen.calc.ApproximateDistanceCalculator;
+import dev.goerner.geozen.calc.PreciseDistanceCalculator;
 import dev.goerner.geozen.model.CoordinateReferenceSystem;
 import dev.goerner.geozen.model.Geometry;
 import dev.goerner.geozen.model.Position;
@@ -81,10 +82,10 @@ public class Point extends Geometry {
     public double getFastDistanceTo(Geometry other) {
         switch (other) {
             case Point otherPoint -> {
-                return DistanceCalculator.approximateDistance(this, otherPoint);
+                return ApproximateDistanceCalculator.calculate(this, otherPoint);
             }
             case LineString otherLineString -> {
-                return DistanceCalculator.approximateDistance(this, otherLineString);
+                return ApproximateDistanceCalculator.calculate(this, otherLineString);
             }
             default ->
                     throw new UnsupportedOperationException("Fast distance calculation is not supported for geometry type: " + other.getClass().getSimpleName());
@@ -95,10 +96,10 @@ public class Point extends Geometry {
     public double getExactDistanceTo(Geometry other) {
         switch (other) {
             case Point otherPoint -> {
-                return DistanceCalculator.preciseDistance(this, otherPoint);
+                return PreciseDistanceCalculator.calculate(this, otherPoint);
             }
             case LineString otherLineString -> {
-                return DistanceCalculator.preciseDistance(this, otherLineString);
+                return PreciseDistanceCalculator.calculate(this, otherLineString);
             }
             default ->
                     throw new UnsupportedOperationException("Exact distance calculation is not supported for geometry type: " + other.getClass().getSimpleName());
