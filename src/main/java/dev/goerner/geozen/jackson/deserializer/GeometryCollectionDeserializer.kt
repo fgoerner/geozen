@@ -28,13 +28,13 @@ class GeometryCollectionDeserializer : ValueDeserializer<GeometryCollection>() {
             )
         ) { "Invalid GeoJSON type: $type. Expected 'GeometryCollection'." }
 
-        val pointSerializer = ctxt.findRootValueDeserializer(ctxt.constructType(Point::class.java))
-        val lineStringSerializer = ctxt.findRootValueDeserializer(ctxt.constructType(LineString::class.java))
-        val polygonSerializer = ctxt.findRootValueDeserializer(ctxt.constructType(Polygon::class.java))
-        val multiPointSerializer = ctxt.findRootValueDeserializer(ctxt.constructType(MultiPoint::class.java))
-        val multiLineStringSerializer = ctxt.findRootValueDeserializer(ctxt.constructType(MultiLineString::class.java))
-        val multiPolygonSerializer = ctxt.findRootValueDeserializer(ctxt.constructType(MultiPolygon::class.java))
-        val geometryCollectionSerializer = ctxt.findRootValueDeserializer(ctxt.constructType(GeometryCollection::class.java))
+        val pointDeserializer = ctxt.findRootValueDeserializer(ctxt.constructType(Point::class.java))
+        val lineStringDeserializer = ctxt.findRootValueDeserializer(ctxt.constructType(LineString::class.java))
+        val polygonDeserializer = ctxt.findRootValueDeserializer(ctxt.constructType(Polygon::class.java))
+        val multiPointDeserializer = ctxt.findRootValueDeserializer(ctxt.constructType(MultiPoint::class.java))
+        val multiLineStringDeserializer = ctxt.findRootValueDeserializer(ctxt.constructType(MultiLineString::class.java))
+        val multiPolygonDeserializer = ctxt.findRootValueDeserializer(ctxt.constructType(MultiPolygon::class.java))
+        val geometryCollectionDeserializer = ctxt.findRootValueDeserializer(ctxt.constructType(GeometryCollection::class.java))
 
         val geometriesNode = rootNode["geometries"]
         require(geometriesNode != null && geometriesNode.isArray) { "Invalid or missing 'geometries' field for GeometryCollection." }
@@ -42,13 +42,13 @@ class GeometryCollectionDeserializer : ValueDeserializer<GeometryCollection>() {
             val localTypeNode = it["type"]
             require(localTypeNode != null && localTypeNode.isString) { "Each geometry in 'geometries' must have a valid 'type' field." }
             val geometryDeserializer = when (val localType = localTypeNode.asString()) {
-                "Point" -> pointSerializer
-                "LineString" -> lineStringSerializer
-                "Polygon" -> polygonSerializer
-                "MultiPoint" -> multiPointSerializer
-                "MultiLineString" -> multiLineStringSerializer
-                "MultiPolygon" -> multiPolygonSerializer
-                "GeometryCollection" -> geometryCollectionSerializer
+                "Point" -> pointDeserializer
+                "LineString" -> lineStringDeserializer
+                "Polygon" -> polygonDeserializer
+                "MultiPoint" -> multiPointDeserializer
+                "MultiLineString" -> multiLineStringDeserializer
+                "MultiPolygon" -> multiPolygonDeserializer
+                "GeometryCollection" -> geometryCollectionDeserializer
                 else -> throw java.lang.IllegalArgumentException("Invalid GeoJSON type: $localType.")
             }
 
