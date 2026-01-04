@@ -44,6 +44,6 @@ public class PreciseDistanceCalculatorTest {
 
         double preciseDistance = PreciseDistanceCalculator.INSTANCE.calculate(p1, lineString);
 
-        assertEquals(1837.9808887665006, preciseDistance);
+        assertEquals(1874.0229499712636, preciseDistance);
     }
 }

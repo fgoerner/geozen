@@ -1,30 +1,26 @@
-package dev.goerner.geozen.jackson.serializer;
+package dev.goerner.geozen.jackson.serializer
 
-import dev.goerner.geozen.model.Position;
-import dev.goerner.geozen.model.multi_geometry.MultiLineString;
-import tools.jackson.core.JsonGenerator;
-import tools.jackson.databind.SerializationContext;
+import dev.goerner.geozen.model.multi_geometry.MultiLineString
+import tools.jackson.core.JsonGenerator
+import tools.jackson.databind.SerializationContext
 
-import java.util.List;
+class MultiLineStringSerializer : AbstractGeometrySerializer<MultiLineString>() {
 
-public class MultiLineStringSerializer extends AbstractGeometrySerializer<MultiLineString> {
+    override fun serialize(value: MultiLineString, gen: JsonGenerator, ctxt: SerializationContext) {
+        gen.writeStartObject()
 
-    @Override
-    public void serialize(MultiLineString value, JsonGenerator gen, SerializationContext ctxt) {
-        gen.writeStartObject();
+        gen.writeStringProperty("type", "MultiLineString")
 
-        gen.writeStringProperty("type", "MultiLineString");
-
-        gen.writeArrayPropertyStart("coordinates");
-        for (List<Position> lineString : value.getCoordinates()) {
-            gen.writeStartArray();
-            for (Position position : lineString) {
-                writePosition(position, gen);
+        gen.writeArrayPropertyStart("coordinates")
+        for (lineString in value.coordinates) {
+            gen.writeStartArray()
+            for (position in lineString) {
+                writePosition(position, gen)
             }
-            gen.writeEndArray();
+            gen.writeEndArray()
         }
-        gen.writeEndArray();
+        gen.writeEndArray()
 
-        gen.writeEndObject();
+        gen.writeEndObject()
     }
 }

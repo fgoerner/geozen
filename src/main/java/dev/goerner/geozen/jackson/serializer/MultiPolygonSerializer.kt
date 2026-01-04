@@ -1,34 +1,30 @@
-package dev.goerner.geozen.jackson.serializer;
+package dev.goerner.geozen.jackson.serializer
 
-import dev.goerner.geozen.model.Position;
-import dev.goerner.geozen.model.multi_geometry.MultiPolygon;
-import tools.jackson.core.JsonGenerator;
-import tools.jackson.databind.SerializationContext;
+import dev.goerner.geozen.model.multi_geometry.MultiPolygon
+import tools.jackson.core.JsonGenerator
+import tools.jackson.databind.SerializationContext
 
-import java.util.List;
+class MultiPolygonSerializer : AbstractGeometrySerializer<MultiPolygon>() {
 
-public class MultiPolygonSerializer extends AbstractGeometrySerializer<MultiPolygon> {
+    override fun serialize(value: MultiPolygon, gen: JsonGenerator, ctxt: SerializationContext) {
+        gen.writeStartObject()
 
-    @Override
-    public void serialize(MultiPolygon value, JsonGenerator gen, SerializationContext ctxt) {
-        gen.writeStartObject();
+        gen.writeStringProperty("type", "MultiPolygon")
 
-        gen.writeStringProperty("type", "MultiPolygon");
-
-        gen.writeArrayPropertyStart("coordinates");
-        for (List<List<Position>> polygon : value.getCoordinates()) {
-            gen.writeStartArray();
-            for (List<Position> ring : polygon) {
-                gen.writeStartArray();
-                for (Position position : ring) {
-                    writePosition(position, gen);
+        gen.writeArrayPropertyStart("coordinates")
+        for (polygon in value.coordinates) {
+            gen.writeStartArray()
+            for (ring in polygon) {
+                gen.writeStartArray()
+                for (position in ring) {
+                    writePosition(position, gen)
                 }
-                gen.writeEndArray();
+                gen.writeEndArray()
             }
-            gen.writeEndArray();
+            gen.writeEndArray()
         }
-        gen.writeEndArray();
+        gen.writeEndArray()
 
-        gen.writeEndObject();
+        gen.writeEndObject()
     }
 }

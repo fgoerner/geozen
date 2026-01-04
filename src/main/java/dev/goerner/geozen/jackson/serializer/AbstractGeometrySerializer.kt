@@ -1,19 +1,19 @@
-package dev.goerner.geozen.jackson.serializer;
+package dev.goerner.geozen.jackson.serializer
 
-import dev.goerner.geozen.model.Geometry;
-import dev.goerner.geozen.model.Position;
-import tools.jackson.core.JsonGenerator;
-import tools.jackson.databind.ValueSerializer;
+import dev.goerner.geozen.model.Geometry
+import dev.goerner.geozen.model.Position
+import tools.jackson.core.JsonGenerator
+import tools.jackson.databind.ValueSerializer
 
-public abstract class AbstractGeometrySerializer<T extends Geometry> extends ValueSerializer<T> {
+abstract class AbstractGeometrySerializer<T : Geometry> : ValueSerializer<T>() {
 
-    protected void writePosition(Position position, JsonGenerator gen) {
-        gen.writeStartArray();
-        gen.writeNumber(position.getLongitude());
-        gen.writeNumber(position.getLatitude());
-        if (position.getAltitude() != 0) {
-            gen.writeNumber(position.getAltitude());
+    protected fun writePosition(position: Position, gen: JsonGenerator) {
+        gen.writeStartArray()
+        gen.writeNumber(position.longitude)
+        gen.writeNumber(position.latitude)
+        if (position.altitude != 0.0) {
+            gen.writeNumber(position.altitude)
         }
-        gen.writeEndArray();
+        gen.writeEndArray()
     }
 }

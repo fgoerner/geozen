@@ -1,24 +1,22 @@
-package dev.goerner.geozen.jackson.serializer;
+package dev.goerner.geozen.jackson.serializer
 
-import dev.goerner.geozen.model.Position;
-import dev.goerner.geozen.model.simple_geometry.LineString;
-import tools.jackson.core.JsonGenerator;
-import tools.jackson.databind.SerializationContext;
+import dev.goerner.geozen.model.simple_geometry.LineString
+import tools.jackson.core.JsonGenerator
+import tools.jackson.databind.SerializationContext
 
-public class LineStringSerializer extends AbstractGeometrySerializer<LineString> {
+class LineStringSerializer : AbstractGeometrySerializer<LineString>() {
 
-    @Override
-    public void serialize(LineString lineString, JsonGenerator gen, SerializationContext ctxt) {
-        gen.writeStartObject();
+    override fun serialize(lineString: LineString, gen: JsonGenerator, ctxt: SerializationContext) {
+        gen.writeStartObject()
 
-        gen.writeStringProperty("type", "LineString");
+        gen.writeStringProperty("type", "LineString")
 
-        gen.writeArrayPropertyStart("coordinates");
-        for (Position position : lineString.getCoordinates()) {
-            writePosition(position, gen);
+        gen.writeArrayPropertyStart("coordinates")
+        for (position in lineString.coordinates) {
+            writePosition(position, gen)
         }
-        gen.writeEndArray();
+        gen.writeEndArray()
 
-        gen.writeEndObject();
+        gen.writeEndObject()
     }
 }

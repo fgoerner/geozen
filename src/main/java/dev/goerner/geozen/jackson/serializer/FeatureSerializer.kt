@@ -1,50 +1,48 @@
-package dev.goerner.geozen.jackson.serializer;
+package dev.goerner.geozen.jackson.serializer
 
-import dev.goerner.geozen.model.Feature;
-import dev.goerner.geozen.model.multi_geometry.MultiLineString;
-import dev.goerner.geozen.model.multi_geometry.MultiPoint;
-import dev.goerner.geozen.model.multi_geometry.MultiPolygon;
-import dev.goerner.geozen.model.simple_geometry.LineString;
-import dev.goerner.geozen.model.simple_geometry.Point;
-import dev.goerner.geozen.model.simple_geometry.Polygon;
-import tools.jackson.core.JsonGenerator;
-import tools.jackson.databind.SerializationContext;
-import tools.jackson.databind.ValueSerializer;
+import dev.goerner.geozen.model.Feature
+import dev.goerner.geozen.model.multi_geometry.MultiLineString
+import dev.goerner.geozen.model.multi_geometry.MultiPoint
+import dev.goerner.geozen.model.multi_geometry.MultiPolygon
+import dev.goerner.geozen.model.simple_geometry.LineString
+import dev.goerner.geozen.model.simple_geometry.Point
+import dev.goerner.geozen.model.simple_geometry.Polygon
+import tools.jackson.core.JsonGenerator
+import tools.jackson.databind.SerializationContext
+import tools.jackson.databind.ValueSerializer
 
-public class FeatureSerializer extends ValueSerializer<Feature> {
+class FeatureSerializer : ValueSerializer<Feature>() {
 
-    @Override
-    public void serialize(Feature value, JsonGenerator gen, SerializationContext ctxt) {
-        gen.writeStartObject();
+    override fun serialize(value: Feature, gen: JsonGenerator, ctxt: SerializationContext) {
+        gen.writeStartObject()
 
-        gen.writeStringProperty("type", "Feature");
+        gen.writeStringProperty("type", "Feature")
 
-        if (value.getId() != null) {
-            gen.writeStringProperty("id", value.getId());
+        if (value.id != null) {
+            gen.writeStringProperty("id", value.id)
         }
 
-        gen.writeName("geometry");
-        switch (value.getGeometry()) {
-            case Point point -> ctxt.findValueSerializer(Point.class).serialize(point, gen, ctxt);
-            case LineString lineString -> ctxt.findValueSerializer(LineString.class).serialize(lineString, gen, ctxt);
-            case Polygon polygon -> ctxt.findValueSerializer(Polygon.class).serialize(polygon, gen, ctxt);
-            case MultiPoint multiPoint -> ctxt.findValueSerializer(MultiPoint.class).serialize(multiPoint, gen, ctxt);
-            case MultiLineString multiLineString ->
-                    ctxt.findValueSerializer(MultiLineString.class).serialize(multiLineString, gen, ctxt);
-            case MultiPolygon multiPolygon ->
-                    ctxt.findValueSerializer(MultiPolygon.class).serialize(multiPolygon, gen, ctxt);
-            case null -> gen.writeNull();
-            default ->
-                    throw new IllegalArgumentException("Invalid Geometry type: " + value.getGeometry().getClass().getSimpleName());
+        gen.writeName("geometry")
+        when (val geometry = value.geometry) {
+            is Point -> ctxt.findValueSerializer(Point::class.java).serialize(geometry, gen, ctxt)
+            is LineString -> ctxt.findValueSerializer(LineString::class.java).serialize(geometry, gen, ctxt)
+            is Polygon -> ctxt.findValueSerializer(Polygon::class.java).serialize(geometry, gen, ctxt)
+            is MultiPoint -> ctxt.findValueSerializer(MultiPoint::class.java).serialize(geometry, gen, ctxt)
+            is MultiLineString -> ctxt.findValueSerializer(MultiLineString::class.java).serialize(geometry, gen, ctxt)
+            is MultiPolygon -> ctxt.findValueSerializer(MultiPolygon::class.java).serialize(geometry, gen, ctxt)
+            null -> gen.writeNull()
+            else -> throw IllegalArgumentException(
+                "Invalid Geometry type: " + geometry.javaClass.getSimpleName()
+            )
         }
 
-        gen.writeName("properties");
-        if (value.getProperties() != null) {
-            gen.writePOJO(value.getProperties());
+        gen.writeName("properties")
+        if (value.properties != null) {
+            gen.writePOJO(value.properties)
         } else {
-            gen.writeNull();
+            gen.writeNull()
         }
 
-        gen.writeEndObject();
+        gen.writeEndObject()
     }
 }
