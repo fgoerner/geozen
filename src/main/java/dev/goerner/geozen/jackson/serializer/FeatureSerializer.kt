@@ -1,6 +1,7 @@
 package dev.goerner.geozen.jackson.serializer
 
 import dev.goerner.geozen.model.Feature
+import dev.goerner.geozen.model.collections.GeometryCollection
 import dev.goerner.geozen.model.multi_geometry.MultiLineString
 import dev.goerner.geozen.model.multi_geometry.MultiPoint
 import dev.goerner.geozen.model.multi_geometry.MultiPolygon
@@ -30,6 +31,7 @@ class FeatureSerializer : ValueSerializer<Feature>() {
             is MultiPoint -> ctxt.findValueSerializer(MultiPoint::class.java).serialize(geometry, gen, ctxt)
             is MultiLineString -> ctxt.findValueSerializer(MultiLineString::class.java).serialize(geometry, gen, ctxt)
             is MultiPolygon -> ctxt.findValueSerializer(MultiPolygon::class.java).serialize(geometry, gen, ctxt)
+            is GeometryCollection -> ctxt.findValueSerializer(GeometryCollection::class.java).serialize(geometry, gen, ctxt)
             null -> gen.writeNull()
             else -> throw IllegalArgumentException(
                 "Invalid Geometry type: " + geometry.javaClass.getSimpleName()

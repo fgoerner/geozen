@@ -1,6 +1,7 @@
 package dev.goerner.geozen.jackson.deserializer
 
 import dev.goerner.geozen.model.Geometry
+import dev.goerner.geozen.model.collections.GeometryCollection
 import dev.goerner.geozen.model.multi_geometry.MultiLineString
 import dev.goerner.geozen.model.multi_geometry.MultiPoint
 import dev.goerner.geozen.model.multi_geometry.MultiPolygon
@@ -26,6 +27,7 @@ class GeometryDeserializer : AbstractGeometryDeserializer<Geometry>() {
             "MultiPoint" -> ctxt.constructType(MultiPoint::class.java)
             "MultiLineString" -> ctxt.constructType(MultiLineString::class.java)
             "MultiPolygon" -> ctxt.constructType(MultiPolygon::class.java)
+            "GeometryCollection" -> ctxt.constructType(GeometryCollection::class.java)
             else -> throw IllegalArgumentException("Invalid GeoJSON type: $type.")
         }
         val deserializer = ctxt.findRootValueDeserializer(javaType)

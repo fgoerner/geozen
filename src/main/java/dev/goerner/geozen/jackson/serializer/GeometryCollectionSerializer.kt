@@ -27,6 +27,7 @@ class GeometryCollectionSerializer : ValueSerializer<GeometryCollection>() {
                 is MultiPoint -> ctxt.findValueSerializer(MultiPoint::class.java).serialize(geometry, gen, ctxt)
                 is MultiLineString -> ctxt.findValueSerializer(MultiLineString::class.java).serialize(geometry, gen, ctxt)
                 is MultiPolygon -> ctxt.findValueSerializer(MultiPolygon::class.java).serialize(geometry, gen, ctxt)
+                is GeometryCollection -> ctxt.findValueSerializer(GeometryCollection::class.java).serialize(geometry, gen, ctxt)
                 else -> throw IllegalArgumentException("Invalid Geometry type: " + geometry.javaClass.getSimpleName())
             }
         }
