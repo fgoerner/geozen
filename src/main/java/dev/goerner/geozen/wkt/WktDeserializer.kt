@@ -119,7 +119,7 @@ class WktDeserializer {
     private fun parsePoint(coords: String, crs: CoordinateReferenceSystem): Point {
         var coords = coords
         if (coords == "EMPTY") {
-            return Point(Position(0.0, 0.0), crs)
+            return Point(null, crs)
         }
 
         coords = stripParentheses(coords)
