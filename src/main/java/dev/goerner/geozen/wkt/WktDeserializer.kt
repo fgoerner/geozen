@@ -185,7 +185,7 @@ class WktDeserializer {
     private fun parseGeometryCollection(coords: String, crs: CoordinateReferenceSystem): GeometryCollection {
         var coords = coords
         if (coords == "EMPTY") {
-            return GeometryCollection(emptyList())
+            return GeometryCollection(emptyList(), crs)
         }
 
         coords = stripParentheses(coords)
