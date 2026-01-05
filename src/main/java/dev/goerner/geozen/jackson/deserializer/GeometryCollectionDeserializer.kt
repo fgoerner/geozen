@@ -44,7 +44,7 @@ class GeometryCollectionDeserializer : ValueDeserializer<GeometryCollection>() {
                 "MultiLineString" -> multiLineStringDeserializer
                 "MultiPolygon" -> multiPolygonDeserializer
                 "GeometryCollection" -> geometryCollectionDeserializer
-                else -> throw java.lang.IllegalArgumentException("Invalid GeoJSON type: $localType.")
+                else -> throw IllegalArgumentException("Invalid GeoJSON type: $localType.")
             }
 
             geometryDeserializer.deserialize(it.traverse(ctxt), ctxt) as Geometry

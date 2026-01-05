@@ -371,7 +371,7 @@ class WktSerializerTest {
         GeometryCollection collection = new GeometryCollection(List.of(
                 new Point(10.0, 20.0, CoordinateReferenceSystem.WEB_MERCATOR),
                 new LineString(List.of(new Position(30.0, 40.0), new Position(50.0, 60.0)), CoordinateReferenceSystem.WEB_MERCATOR)
-        ));
+        ), CoordinateReferenceSystem.WEB_MERCATOR);
         String ewkt = serializer.toEwkt(collection);
         assertEquals("SRID=3857;GEOMETRYCOLLECTION (POINT (10.0 20.0), LINESTRING (30.0 40.0, 50.0 60.0))", ewkt);
     }

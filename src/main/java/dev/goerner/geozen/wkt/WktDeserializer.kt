@@ -189,7 +189,7 @@ class WktDeserializer {
         }
 
         coords = stripParentheses(coords)
-        val geometries: MutableList<Geometry?> = ArrayList()
+        val geometries: MutableList<Geometry> = ArrayList()
 
         var depth = 0
         var start = 0
@@ -219,7 +219,7 @@ class WktDeserializer {
             geometries.add(parseGeometry(geomWkt, crs))
         }
 
-        return GeometryCollection(geometries)
+        return GeometryCollection(geometries, crs)
     }
 
     private fun parsePosition(coords: String): Position {

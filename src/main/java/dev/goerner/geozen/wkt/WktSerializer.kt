@@ -95,9 +95,8 @@ class WktSerializer {
 
         val sb = StringBuilder()
 
-        if (includeExtended && !collection.geometries.isEmpty()) {
-            val crs: CoordinateReferenceSystem = collection.geometries[0].coordinateReferenceSystem
-            sb.append("SRID=").append(getSrid(crs)).append(";")
+        if (includeExtended) {
+            sb.append("SRID=").append(getSrid(collection.coordinateReferenceSystem)).append(";")
         }
 
         sb.append("GEOMETRYCOLLECTION")
@@ -151,7 +150,7 @@ class WktSerializer {
 
     private fun serializePolygon(polygon: Polygon): String {
         val sb = StringBuilder("POLYGON")
-        val coords = polygon.getCoordinates()
+        val coords = polygon.coordinates
 
         if (coords == null || coords.isEmpty()) {
             sb.append(" EMPTY")
