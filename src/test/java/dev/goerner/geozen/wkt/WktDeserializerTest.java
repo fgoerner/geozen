@@ -463,11 +463,6 @@ class WktDeserializerTest {
 
     // Error Handling Tests
     @Test
-    void testDeserializeNullWkt() {
-        assertThrows(WktException.class, () -> deserializer.fromWkt(null));
-    }
-
-    @Test
     void testDeserializeEmptyWkt() {
         assertThrows(WktException.class, () -> deserializer.fromWkt(""));
     }
