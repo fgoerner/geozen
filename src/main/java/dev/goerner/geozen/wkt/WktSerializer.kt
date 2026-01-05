@@ -162,7 +162,7 @@ class WktSerializer {
                     sb.append(", ")
                 }
                 sb.append("(")
-                appendPositionList(sb, coords[i]!!)
+                appendPositionList(sb, coords[i])
                 sb.append(")")
             }
             sb.append(")")
@@ -184,7 +184,7 @@ class WktSerializer {
                     sb.append(", ")
                 }
                 sb.append("(")
-                appendPosition(sb, coords.get(i)!!)
+                appendPosition(sb, coords[i])
                 sb.append(")")
             }
             sb.append(")")
@@ -206,7 +206,7 @@ class WktSerializer {
                     sb.append(", ")
                 }
                 sb.append("(")
-                appendPositionList(sb, coords[i]!!)
+                appendPositionList(sb, coords[i])
                 sb.append(")")
             }
             sb.append(")")
@@ -234,7 +234,7 @@ class WktSerializer {
                         sb.append(", ")
                     }
                     sb.append("(")
-                    appendPositionList(sb, polygon[j]!!)
+                    appendPositionList(sb, polygon[j])
                     sb.append(")")
                 }
                 sb.append(")")
@@ -252,12 +252,12 @@ class WktSerializer {
         }
     }
 
-    private fun appendPositionList(sb: StringBuilder, positions: MutableList<Position?>) {
+    private fun appendPositionList(sb: StringBuilder, positions: List<Position>) {
         for (i in positions.indices) {
             if (i > 0) {
                 sb.append(", ")
             }
-            appendPosition(sb, positions[i]!!)
+            appendPosition(sb, positions[i])
         }
     }
 
