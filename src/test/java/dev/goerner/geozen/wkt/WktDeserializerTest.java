@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -75,7 +74,8 @@ class WktDeserializerTest {
         Geometry geom = deserializer.fromWkt("POINT EMPTY");
         assertInstanceOf(Point.class, geom);
         Point point = (Point) geom;
-        assertNull(point.getCoordinates());
+        assertEquals(Double.NaN, point.getCoordinates().getLongitude());
+        assertEquals(Double.NaN, point.getCoordinates().getLatitude());
     }
 
     @Test
