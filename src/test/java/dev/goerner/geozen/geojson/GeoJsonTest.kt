@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertInstanceOf
+import org.junit.jupiter.api.assertNotNull
 import tools.jackson.databind.ObjectMapper
 import tools.jackson.databind.json.JsonMapper
 
@@ -199,7 +200,7 @@ class GeoJsonTest {
         val id = "123"
         val point: Geometry = Point(1.0, 2.0)
         val properties: Map<String, String> = mapOf("name" to "John Doe")
-        val feature = Feature(point, id, properties)
+        val feature = Feature(id, point, properties)
 
         val geoJsonString: String? = objectMapper.writeValueAsString(feature)
 
@@ -214,7 +215,7 @@ class GeoJsonTest {
         val id = "123"
         val point: Geometry = Point(1.0, 2.0)
         val properties: Map<String, String> = mapOf("name" to "John Doe")
-        val feature = Feature(point, id, properties)
+        val feature = Feature(id, point, properties)
         val features: List<Feature> = listOf(feature)
         val featureCollection = FeatureCollection(features)
 
@@ -463,6 +464,7 @@ class GeoJsonTest {
         val point = feature.geometry
         assertEquals(1.0, point.longitude)
         assertEquals(2.0, point.latitude)
+        assertNotNull(feature.properties)
         assertEquals("John Doe", feature.properties["name"])
     }
 
@@ -481,6 +483,7 @@ class GeoJsonTest {
         val point = feature.geometry
         assertEquals(1.0, point.longitude)
         assertEquals(2.0, point.latitude)
+        assertNotNull(feature.properties)
         assertEquals("John Doe", feature.properties["name"])
     }
 

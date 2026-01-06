@@ -9,7 +9,7 @@ class FeatureCollectionTest {
     @Test
     fun testFeaturesConstructor() {
         val features = listOf(
-            Feature(Point(0.0, 0.0))
+            Feature(null, Point(0.0, 0.0))
         )
 
         val featureCollection = FeatureCollection(features)

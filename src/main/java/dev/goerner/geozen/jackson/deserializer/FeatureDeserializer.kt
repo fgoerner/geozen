@@ -30,6 +30,6 @@ class FeatureDeserializer : ValueDeserializer<Feature>() {
         require(propertiesNode != null && propertiesNode.isObject) { "Missing or invalid 'properties' field in GeoJSON Feature." }
         val properties = propertiesNode.properties().associate { it.key to it.value.asString() }
 
-        return Feature(geometry, id, properties)
+        return Feature(id, geometry, properties)
     }
 }

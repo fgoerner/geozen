@@ -34,8 +34,9 @@ class FeatureSerializer : ValueSerializer<Feature>() {
             is GeometryCollection -> ctxt.findValueSerializer(GeometryCollection::class.java)
                 .serialize(geometry, gen, ctxt)
 
+            null -> gen.writeNull()
             else -> throw IllegalArgumentException(
-                "Invalid Geometry type: " + geometry.javaClass.getSimpleName()
+                "Invalid Geometry type: " + geometry.javaClass.simpleName
             )
         }
 
