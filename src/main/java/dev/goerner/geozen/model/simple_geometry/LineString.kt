@@ -1,52 +1,23 @@
-package dev.goerner.geozen.model.simple_geometry;
+package dev.goerner.geozen.model.simple_geometry
 
-import dev.goerner.geozen.model.CoordinateReferenceSystem;
-import dev.goerner.geozen.model.Geometry;
-import dev.goerner.geozen.model.Position;
-
-import java.util.List;
+import dev.goerner.geozen.model.CoordinateReferenceSystem
+import dev.goerner.geozen.model.Geometry
+import dev.goerner.geozen.model.Position
 
 /**
- * A {@link LineString} is a {@link Geometry} that represents a sequence of {@link Position Positions} in space. It is
- * defined by a list of {@link Position Positions} and a {@link CoordinateReferenceSystem}.
+ * A [LineString] is a [Geometry] that represents a sequence of [Positions][Position] in space. It is
+ * defined by a list of [Positions][Position] and a [CoordinateReferenceSystem].
  */
-public class LineString extends Geometry {
+class LineString(
+    val coordinates: List<Position>,
+    coordinateReferenceSystem: CoordinateReferenceSystem = CoordinateReferenceSystem.WGS_84
+) : Geometry(coordinateReferenceSystem) {
 
-    private final List<Position> coordinates;
-
-    /**
-     * Creates a new {@link LineString} with the given list of {@link Position Positions} and the default WGS 84
-     * {@link CoordinateReferenceSystem}.
-     *
-     * @param coordinates The list of {@link Position Positions} representing the {@link LineString}.
-     */
-    public LineString(List<Position> coordinates) {
-        this(coordinates, CoordinateReferenceSystem.WGS_84);
+    override fun getFastDistanceTo(other: Geometry): Double {
+        throw UnsupportedOperationException("Fast distance calculation not implemented yet")
     }
 
-    /**
-     * Creates a new {@link LineString} with the given list of {@link Position Positions} and the given
-     * {@link CoordinateReferenceSystem}.
-     *
-     * @param coordinates               The list of {@link Position Positions} representing the {@link LineString}.
-     * @param coordinateReferenceSystem The {@link CoordinateReferenceSystem} of the {@link LineString}.
-     */
-    public LineString(List<Position> coordinates, CoordinateReferenceSystem coordinateReferenceSystem) {
-        super(coordinateReferenceSystem);
-        this.coordinates = List.copyOf(coordinates);
-    }
-
-    @Override
-    public double getFastDistanceTo(Geometry other) {
-        throw new UnsupportedOperationException("Fast distance calculation not implemented yet");
-    }
-
-    @Override
-    public double getExactDistanceTo(Geometry other) {
-        throw new UnsupportedOperationException("Exact distance calculation not implemented yet");
-    }
-
-    public List<Position> getCoordinates() {
-        return this.coordinates;
+    override fun getExactDistanceTo(other: Geometry): Double {
+        throw UnsupportedOperationException("Exact distance calculation not implemented yet")
     }
 }

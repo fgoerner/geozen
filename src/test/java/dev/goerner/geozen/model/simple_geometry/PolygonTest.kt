@@ -1,53 +1,57 @@
-package dev.goerner.geozen.model.simple_geometry;
+package dev.goerner.geozen.model.simple_geometry
 
-import dev.goerner.geozen.model.CoordinateReferenceSystem;
-import dev.goerner.geozen.model.Position;
-import org.junit.jupiter.api.Test;
+import dev.goerner.geozen.model.CoordinateReferenceSystem
+import dev.goerner.geozen.model.Position
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-public class PolygonTest {
-
+class PolygonTest {
     @Test
-    public void testExteriorRingConstructor() {
-        List<Position> exteriorRing = new ArrayList<>();
-        exteriorRing.add(new Position(1.0, 2.0, 3.0));
-        exteriorRing.add(new Position(4.0, 5.0, 6.0));
-        List<List<Position>> coordinates = new ArrayList<>();
-        coordinates.add(exteriorRing);
-        Polygon polygon = new Polygon(coordinates);
+    fun testExteriorRingConstructor() {
+        val exteriorRing = listOf(
+            Position(1.0, 2.0, 3.0),
+            Position(4.0, 5.0, 6.0)
+        )
+        val coordinates = listOf(
+            exteriorRing
+        )
 
-        assertEquals(1, polygon.getCoordinates().size());
-        assertEquals(exteriorRing, polygon.getCoordinates().getFirst());
-        assertEquals(CoordinateReferenceSystem.WGS_84, polygon.getCoordinateReferenceSystem());
+        val polygon = Polygon(coordinates)
+
+        Assertions.assertEquals(1, polygon.coordinates.size)
+        Assertions.assertEquals(exteriorRing, polygon.coordinates[0])
+        Assertions.assertEquals(CoordinateReferenceSystem.WGS_84, polygon.coordinateReferenceSystem)
     }
 
     @Test
-    public void testExteriorRingAndReferenceSystemConstructor() {
-        List<Position> exteriorRing = new ArrayList<>();
-        exteriorRing.add(new Position(1.0, 2.0, 3.0));
-        exteriorRing.add(new Position(4.0, 5.0, 6.0));
-        List<List<Position>> coordinates = new ArrayList<>();
-        coordinates.add(exteriorRing);
-        Polygon polygon = new Polygon(coordinates, CoordinateReferenceSystem.WEB_MERCATOR);
+    fun testExteriorRingAndReferenceSystemConstructor() {
+        val exteriorRing = listOf(
+            Position(1.0, 2.0, 3.0),
+            Position(4.0, 5.0, 6.0)
+        )
+        val coordinates = listOf(
+            exteriorRing
+        )
 
-        assertEquals(1, polygon.getCoordinates().size());
-        assertEquals(exteriorRing, polygon.getCoordinates().getFirst());
-        assertEquals(CoordinateReferenceSystem.WEB_MERCATOR, polygon.getCoordinateReferenceSystem());
+        val polygon = Polygon(coordinates, CoordinateReferenceSystem.WEB_MERCATOR)
+
+        Assertions.assertEquals(1, polygon.coordinates.size)
+        Assertions.assertEquals(exteriorRing, polygon.coordinates[0])
+        Assertions.assertEquals(CoordinateReferenceSystem.WEB_MERCATOR, polygon.coordinateReferenceSystem)
     }
 
     @Test
-    public void testGetExteriorRing() {
-        List<Position> exteriorRing = new ArrayList<>();
-        exteriorRing.add(new Position(1.0, 2.0, 3.0));
-        exteriorRing.add(new Position(4.0, 5.0, 6.0));
-        List<List<Position>> coordinates = new ArrayList<>();
-        coordinates.add(exteriorRing);
-        Polygon polygon = new Polygon(coordinates);
+    fun testGetExteriorRing() {
+        val exteriorRing = listOf(
+            Position(1.0, 2.0, 3.0),
+            Position(4.0, 5.0, 6.0)
+        )
+        val coordinates = listOf(
+            exteriorRing
+        )
 
-        assertEquals(exteriorRing, polygon.getExteriorRing());
+        val polygon = Polygon(coordinates)
+
+        Assertions.assertEquals(exteriorRing, polygon.exteriorRing)
     }
 }

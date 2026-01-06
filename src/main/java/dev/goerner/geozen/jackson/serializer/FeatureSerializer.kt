@@ -31,19 +31,16 @@ class FeatureSerializer : ValueSerializer<Feature>() {
             is MultiPoint -> ctxt.findValueSerializer(MultiPoint::class.java).serialize(geometry, gen, ctxt)
             is MultiLineString -> ctxt.findValueSerializer(MultiLineString::class.java).serialize(geometry, gen, ctxt)
             is MultiPolygon -> ctxt.findValueSerializer(MultiPolygon::class.java).serialize(geometry, gen, ctxt)
-            is GeometryCollection -> ctxt.findValueSerializer(GeometryCollection::class.java).serialize(geometry, gen, ctxt)
-            null -> gen.writeNull()
+            is GeometryCollection -> ctxt.findValueSerializer(GeometryCollection::class.java)
+                .serialize(geometry, gen, ctxt)
+
             else -> throw IllegalArgumentException(
                 "Invalid Geometry type: " + geometry.javaClass.getSimpleName()
             )
         }
 
         gen.writeName("properties")
-        if (value.properties != null) {
-            gen.writePOJO(value.properties)
-        } else {
-            gen.writeNull()
-        }
+        gen.writePOJO(value.properties)
 
         gen.writeEndObject()
     }

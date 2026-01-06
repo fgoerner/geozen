@@ -1,42 +1,35 @@
-package dev.goerner.geozen.model;
+package dev.goerner.geozen.model
 
 /**
- * A {@link Geometry} represents spatial objects in space. It is defined by a {@link CoordinateReferenceSystem} and by
- * some data structure of {@link Position Positions} provided by its descendants, that define the shape of the spatial
+ * A [Geometry] represents spatial objects in space. It is defined by a [CoordinateReferenceSystem] and by
+ * some data structure of [Positions][Position] provided by its descendants, that define the shape of the spatial
  * object.
  */
-public abstract class Geometry {
-    private final CoordinateReferenceSystem coordinateReferenceSystem;
-
-    public Geometry(CoordinateReferenceSystem coordinateReferenceSystem) {
-        this.coordinateReferenceSystem = coordinateReferenceSystem;
-    }
-
-    public CoordinateReferenceSystem getCoordinateReferenceSystem() {
-        return coordinateReferenceSystem;
-    }
+abstract class Geometry(val coordinateReferenceSystem: CoordinateReferenceSystem) {
 
     /**
-     * Calculates an approximate distance to another {@link Geometry}.
-     *
-     * <p>This method is intended to provide a fast approximation of the distance between two geometries,
+     * Calculates an approximate distance to another [Geometry].
+     * 
+     * 
+     * This method is intended to provide a fast approximation of the distance between two geometries,
      * which may be less accurate than the exact distance calculation. The specific algorithm used for
-     * this approximation is left to the implementation in the subclasses of {@link Geometry}.</p>
-     *
-     * @param other The other {@link Geometry} to which the distance is calculated.
-     * @return An approximate distance to the other {@link Geometry}.
+     * this approximation is left to the implementation in the subclasses of [Geometry].
+     * 
+     * @param other The other [Geometry] to which the distance is calculated.
+     * @return An approximate distance to the other [Geometry].
      */
-    public abstract double getFastDistanceTo(Geometry other);
+    abstract fun getFastDistanceTo(other: Geometry): Double
 
     /**
-     * Calculates the exact distance to another {@link Geometry}.
-     *
-     * <p>This method is intended to provide an accurate calculation of the distance between two geometries.
+     * Calculates the exact distance to another [Geometry].
+     * 
+     * 
+     * This method is intended to provide an accurate calculation of the distance between two geometries.
      * The specific algorithm used for this exact distance calculation is left to the implementation in
-     * the subclasses of {@link Geometry}.</p>
-     *
-     * @param other The other {@link Geometry} to which the distance is calculated.
-     * @return The exact distance to the other {@link Geometry}.
+     * the subclasses of [Geometry].
+     * 
+     * @param other The other [Geometry] to which the distance is calculated.
+     * @return The exact distance to the other [Geometry].
      */
-    public abstract double getExactDistanceTo(Geometry other);
+    abstract fun getExactDistanceTo(other: Geometry): Double
 }

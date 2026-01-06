@@ -1,44 +1,28 @@
-package dev.goerner.geozen.geojson;
+package dev.goerner.geozen.geojson
 
-import dev.goerner.geozen.jackson.GeoZenModule;
-import dev.goerner.geozen.model.Feature;
-import dev.goerner.geozen.model.Geometry;
-import dev.goerner.geozen.model.Position;
-import dev.goerner.geozen.model.collections.FeatureCollection;
-import dev.goerner.geozen.model.collections.GeometryCollection;
-import dev.goerner.geozen.model.multi_geometry.MultiLineString;
-import dev.goerner.geozen.model.multi_geometry.MultiPoint;
-import dev.goerner.geozen.model.multi_geometry.MultiPolygon;
-import dev.goerner.geozen.model.simple_geometry.LineString;
-import dev.goerner.geozen.model.simple_geometry.Point;
-import dev.goerner.geozen.model.simple_geometry.Polygon;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.json.JsonMapper;
+import dev.goerner.geozen.jackson.GeoZenModule
+import dev.goerner.geozen.model.Feature
+import dev.goerner.geozen.model.Geometry
+import dev.goerner.geozen.model.Position
+import dev.goerner.geozen.model.collections.FeatureCollection
+import dev.goerner.geozen.model.collections.GeometryCollection
+import dev.goerner.geozen.model.multi_geometry.MultiLineString
+import dev.goerner.geozen.model.multi_geometry.MultiPoint
+import dev.goerner.geozen.model.multi_geometry.MultiPolygon
+import dev.goerner.geozen.model.simple_geometry.LineString
+import dev.goerner.geozen.model.simple_geometry.Point
+import dev.goerner.geozen.model.simple_geometry.Polygon
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertInstanceOf
+import tools.jackson.databind.ObjectMapper
+import tools.jackson.databind.json.JsonMapper
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-
-public class GeoJsonTest {
-
-    private static ObjectMapper objectMapper;
-
-    @BeforeAll
-    static void setup() {
-        objectMapper = JsonMapper.builder()
-                .addModule(new GeoZenModule())
-                .build();
-    }
-
+class GeoJsonTest {
     @Test
-    public void testNestedPointDeserialization() {
-        String json = """
+    fun testNestedPointDeserialization() {
+        val json = """
                 {
                     "name": "Some JSON Object",
                     "location": {
@@ -47,438 +31,476 @@ public class GeoJsonTest {
                     },
                     "dataSource": "MANUAL"
                 }
-                """;
+                
+                """.trimIndent()
 
-        LocationDTO locationDTO = objectMapper.readValue(json, LocationDTO.class);
+        val locationDTO: LocationDTO = objectMapper.readValue<LocationDTO>(json, LocationDTO::class.java)
 
-        assertEquals("Some JSON Object", locationDTO.name());
-        assertInstanceOf(Point.class, locationDTO.location());
-        Point point = (Point) locationDTO.location();
-        assertEquals(9.123456, point.getLongitude());
-        assertEquals(45.987654, point.getLatitude());
-        assertEquals("MANUAL", locationDTO.dataSource());
+        assertEquals("Some JSON Object", locationDTO.name)
+        assertInstanceOf<Point>(locationDTO.location)
+        val point = locationDTO.location
+        assertEquals(9.123456, point.longitude)
+        assertEquals(45.987654, point.latitude)
+        assertEquals("MANUAL", locationDTO.dataSource)
     }
 
     @Test
-    public void testPointSerialization() {
-        Geometry point = new Point(1.0, 2.0, 3.0);
+    fun testPointSerialization() {
+        val point: Geometry = Point(1.0, 2.0, 3.0)
 
-        String geoJsonString = objectMapper.writeValueAsString(point);
+        val geoJsonString: String? = objectMapper.writeValueAsString(point)
 
-        assertEquals("{\"type\":\"Point\",\"coordinates\":[1.0,2.0,3.0]}", geoJsonString);
+        assertEquals("{\"type\":\"Point\",\"coordinates\":[1.0,2.0,3.0]}", geoJsonString)
     }
 
     @Test
-    public void testLineStringSerialization() {
-        List<Position> coordinates = new ArrayList<>();
-        coordinates.add(new Position(1.0, 2.0, 3.0));
-        coordinates.add(new Position(4.0, 5.0, 6.0));
-        Geometry lineString = new LineString(coordinates);
+    fun testLineStringSerialization() {
+        val coordinates: List<Position> = listOf(
+            Position(1.0, 2.0, 3.0),
+            Position(4.0, 5.0, 6.0)
+        )
+        val lineString: Geometry = LineString(coordinates)
 
-        String geoJsonString = objectMapper.writeValueAsString(lineString);
+        val geoJsonString: String? = objectMapper.writeValueAsString(lineString)
 
-        assertEquals("{\"type\":\"LineString\",\"coordinates\":[[1.0,2.0,3.0],[4.0,5.0,6.0]]}", geoJsonString);
+        assertEquals(
+            "{\"type\":\"LineString\",\"coordinates\":[[1.0,2.0,3.0],[4.0,5.0,6.0]]}",
+            geoJsonString
+        )
     }
 
     @Test
-    public void testPolygonSerialization() {
-        List<List<Position>> coordinates = new ArrayList<>();
-        List<Position> exteriorRing = new ArrayList<>();
-        exteriorRing.add(new Position(1.0, 2.0, 3.0));
-        exteriorRing.add(new Position(4.0, 5.0, 6.0));
-        exteriorRing.add(new Position(7.0, 8.0, 9.0));
-        exteriorRing.add(new Position(1.0, 2.0, 3.0));
-        coordinates.add(exteriorRing);
-        List<Position> interiorRing = new ArrayList<>();
-        interiorRing.add(new Position(10.0, 11.0, 12.0));
-        interiorRing.add(new Position(13.0, 14.0, 15.0));
-        interiorRing.add(new Position(16.0, 17.0, 18.0));
-        interiorRing.add(new Position(10.0, 11.0, 12.0));
-        coordinates.add(interiorRing);
-        Geometry polygon = new Polygon(coordinates);
+    fun testPolygonSerialization() {
+        val coordinates: List<List<Position>> = listOf(
+            listOf(
+                Position(1.0, 2.0, 3.0),
+                Position(4.0, 5.0, 6.0),
+                Position(7.0, 8.0, 9.0),
+                Position(1.0, 2.0, 3.0)
+            ),
+            listOf(
+                Position(10.0, 11.0, 12.0),
+                Position(13.0, 14.0, 15.0),
+                Position(16.0, 17.0, 18.0),
+                Position(10.0, 11.0, 12.0)
+            )
+        )
+        val polygon: Geometry = Polygon(coordinates)
 
-        String geoJsonString = objectMapper.writeValueAsString(polygon);
+        val geoJsonString: String? = objectMapper.writeValueAsString(polygon)
 
-        assertEquals("{\"type\":\"Polygon\",\"coordinates\":[[[1.0,2.0,3.0],[4.0,5.0,6.0],[7.0,8.0,9.0],[1.0,2.0,3.0]],[[10.0,11.0,12.0],[13.0,14.0,15.0],[16.0,17.0,18.0],[10.0,11.0,12.0]]]}", geoJsonString);
+        assertEquals(
+            "{\"type\":\"Polygon\",\"coordinates\":[[[1.0,2.0,3.0],[4.0,5.0,6.0],[7.0,8.0,9.0],[1.0,2.0,3.0]],[[10.0,11.0,12.0],[13.0,14.0,15.0],[16.0,17.0,18.0],[10.0,11.0,12.0]]]}",
+            geoJsonString
+        )
     }
 
     @Test
-    public void testMultiPointSerialization() {
-        List<Position> coordinates = new ArrayList<>();
-        coordinates.add(new Position(1.0, 2.0, 3.0));
-        coordinates.add(new Position(4.0, 5.0, 6.0));
-        Geometry multiPoint = new MultiPoint(coordinates);
+    fun testMultiPointSerialization() {
+        val coordinates: List<Position> = listOf(
+            Position(1.0, 2.0, 3.0),
+            Position(4.0, 5.0, 6.0)
+        )
+        val multiPoint: Geometry = MultiPoint(coordinates)
 
-        String geoJsonString = objectMapper.writeValueAsString(multiPoint);
+        val geoJsonString: String? = objectMapper.writeValueAsString(multiPoint)
 
-        assertEquals("{\"type\":\"MultiPoint\",\"coordinates\":[[1.0,2.0,3.0],[4.0,5.0,6.0]]}", geoJsonString);
+        assertEquals(
+            "{\"type\":\"MultiPoint\",\"coordinates\":[[1.0,2.0,3.0],[4.0,5.0,6.0]]}",
+            geoJsonString
+        )
     }
 
     @Test
-    public void testMultiLineStringSerialization() {
-        List<List<Position>> coordinates = new ArrayList<>();
-        List<Position> lineString1 = new ArrayList<>();
-        lineString1.add(new Position(1.0, 2.0, 3.0));
-        lineString1.add(new Position(4.0, 5.0, 6.0));
-        List<Position> lineString2 = new ArrayList<>();
-        lineString2.add(new Position(7.0, 8.0, 9.0));
-        lineString2.add(new Position(10.0, 11.0, 12.0));
-        coordinates.add(lineString1);
-        coordinates.add(lineString2);
-        Geometry multiLineString = new MultiLineString(coordinates);
+    fun testMultiLineStringSerialization() {
+        val coordinates: List<List<Position>> = listOf(
+            listOf(
+                Position(1.0, 2.0, 3.0),
+                Position(4.0, 5.0, 6.0)
+            ),
+            listOf(
+                Position(7.0, 8.0, 9.0),
+                Position(10.0, 11.0, 12.0)
+            )
+        )
+        val multiLineString: Geometry = MultiLineString(coordinates)
 
-        String geoJsonString = objectMapper.writeValueAsString(multiLineString);
+        val geoJsonString: String? = objectMapper.writeValueAsString(multiLineString)
 
-        assertEquals("{\"type\":\"MultiLineString\",\"coordinates\":[[[1.0,2.0,3.0],[4.0,5.0,6.0]],[[7.0,8.0,9.0],[10.0,11.0,12.0]]]}", geoJsonString);
+        assertEquals(
+            "{\"type\":\"MultiLineString\",\"coordinates\":[[[1.0,2.0,3.0],[4.0,5.0,6.0]],[[7.0,8.0,9.0],[10.0,11.0,12.0]]]}",
+            geoJsonString
+        )
     }
 
     @Test
-    public void testMultiPolygonSerialization() {
-        List<List<List<Position>>> coordinates = new ArrayList<>();
-        List<List<Position>> polygon1 = new ArrayList<>();
-        List<Position> exteriorRing1 = new ArrayList<>();
-        exteriorRing1.add(new Position(1.0, 2.0, 3.0));
-        exteriorRing1.add(new Position(4.0, 5.0, 6.0));
-        exteriorRing1.add(new Position(7.0, 8.0, 9.0));
-        exteriorRing1.add(new Position(1.0, 2.0, 3.0));
-        polygon1.add(exteriorRing1);
-        List<Position> interiorRing1 = new ArrayList<>();
-        interiorRing1.add(new Position(10.0, 11.0, 12.0));
-        interiorRing1.add(new Position(13.0, 14.0, 15.0));
-        interiorRing1.add(new Position(16.0, 17.0, 18.0));
-        interiorRing1.add(new Position(10.0, 11.0, 12.0));
-        polygon1.add(interiorRing1);
-        coordinates.add(polygon1);
-        List<List<Position>> polygon2 = new ArrayList<>();
-        List<Position> exteriorRing2 = new ArrayList<>();
-        exteriorRing2.add(new Position(19.0, 20.0, 21.0));
-        exteriorRing2.add(new Position(22.0, 23.0, 24.0));
-        exteriorRing2.add(new Position(25.0, 26.0, 27.0));
-        exteriorRing2.add(new Position(19.0, 20.0, 21.0));
-        polygon2.add(exteriorRing2);
-        List<Position> interiorRing2 = new ArrayList<>();
-        interiorRing2.add(new Position(28.0, 29.0, 30.0));
-        interiorRing2.add(new Position(31.0, 32.0, 33.0));
-        interiorRing2.add(new Position(34.0, 35.0, 36.0));
-        interiorRing2.add(new Position(28.0, 29.0, 30.0));
-        polygon2.add(interiorRing2);
-        coordinates.add(polygon2);
-        Geometry multiPolygon = new MultiPolygon(coordinates);
+    fun testMultiPolygonSerialization() {
+        val coordinates: List<List<List<Position>>> = listOf(
+            listOf(
+                listOf(
+                    Position(1.0, 2.0, 3.0),
+                    Position(4.0, 5.0, 6.0),
+                    Position(7.0, 8.0, 9.0),
+                    Position(1.0, 2.0, 3.0)
+                ),
+                listOf(
+                    Position(10.0, 11.0, 12.0),
+                    Position(13.0, 14.0, 15.0),
+                    Position(16.0, 17.0, 18.0),
+                    Position(10.0, 11.0, 12.0)
+                )
+            ),
+            listOf(
+                listOf(
+                    Position(19.0, 20.0, 21.0),
+                    Position(22.0, 23.0, 24.0),
+                    Position(25.0, 26.0, 27.0),
+                    Position(19.0, 20.0, 21.0)
+                ),
+                listOf(
+                    Position(28.0, 29.0, 30.0),
+                    Position(31.0, 32.0, 33.0),
+                    Position(34.0, 35.0, 36.0),
+                    Position(28.0, 29.0, 30.0)
+                )
+            )
+        )
+        val multiPolygon: Geometry = MultiPolygon(coordinates)
 
-        String geoJsonString = objectMapper.writeValueAsString(multiPolygon);
+        val geoJsonString: String? = objectMapper.writeValueAsString(multiPolygon)
 
-        assertEquals("{\"type\":\"MultiPolygon\",\"coordinates\":[[[[1.0,2.0,3.0],[4.0,5.0,6.0],[7.0,8.0,9.0],[1.0,2.0,3.0]],[[10.0,11.0,12.0],[13.0,14.0,15.0],[16.0,17.0,18.0],[10.0,11.0,12.0]]],[[[19.0,20.0,21.0],[22.0,23.0,24.0],[25.0,26.0,27.0],[19.0,20.0,21.0]],[[28.0,29.0,30.0],[31.0,32.0,33.0],[34.0,35.0,36.0],[28.0,29.0,30.0]]]]}", geoJsonString);
+        assertEquals(
+            "{\"type\":\"MultiPolygon\",\"coordinates\":[[[[1.0,2.0,3.0],[4.0,5.0,6.0],[7.0,8.0,9.0],[1.0,2.0,3.0]],[[10.0,11.0,12.0],[13.0,14.0,15.0],[16.0,17.0,18.0],[10.0,11.0,12.0]]],[[[19.0,20.0,21.0],[22.0,23.0,24.0],[25.0,26.0,27.0],[19.0,20.0,21.0]],[[28.0,29.0,30.0],[31.0,32.0,33.0],[34.0,35.0,36.0],[28.0,29.0,30.0]]]]}",
+            geoJsonString
+        )
     }
 
     @Test
-    public void testGeometryCollectionSerialization() {
-        Geometry point = new Point(1.0, 2.0);
-        List<Position> coordinates = new ArrayList<>();
-        coordinates.add(new Position(3.0, 4.0));
-        coordinates.add(new Position(5.0, 6.0));
-        Geometry lineString = new LineString(coordinates);
-        List<Geometry> geometries = new ArrayList<>();
-        geometries.add(point);
-        geometries.add(lineString);
-        GeometryCollection geometryCollection = new GeometryCollection(geometries);
+    fun testGeometryCollectionSerialization() {
+        val point: Geometry = Point(1.0, 2.0)
+        val coordinates: List<Position> = listOf(
+            Position(3.0, 4.0),
+            Position(5.0, 6.0)
+        )
+        val lineString: Geometry = LineString(coordinates)
+        val geometries: List<Geometry> = listOf(point, lineString)
+        val geometryCollection = GeometryCollection(geometries)
 
-        String geoJsonString = objectMapper.writeValueAsString(geometryCollection);
+        val geoJsonString: String? = objectMapper.writeValueAsString(geometryCollection)
 
-        assertEquals("{\"type\":\"GeometryCollection\",\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1.0,2.0]},{\"type\":\"LineString\",\"coordinates\":[[3.0,4.0],[5.0,6.0]]}]}", geoJsonString);
+        assertEquals(
+            "{\"type\":\"GeometryCollection\",\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1.0,2.0]},{\"type\":\"LineString\",\"coordinates\":[[3.0,4.0],[5.0,6.0]]}]}",
+            geoJsonString
+        )
     }
 
     @Test
-    public void testFeatureSerialization() {
-        String id = "123";
-        Geometry point = new Point(1.0, 2.0);
-        Map<String, String> properties = new HashMap<>();
-        properties.put("name", "John Doe");
-        Feature feature = new Feature(id, point, properties);
+    fun testFeatureSerialization() {
+        val id = "123"
+        val point: Geometry = Point(1.0, 2.0)
+        val properties: Map<String, String> = mapOf("name" to "John Doe")
+        val feature = Feature(point, id, properties)
 
-        String geoJsonString = objectMapper.writeValueAsString(feature);
+        val geoJsonString: String? = objectMapper.writeValueAsString(feature)
 
-        assertEquals("{\"type\":\"Feature\",\"id\":\"123\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[1.0,2.0]},\"properties\":{\"name\":\"John Doe\"}}", geoJsonString);
+        assertEquals(
+            "{\"type\":\"Feature\",\"id\":\"123\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[1.0,2.0]},\"properties\":{\"name\":\"John Doe\"}}",
+            geoJsonString
+        )
     }
 
     @Test
-    public void testFeatureCollectionSerialization() {
-        String id = "123";
-        Geometry point = new Point(1.0, 2.0);
-        Map<String, String> properties = new HashMap<>();
-        properties.put("name", "John Doe");
-        Feature feature = new Feature(id, point, properties);
-        List<Feature> features = new ArrayList<>();
-        features.add(feature);
-        FeatureCollection featureCollection = new FeatureCollection(features);
+    fun testFeatureCollectionSerialization() {
+        val id = "123"
+        val point: Geometry = Point(1.0, 2.0)
+        val properties: Map<String, String> = mapOf("name" to "John Doe")
+        val feature = Feature(point, id, properties)
+        val features: List<Feature> = listOf(feature)
+        val featureCollection = FeatureCollection(features)
 
-        String geoJsonString = objectMapper.writeValueAsString(featureCollection);
+        val geoJsonString: String? = objectMapper.writeValueAsString(featureCollection)
 
-        assertEquals("{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"id\":\"123\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[1.0,2.0]},\"properties\":{\"name\":\"John Doe\"}}]}", geoJsonString);
+        assertEquals(
+            "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"id\":\"123\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[1.0,2.0]},\"properties\":{\"name\":\"John Doe\"}}]}",
+            geoJsonString
+        )
     }
 
     @Test
-    void testPointDeserialization() {
-        String geoJsonString = "{\"type\":\"Point\",\"coordinates\":[1.0,2.0,3.0]}";
+    fun testPointDeserialization() {
+        val geoJsonString = "{\"type\":\"Point\",\"coordinates\":[1.0,2.0,3.0]}"
 
-        Geometry geometry = objectMapper.readValue(geoJsonString, Geometry.class);
+        val geometry: Geometry = objectMapper.readValue(geoJsonString, Geometry::class.java)
 
-        assertInstanceOf(Point.class, geometry);
-        Point point = (Point) geometry;
-        assertEquals(1.0, point.getLongitude());
-        assertEquals(2.0, point.getLatitude());
-        assertEquals(3.0, point.getAltitude());
+        assertInstanceOf<Point>(geometry)
+        assertEquals(1.0, geometry.longitude)
+        assertEquals(2.0, geometry.latitude)
+        assertEquals(3.0, geometry.altitude)
     }
 
     @Test
-    void testLineStringDeserialization() {
-        String geoJsonString = "{\"type\":\"LineString\",\"coordinates\":[[1.0,2.0,3.0],[4.0,5.0,6.0]]}";
+    fun testLineStringDeserialization() {
+        val geoJsonString = "{\"type\":\"LineString\",\"coordinates\":[[1.0,2.0,3.0],[4.0,5.0,6.0]]}"
 
-        Geometry geometry = objectMapper.readValue(geoJsonString, Geometry.class);
+        val geometry: Geometry = objectMapper.readValue(geoJsonString, Geometry::class.java)
 
-        assertInstanceOf(LineString.class, geometry);
-        LineString lineString = (LineString) geometry;
-        assertEquals(2, lineString.getCoordinates().size());
-        Position position0 = lineString.getCoordinates().getFirst();
-        assertEquals(1.0, position0.getLongitude());
-        assertEquals(2.0, position0.getLatitude());
-        assertEquals(3.0, position0.getAltitude());
-        Position position1 = lineString.getCoordinates().get(1);
-        assertEquals(4.0, position1.getLongitude());
-        assertEquals(5.0, position1.getLatitude());
-        assertEquals(6.0, position1.getAltitude());
+        assertInstanceOf<LineString>(geometry)
+        assertEquals(2, geometry.coordinates.size)
+        val position0: Position = geometry.coordinates.first()
+        assertEquals(1.0, position0.longitude)
+        assertEquals(2.0, position0.latitude)
+        assertEquals(3.0, position0.altitude)
+        val position1 = geometry.coordinates[1]
+        assertEquals(4.0, position1.longitude)
+        assertEquals(5.0, position1.latitude)
+        assertEquals(6.0, position1.altitude)
     }
 
     @Test
-    void testPolygonDeserialization() {
-        String geoJsonString = "{\"type\":\"Polygon\",\"coordinates\":[[[1.0,2.0,3.0],[4.0,5.0,6.0],[7.0,8.0,9.0],[1.0,2.0,3.0]],[[10.0,11.0,12.0],[13.0,14.0,15.0],[16.0,17.0,18.0],[10.0,11.0,12.0]]]}";
+    fun testPolygonDeserialization() {
+        val geoJsonString =
+            "{\"type\":\"Polygon\",\"coordinates\":[[[1.0,2.0,3.0],[4.0,5.0,6.0],[7.0,8.0,9.0],[1.0,2.0,3.0]],[[10.0,11.0,12.0],[13.0,14.0,15.0],[16.0,17.0,18.0],[10.0,11.0,12.0]]]}"
 
-        Geometry geometry = objectMapper.readValue(geoJsonString, Geometry.class);
+        val geometry: Geometry = objectMapper.readValue(geoJsonString, Geometry::class.java)
 
-        assertInstanceOf(Polygon.class, geometry);
-        Polygon polygon = (Polygon) geometry;
-        assertEquals(2, polygon.getCoordinates().size());
-        List<Position> exteriorRing = polygon.getCoordinates().getFirst();
-        Position exteriorRingPosition0 = exteriorRing.getFirst();
-        assertEquals(1.0, exteriorRingPosition0.getLongitude());
-        assertEquals(2.0, exteriorRingPosition0.getLatitude());
-        assertEquals(3.0, exteriorRingPosition0.getAltitude());
-        Position exteriorRingPosition1 = exteriorRing.get(1);
-        assertEquals(4.0, exteriorRingPosition1.getLongitude());
-        assertEquals(5.0, exteriorRingPosition1.getLatitude());
-        assertEquals(6.0, exteriorRingPosition1.getAltitude());
-        Position exteriorRingPosition2 = exteriorRing.get(2);
-        assertEquals(7.0, exteriorRingPosition2.getLongitude());
-        assertEquals(8.0, exteriorRingPosition2.getLatitude());
-        assertEquals(9.0, exteriorRingPosition2.getAltitude());
-        Position exteriorRingPosition3 = exteriorRing.get(3);
-        assertEquals(1.0, exteriorRingPosition3.getLongitude());
-        assertEquals(2.0, exteriorRingPosition3.getLatitude());
-        assertEquals(3.0, exteriorRingPosition3.getAltitude());
-        List<Position> interiorRing = polygon.getCoordinates().get(1);
-        Position interiorRingPosition0 = interiorRing.getFirst();
-        assertEquals(10.0, interiorRingPosition0.getLongitude());
-        assertEquals(11.0, interiorRingPosition0.getLatitude());
-        assertEquals(12.0, interiorRingPosition0.getAltitude());
-        Position interiorRingPosition1 = interiorRing.get(1);
-        assertEquals(13.0, interiorRingPosition1.getLongitude());
-        assertEquals(14.0, interiorRingPosition1.getLatitude());
-        assertEquals(15.0, interiorRingPosition1.getAltitude());
-        Position interiorRingPosition2 = interiorRing.get(2);
-        assertEquals(16.0, interiorRingPosition2.getLongitude());
-        assertEquals(17.0, interiorRingPosition2.getLatitude());
-        assertEquals(18.0, interiorRingPosition2.getAltitude());
-        Position interiorRingPosition3 = interiorRing.get(3);
-        assertEquals(10.0, interiorRingPosition3.getLongitude());
-        assertEquals(11.0, interiorRingPosition3.getLatitude());
-        assertEquals(12.0, interiorRingPosition3.getAltitude());
+        assertInstanceOf<Polygon>(geometry)
+        assertEquals(2, geometry.coordinates.size)
+        val exteriorRing: List<Position> = geometry.coordinates.first()
+        val exteriorRingPosition0: Position = exteriorRing.first()
+        assertEquals(1.0, exteriorRingPosition0.longitude)
+        assertEquals(2.0, exteriorRingPosition0.latitude)
+        assertEquals(3.0, exteriorRingPosition0.altitude)
+        val exteriorRingPosition1 = exteriorRing[1]
+        assertEquals(4.0, exteriorRingPosition1.longitude)
+        assertEquals(5.0, exteriorRingPosition1.latitude)
+        assertEquals(6.0, exteriorRingPosition1.altitude)
+        val exteriorRingPosition2 = exteriorRing[2]
+        assertEquals(7.0, exteriorRingPosition2.longitude)
+        assertEquals(8.0, exteriorRingPosition2.latitude)
+        assertEquals(9.0, exteriorRingPosition2.altitude)
+        val exteriorRingPosition3 = exteriorRing[3]
+        assertEquals(1.0, exteriorRingPosition3.longitude)
+        assertEquals(2.0, exteriorRingPosition3.latitude)
+        assertEquals(3.0, exteriorRingPosition3.altitude)
+        val interiorRing: List<Position> = geometry.coordinates[1]
+        val interiorRingPosition0: Position = interiorRing.first()
+        assertEquals(10.0, interiorRingPosition0.longitude)
+        assertEquals(11.0, interiorRingPosition0.latitude)
+        assertEquals(12.0, interiorRingPosition0.altitude)
+        val interiorRingPosition1 = interiorRing[1]
+        assertEquals(13.0, interiorRingPosition1.longitude)
+        assertEquals(14.0, interiorRingPosition1.latitude)
+        assertEquals(15.0, interiorRingPosition1.altitude)
+        val interiorRingPosition2 = interiorRing[2]
+        assertEquals(16.0, interiorRingPosition2.longitude)
+        assertEquals(17.0, interiorRingPosition2.latitude)
+        assertEquals(18.0, interiorRingPosition2.altitude)
+        val interiorRingPosition3 = interiorRing[3]
+        assertEquals(10.0, interiorRingPosition3.longitude)
+        assertEquals(11.0, interiorRingPosition3.latitude)
+        assertEquals(12.0, interiorRingPosition3.altitude)
     }
 
     @Test
-    public void testMultiPointDeserialization() {
-        String geoJsonString = "{\"type\":\"MultiPoint\",\"coordinates\":[[1.0,2.0,3.0],[4.0,5.0,6.0]]}";
+    fun testMultiPointDeserialization() {
+        val geoJsonString = "{\"type\":\"MultiPoint\",\"coordinates\":[[1.0,2.0,3.0],[4.0,5.0,6.0]]}"
 
-        Geometry geometry = objectMapper.readValue(geoJsonString, Geometry.class);
+        val geometry: Geometry = objectMapper.readValue(geoJsonString, Geometry::class.java)
 
-        assertInstanceOf(MultiPoint.class, geometry);
-        MultiPoint multiPoint = (MultiPoint) geometry;
-        assertEquals(2, multiPoint.getCoordinates().size());
-        Position position0 = multiPoint.getCoordinates().getFirst();
-        assertEquals(1.0, position0.getLongitude());
-        assertEquals(2.0, position0.getLatitude());
-        assertEquals(3.0, position0.getAltitude());
-        Position position1 = multiPoint.getCoordinates().get(1);
-        assertEquals(4.0, position1.getLongitude());
-        assertEquals(5.0, position1.getLatitude());
-        assertEquals(6.0, position1.getAltitude());
+        assertInstanceOf<MultiPoint>(geometry)
+        assertEquals(2, geometry.coordinates.size)
+        val position0: Position = geometry.coordinates.first()
+        assertEquals(1.0, position0.longitude)
+        assertEquals(2.0, position0.latitude)
+        assertEquals(3.0, position0.altitude)
+        val position1 = geometry.coordinates[1]
+        assertEquals(4.0, position1.longitude)
+        assertEquals(5.0, position1.latitude)
+        assertEquals(6.0, position1.altitude)
     }
 
     @Test
-    public void testMultiLineStringDeserialization() {
-        String geoJsonString = "{\"type\":\"MultiLineString\",\"coordinates\":[[[1.0,2.0,3.0],[4.0,5.0,6.0]],[[7.0,8.0,9.0],[10.0,11.0,12.0]]]}";
+    fun testMultiLineStringDeserialization() {
+        val geoJsonString =
+            "{\"type\":\"MultiLineString\",\"coordinates\":[[[1.0,2.0,3.0],[4.0,5.0,6.0]],[[7.0,8.0,9.0],[10.0,11.0,12.0]]]}"
 
-        Geometry geometry = objectMapper.readValue(geoJsonString, Geometry.class);
+        val geometry: Geometry = objectMapper.readValue(geoJsonString, Geometry::class.java)
 
-        assertInstanceOf(MultiLineString.class, geometry);
-        MultiLineString multiLineString = (MultiLineString) geometry;
-        assertEquals(2, multiLineString.getCoordinates().size());
-        List<Position> lineString1 = multiLineString.getCoordinates().getFirst();
-        Position position0 = lineString1.getFirst();
-        assertEquals(1.0, position0.getLongitude());
-        assertEquals(2.0, position0.getLatitude());
-        assertEquals(3.0, position0.getAltitude());
-        Position position1 = lineString1.get(1);
-        assertEquals(4.0, position1.getLongitude());
-        assertEquals(5.0, position1.getLatitude());
-        assertEquals(6.0, position1.getAltitude());
-        List<Position> lineString2 = multiLineString.getCoordinates().get(1);
-        Position position2 = lineString2.getFirst();
-        assertEquals(7.0, position2.getLongitude());
-        assertEquals(8.0, position2.getLatitude());
-        assertEquals(9.0, position2.getAltitude());
-        Position position3 = lineString2.get(1);
-        assertEquals(10.0, position3.getLongitude());
-        assertEquals(11.0, position3.getLatitude());
-        assertEquals(12.0, position3.getAltitude());
+        assertInstanceOf<MultiLineString>(geometry)
+        assertEquals(2, geometry.coordinates.size)
+        val lineString1: List<Position> = geometry.coordinates.first()
+        val position0: Position = lineString1.first()
+        assertEquals(1.0, position0.longitude)
+        assertEquals(2.0, position0.latitude)
+        assertEquals(3.0, position0.altitude)
+        val position1 = lineString1[1]
+        assertEquals(4.0, position1.longitude)
+        assertEquals(5.0, position1.latitude)
+        assertEquals(6.0, position1.altitude)
+        val lineString2: List<Position> = geometry.coordinates[1]
+        val position2: Position = lineString2.first()
+        assertEquals(7.0, position2.longitude)
+        assertEquals(8.0, position2.latitude)
+        assertEquals(9.0, position2.altitude)
+        val position3 = lineString2[1]
+        assertEquals(10.0, position3.longitude)
+        assertEquals(11.0, position3.latitude)
+        assertEquals(12.0, position3.altitude)
     }
 
     @Test
-    public void testMultiPolygonDeserialization() {
-        String geoJsonString = "{\"type\":\"MultiPolygon\",\"coordinates\":[[[[1.0,2.0,3.0],[4.0,5.0,6.0],[7.0,8.0,9.0],[1.0,2.0,3.0]],[[10.0,11.0,12.0],[13.0,14.0,15.0],[16.0,17.0,18.0],[10.0,11.0,12.0]]],[[[19.0,20.0,21.0],[22.0,23.0,24.0],[25.0,26.0,27.0],[19.0,20.0,21.0]],[[28.0,29.0,30.0],[31.0,32.0,33.0],[34.0,35.0,36.0],[28.0,29.0,30.0]]]]}";
+    fun testMultiPolygonDeserialization() {
+        val geoJsonString =
+            "{\"type\":\"MultiPolygon\",\"coordinates\":[[[[1.0,2.0,3.0],[4.0,5.0,6.0],[7.0,8.0,9.0],[1.0,2.0,3.0]],[[10.0,11.0,12.0],[13.0,14.0,15.0],[16.0,17.0,18.0],[10.0,11.0,12.0]]],[[[19.0,20.0,21.0],[22.0,23.0,24.0],[25.0,26.0,27.0],[19.0,20.0,21.0]],[[28.0,29.0,30.0],[31.0,32.0,33.0],[34.0,35.0,36.0],[28.0,29.0,30.0]]]]}"
 
-        Geometry geometry = objectMapper.readValue(geoJsonString, Geometry.class);
+        val geometry: Geometry = objectMapper.readValue(geoJsonString, Geometry::class.java)
 
-        assertInstanceOf(MultiPolygon.class, geometry);
-        MultiPolygon multiPolygon = (MultiPolygon) geometry;
-        assertEquals(2, multiPolygon.getCoordinates().size());
-        List<List<Position>> polygon1 = multiPolygon.getCoordinates().getFirst();
-        Position exteriorRingPosition0 = polygon1.getFirst().getFirst();
-        assertEquals(1.0, exteriorRingPosition0.getLongitude());
-        assertEquals(2.0, exteriorRingPosition0.getLatitude());
-        assertEquals(3.0, exteriorRingPosition0.getAltitude());
-        Position exteriorRingPosition1 = polygon1.getFirst().get(1);
-        assertEquals(4.0, exteriorRingPosition1.getLongitude());
-        assertEquals(5.0, exteriorRingPosition1.getLatitude());
-        assertEquals(6.0, exteriorRingPosition1.getAltitude());
-        Position exteriorRingPosition2 = polygon1.getFirst().get(2);
-        assertEquals(7.0, exteriorRingPosition2.getLongitude());
-        assertEquals(8.0, exteriorRingPosition2.getLatitude());
-        assertEquals(9.0, exteriorRingPosition2.getAltitude());
-        Position exteriorRingPosition3 = polygon1.getFirst().get(3);
-        assertEquals(1.0, exteriorRingPosition3.getLongitude());
-        assertEquals(2.0, exteriorRingPosition3.getLatitude());
-        assertEquals(3.0, exteriorRingPosition3.getAltitude());
-        List<Position> interiorRing1 = polygon1.get(1);
-        Position interiorRingPosition0 = interiorRing1.getFirst();
-        assertEquals(10.0, interiorRingPosition0.getLongitude());
-        assertEquals(11.0, interiorRingPosition0.getLatitude());
-        assertEquals(12.0, interiorRingPosition0.getAltitude());
-        Position interiorRingPosition1 = interiorRing1.get(1);
-        assertEquals(13.0, interiorRingPosition1.getLongitude());
-        assertEquals(14.0, interiorRingPosition1.getLatitude());
-        assertEquals(15.0, interiorRingPosition1.getAltitude());
-        Position interiorRingPosition2 = interiorRing1.get(2);
-        assertEquals(16.0, interiorRingPosition2.getLongitude());
-        assertEquals(17.0, interiorRingPosition2.getLatitude());
-        assertEquals(18.0, interiorRingPosition2.getAltitude());
-        Position interiorRingPosition3 = interiorRing1.get(3);
-        assertEquals(10.0, interiorRingPosition3.getLongitude());
-        assertEquals(11.0, interiorRingPosition3.getLatitude());
-        assertEquals(12.0, interiorRingPosition3.getAltitude());
-        List<List<Position>> polygon2 = multiPolygon.getCoordinates().get(1);
-        List<Position> exteriorRing2 = polygon2.getFirst();
-        Position exteriorRingPosition4 = exteriorRing2.getFirst();
-        assertEquals(19.0, exteriorRingPosition4.getLongitude());
-        assertEquals(20.0, exteriorRingPosition4.getLatitude());
-        assertEquals(21.0, exteriorRingPosition4.getAltitude());
-        Position exteriorRingPosition5 = exteriorRing2.get(1);
-        assertEquals(22.0, exteriorRingPosition5.getLongitude());
-        assertEquals(23.0, exteriorRingPosition5.getLatitude());
-        assertEquals(24.0, exteriorRingPosition5.getAltitude());
-        Position exteriorRingPosition6 = exteriorRing2.get(2);
-        assertEquals(25.0, exteriorRingPosition6.getLongitude());
-        assertEquals(26.0, exteriorRingPosition6.getLatitude());
-        assertEquals(27.0, exteriorRingPosition6.getAltitude());
-        Position exteriorRingPosition7 = exteriorRing2.get(3);
-        assertEquals(19.0, exteriorRingPosition7.getLongitude());
-        assertEquals(20.0, exteriorRingPosition7.getLatitude());
-        assertEquals(21.0, exteriorRingPosition7.getAltitude());
-        List<Position> interiorRing2 = polygon2.get(1);
-        Position interiorRingPosition4 = interiorRing2.getFirst();
-        assertEquals(28.0, interiorRingPosition4.getLongitude());
-        assertEquals(29.0, interiorRingPosition4.getLatitude());
-        assertEquals(30.0, interiorRingPosition4.getAltitude());
-        Position interiorRingPosition5 = interiorRing2.get(1);
-        assertEquals(31.0, interiorRingPosition5.getLongitude());
-        assertEquals(32.0, interiorRingPosition5.getLatitude());
-        assertEquals(33.0, interiorRingPosition5.getAltitude());
-        Position interiorRingPosition6 = interiorRing2.get(2);
-        assertEquals(34.0, interiorRingPosition6.getLongitude());
-        assertEquals(35.0, interiorRingPosition6.getLatitude());
-        assertEquals(36.0, interiorRingPosition6.getAltitude());
-        Position interiorRingPosition7 = interiorRing2.get(3);
-        assertEquals(28.0, interiorRingPosition7.getLongitude());
-        assertEquals(29.0, interiorRingPosition7.getLatitude());
-        assertEquals(30.0, interiorRingPosition7.getAltitude());
+        assertInstanceOf<MultiPolygon>(geometry)
+        assertEquals(2, geometry.coordinates.size)
+        val polygon1: List<List<Position>> = geometry.coordinates.first()
+        val exteriorRingPosition0: Position = polygon1.first().first()
+        assertEquals(1.0, exteriorRingPosition0.longitude)
+        assertEquals(2.0, exteriorRingPosition0.latitude)
+        assertEquals(3.0, exteriorRingPosition0.altitude)
+        val exteriorRingPosition1: Position = polygon1.first()[1]
+        assertEquals(4.0, exteriorRingPosition1.longitude)
+        assertEquals(5.0, exteriorRingPosition1.latitude)
+        assertEquals(6.0, exteriorRingPosition1.altitude)
+        val exteriorRingPosition2: Position = polygon1.first()[2]
+        assertEquals(7.0, exteriorRingPosition2.longitude)
+        assertEquals(8.0, exteriorRingPosition2.latitude)
+        assertEquals(9.0, exteriorRingPosition2.altitude)
+        val exteriorRingPosition3: Position = polygon1.first()[3]
+        assertEquals(1.0, exteriorRingPosition3.longitude)
+        assertEquals(2.0, exteriorRingPosition3.latitude)
+        assertEquals(3.0, exteriorRingPosition3.altitude)
+        val interiorRing1 = polygon1[1]
+        val interiorRingPosition0: Position = interiorRing1.first()
+        assertEquals(10.0, interiorRingPosition0.longitude)
+        assertEquals(11.0, interiorRingPosition0.latitude)
+        assertEquals(12.0, interiorRingPosition0.altitude)
+        val interiorRingPosition1 = interiorRing1[1]
+        assertEquals(13.0, interiorRingPosition1.longitude)
+        assertEquals(14.0, interiorRingPosition1.latitude)
+        assertEquals(15.0, interiorRingPosition1.altitude)
+        val interiorRingPosition2 = interiorRing1[2]
+        assertEquals(16.0, interiorRingPosition2.longitude)
+        assertEquals(17.0, interiorRingPosition2.latitude)
+        assertEquals(18.0, interiorRingPosition2.altitude)
+        val interiorRingPosition3 = interiorRing1[3]
+        assertEquals(10.0, interiorRingPosition3.longitude)
+        assertEquals(11.0, interiorRingPosition3.latitude)
+        assertEquals(12.0, interiorRingPosition3.altitude)
+        val polygon2: List<List<Position>> = geometry.coordinates[1]
+        val exteriorRing2: List<Position> = polygon2.first()
+        val exteriorRingPosition4: Position = exteriorRing2.first()
+        assertEquals(19.0, exteriorRingPosition4.longitude)
+        assertEquals(20.0, exteriorRingPosition4.latitude)
+        assertEquals(21.0, exteriorRingPosition4.altitude)
+        val exteriorRingPosition5 = exteriorRing2[1]
+        assertEquals(22.0, exteriorRingPosition5.longitude)
+        assertEquals(23.0, exteriorRingPosition5.latitude)
+        assertEquals(24.0, exteriorRingPosition5.altitude)
+        val exteriorRingPosition6 = exteriorRing2[2]
+        assertEquals(25.0, exteriorRingPosition6.longitude)
+        assertEquals(26.0, exteriorRingPosition6.latitude)
+        assertEquals(27.0, exteriorRingPosition6.altitude)
+        val exteriorRingPosition7 = exteriorRing2[3]
+        assertEquals(19.0, exteriorRingPosition7.longitude)
+        assertEquals(20.0, exteriorRingPosition7.latitude)
+        assertEquals(21.0, exteriorRingPosition7.altitude)
+        val interiorRing2 = polygon2[1]
+        val interiorRingPosition4: Position = interiorRing2.first()
+        assertEquals(28.0, interiorRingPosition4.longitude)
+        assertEquals(29.0, interiorRingPosition4.latitude)
+        assertEquals(30.0, interiorRingPosition4.altitude)
+        val interiorRingPosition5 = interiorRing2[1]
+        assertEquals(31.0, interiorRingPosition5.longitude)
+        assertEquals(32.0, interiorRingPosition5.latitude)
+        assertEquals(33.0, interiorRingPosition5.altitude)
+        val interiorRingPosition6 = interiorRing2[2]
+        assertEquals(34.0, interiorRingPosition6.longitude)
+        assertEquals(35.0, interiorRingPosition6.latitude)
+        assertEquals(36.0, interiorRingPosition6.altitude)
+        val interiorRingPosition7 = interiorRing2[3]
+        assertEquals(28.0, interiorRingPosition7.longitude)
+        assertEquals(29.0, interiorRingPosition7.latitude)
+        assertEquals(30.0, interiorRingPosition7.altitude)
     }
 
     @Test
-    public void testGeometryCollectionDeserialization() {
-        String geoJsonString = "{\"type\":\"GeometryCollection\",\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1.0,2.0]},{\"type\":\"LineString\",\"coordinates\":[[3.0,4.0],[5.0,6.0]]}]}";
+    fun testGeometryCollectionDeserialization() {
+        val geoJsonString =
+            "{\"type\":\"GeometryCollection\",\"geometries\":[{\"type\":\"Point\",\"coordinates\":[1.0,2.0]},{\"type\":\"LineString\",\"coordinates\":[[3.0,4.0],[5.0,6.0]]}]}"
 
-        GeometryCollection geometryCollection = objectMapper.readValue(geoJsonString, GeometryCollection.class);
+        val geometryCollection: GeometryCollection =
+            objectMapper.readValue(geoJsonString, GeometryCollection::class.java)
 
-        Geometry point = geometryCollection.getGeometries().getFirst();
-        assertInstanceOf(Point.class, point);
-        Point point1 = (Point) point;
-        assertEquals(1.0, point1.getLongitude());
-        assertEquals(2.0, point1.getLatitude());
-        Geometry lineString = geometryCollection.getGeometries().get(1);
-        assertInstanceOf(LineString.class, lineString);
-        LineString lineString1 = (LineString) lineString;
-        assertEquals(2, lineString1.getCoordinates().size());
-        Position position0 = lineString1.getCoordinates().getFirst();
-        assertEquals(3.0, position0.getLongitude());
-        assertEquals(4.0, position0.getLatitude());
-        Position position1 = lineString1.getCoordinates().get(1);
-        assertEquals(5.0, position1.getLongitude());
-        assertEquals(6.0, position1.getLatitude());
+        val point: Geometry = geometryCollection.geometries.first()
+        assertInstanceOf<Point>(point)
+        assertEquals(1.0, point.longitude)
+        assertEquals(2.0, point.latitude)
+        val lineString = geometryCollection.geometries[1]
+        assertInstanceOf<LineString>(lineString)
+        assertEquals(2, lineString.coordinates.size)
+        val position0: Position = lineString.coordinates.first()
+        assertEquals(3.0, position0.longitude)
+        assertEquals(4.0, position0.latitude)
+        val position1 = lineString.coordinates[1]
+        assertEquals(5.0, position1.longitude)
+        assertEquals(6.0, position1.latitude)
     }
 
     @Test
-    public void testFeatureDeserialization() {
-        String geoJsonString = "{\"type\":\"Feature\",\"id\":\"123\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[1.0,2.0]},\"properties\":{\"name\":\"John Doe\"}}";
+    fun testFeatureDeserialization() {
+        val geoJsonString =
+            "{\"type\":\"Feature\",\"id\":\"123\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[1.0,2.0]},\"properties\":{\"name\":\"John Doe\"}}"
 
-        Feature feature = objectMapper.readValue(geoJsonString, Feature.class);
+        val feature: Feature = objectMapper.readValue(geoJsonString, Feature::class.java)
 
-        assertEquals("123", feature.getId());
-        assertInstanceOf(Point.class, feature.getGeometry());
-        Point point = (Point) feature.getGeometry();
-        assertEquals(1.0, point.getLongitude());
-        assertEquals(2.0, point.getLatitude());
-        assertEquals("John Doe", feature.getProperties().get("name"));
+        assertEquals("123", feature.id)
+        assertInstanceOf<Point>(feature.geometry)
+        val point = feature.geometry
+        assertEquals(1.0, point.longitude)
+        assertEquals(2.0, point.latitude)
+        assertEquals("John Doe", feature.properties["name"])
     }
 
     @Test
-    public void testFeatureCollectionDeserialization() {
-        String geoJsonString = "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"id\":\"123\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[1.0,2.0]},\"properties\":{\"name\":\"John Doe\"}}]}";
+    fun testFeatureCollectionDeserialization() {
+        val geoJsonString =
+            "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"id\":\"123\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[1.0,2.0]},\"properties\":{\"name\":\"John Doe\"}}]}"
 
-        FeatureCollection featureCollection = objectMapper.readValue(geoJsonString, FeatureCollection.class);
+        val featureCollection: FeatureCollection =
+            objectMapper.readValue(geoJsonString, FeatureCollection::class.java)
 
-        assertEquals(1, featureCollection.getFeatures().size());
-        Feature feature = featureCollection.getFeatures().getFirst();
-        assertEquals("123", feature.getId());
-        assertInstanceOf(Point.class, feature.getGeometry());
-        Point point = (Point) feature.getGeometry();
-        assertEquals(1.0, point.getLongitude());
-        assertEquals(2.0, point.getLatitude());
-        assertEquals("John Doe", feature.getProperties().get("name"));
+        assertEquals(1, featureCollection.features.size)
+        val feature: Feature = featureCollection.features.first()
+        assertEquals("123", feature.id)
+        assertInstanceOf<Point>(feature.geometry)
+        val point = feature.geometry
+        assertEquals(1.0, point.longitude)
+        assertEquals(2.0, point.latitude)
+        assertEquals("John Doe", feature.properties["name"])
     }
 
     // DTO record for testing nested geometry deserialization
-    public record LocationDTO(
-            String name,
-            Geometry location,
-            String dataSource
-    ) {
+    @JvmRecord
+    data class LocationDTO(
+        val name: String?,
+        val location: Geometry?,
+        val dataSource: String?
+    )
+
+    companion object {
+        private lateinit var objectMapper: ObjectMapper
+
+        @JvmStatic
+        @BeforeAll
+        fun setup() {
+            objectMapper = JsonMapper.builder()
+                .addModule(GeoZenModule())
+                .build()
+        }
     }
 }

@@ -71,7 +71,7 @@ object ApproximateDistanceCalculator {
         var minDistance = Double.MAX_VALUE
         val positions = lineString.coordinates
 
-        require(positions != null && positions.isNotEmpty()) { "LineString must contain at least one position." }
+        require(positions.isNotEmpty()) { "LineString must contain at least one position." }
         if (positions.size == 1) {
             return haversineDistance(p.coordinates, positions[0])
         }

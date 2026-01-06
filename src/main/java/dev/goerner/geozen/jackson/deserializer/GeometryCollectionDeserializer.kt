@@ -27,9 +27,11 @@ class GeometryCollectionDeserializer : ValueDeserializer<GeometryCollection>() {
         val lineStringDeserializer = ctxt.findRootValueDeserializer(ctxt.constructType(LineString::class.java))
         val polygonDeserializer = ctxt.findRootValueDeserializer(ctxt.constructType(Polygon::class.java))
         val multiPointDeserializer = ctxt.findRootValueDeserializer(ctxt.constructType(MultiPoint::class.java))
-        val multiLineStringDeserializer = ctxt.findRootValueDeserializer(ctxt.constructType(MultiLineString::class.java))
+        val multiLineStringDeserializer =
+            ctxt.findRootValueDeserializer(ctxt.constructType(MultiLineString::class.java))
         val multiPolygonDeserializer = ctxt.findRootValueDeserializer(ctxt.constructType(MultiPolygon::class.java))
-        val geometryCollectionDeserializer = ctxt.findRootValueDeserializer(ctxt.constructType(GeometryCollection::class.java))
+        val geometryCollectionDeserializer =
+            ctxt.findRootValueDeserializer(ctxt.constructType(GeometryCollection::class.java))
 
         val geometriesNode = rootNode["geometries"]
         require(geometriesNode != null && geometriesNode.isArray) { "Invalid or missing 'geometries' field for GeometryCollection." }

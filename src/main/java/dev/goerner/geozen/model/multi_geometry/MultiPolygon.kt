@@ -1,62 +1,23 @@
-package dev.goerner.geozen.model.multi_geometry;
+package dev.goerner.geozen.model.multi_geometry
 
-import dev.goerner.geozen.model.CoordinateReferenceSystem;
-import dev.goerner.geozen.model.Geometry;
-import dev.goerner.geozen.model.Position;
-import dev.goerner.geozen.model.simple_geometry.Polygon;
-
-import java.util.ArrayList;
-import java.util.List;
+import dev.goerner.geozen.model.CoordinateReferenceSystem
+import dev.goerner.geozen.model.Geometry
+import dev.goerner.geozen.model.Position
 
 /**
- * A {@link MultiPolygon} is a {@link Geometry} that represents a collection of {@link Polygon Polygons} in space. It is
- * defined by a list of {@link Polygon Polygons} and a {@link CoordinateReferenceSystem}.
+ * A [MultiPolygon] is a [Geometry] that represents a collection of [Polygons][dev.goerner.geozen.model.simple_geometry.Polygon] in space. It is
+ * defined by a list of [Polygons][dev.goerner.geozen.model.simple_geometry.Polygon] and a [CoordinateReferenceSystem].
  */
-public class MultiPolygon extends Geometry {
+class MultiPolygon(
+    val coordinates: List<List<List<Position>>>,
+    coordinateReferenceSystem: CoordinateReferenceSystem = CoordinateReferenceSystem.WGS_84
+) : Geometry(coordinateReferenceSystem) {
 
-    private final List<List<List<Position>>> coordinates;
-
-    /**
-     * Creates a new {@link MultiPolygon} with the given list of {@link Polygon Polygons} and the default WGS 84
-     * {@link CoordinateReferenceSystem}.
-     *
-     * @param coordinates The list of {@link Polygon Polygons} representing the {@link MultiPolygon}.
-     */
-    public MultiPolygon(List<List<List<Position>>> coordinates) {
-        this(coordinates, CoordinateReferenceSystem.WGS_84);
+    override fun getFastDistanceTo(other: Geometry): Double {
+        throw UnsupportedOperationException("Fast distance calculation not implemented yet")
     }
 
-    /**
-     * Creates a new {@link MultiPolygon} with the given list of {@link Polygon Polygons} and the given
-     * {@link CoordinateReferenceSystem}.
-     *
-     * @param coordinates               The list of {@link Polygon Polygons} representing the {@link MultiPolygon}.
-     * @param coordinateReferenceSystem The {@link CoordinateReferenceSystem} of the {@link MultiPolygon}.
-     */
-    public MultiPolygon(List<List<List<Position>>> coordinates, CoordinateReferenceSystem coordinateReferenceSystem) {
-        super(coordinateReferenceSystem);
-        List<List<List<Position>>> coordsCopy = new ArrayList<>();
-        for (List<List<Position>> polygon : coordinates) {
-            List<List<Position>> polygonCopy = new ArrayList<>();
-            for (List<Position> ring : polygon) {
-                polygonCopy.add(List.copyOf(ring));
-            }
-            coordsCopy.add(List.copyOf(polygonCopy));
-        }
-        this.coordinates = List.copyOf(coordsCopy);
-    }
-
-    @Override
-    public double getFastDistanceTo(Geometry other) {
-        throw new UnsupportedOperationException("Fast distance calculation not implemented yet");
-    }
-
-    @Override
-    public double getExactDistanceTo(Geometry other) {
-        throw new UnsupportedOperationException("Exact distance calculation not implemented yet");
-    }
-
-    public List<List<List<Position>>> getCoordinates() {
-        return coordinates;
+    override fun getExactDistanceTo(other: Geometry): Double {
+        throw UnsupportedOperationException("Exact distance calculation not implemented yet")
     }
 }

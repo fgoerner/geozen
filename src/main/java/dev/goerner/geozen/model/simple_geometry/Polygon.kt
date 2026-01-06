@@ -1,67 +1,36 @@
-package dev.goerner.geozen.model.simple_geometry;
+package dev.goerner.geozen.model.simple_geometry
 
-import dev.goerner.geozen.model.CoordinateReferenceSystem;
-import dev.goerner.geozen.model.Geometry;
-import dev.goerner.geozen.model.Position;
-
-import java.util.ArrayList;
-import java.util.List;
+import dev.goerner.geozen.model.CoordinateReferenceSystem
+import dev.goerner.geozen.model.Geometry
+import dev.goerner.geozen.model.Position
 
 /**
- * A {@link Polygon} is a {@link Geometry} that represents an area in space. It is defined by a list of
- * <a href="https://datatracker.ietf.org/doc/html/rfc7946#section-3.1.6">linear rings</a> and a
- * {@link CoordinateReferenceSystem}.
- * <p>
+ * A [Polygon] is a [Geometry] that represents an area in space. It is defined by a list of
+ * [linear rings](https://datatracker.ietf.org/doc/html/rfc7946#section-3.1.6) and a
+ * [CoordinateReferenceSystem].
+ * 
+ * 
  * The first ring is the exterior ring, defining the outer boundary of the polygon. Any subsequent rings are interior
  * rings, defining holes within the polygon.
  */
-public class Polygon extends Geometry {
+class Polygon(
+    val coordinates: List<List<Position>>,
+    coordinateReferenceSystem: CoordinateReferenceSystem = CoordinateReferenceSystem.WGS_84
+) : Geometry(coordinateReferenceSystem) {
 
-    private final List<List<Position>> coordinates;
-
-    /**
-     * Creates a new {@link Polygon} with the given exterior and interior rings and the default WGS 84
-     * {@link CoordinateReferenceSystem}.
-     *
-     * @param coordinates A list of exterior and interior rings of the {@link Polygon}.
-     */
-    public Polygon(List<List<Position>> coordinates) {
-        this(coordinates, CoordinateReferenceSystem.WGS_84);
+    override fun getFastDistanceTo(other: Geometry): Double {
+        throw UnsupportedOperationException("Fast distance calculation not implemented yet")
     }
 
-    /**
-     * Creates a new {@link Polygon} with the given exterior and interior rings and the given {@link CoordinateReferenceSystem}.
-     *
-     * @param coordinates               A list of exterior and interior rings of the {@link Polygon}.
-     * @param coordinateReferenceSystem The {@link CoordinateReferenceSystem} of the {@link Polygon}.
-     */
-    public Polygon(List<List<Position>> coordinates, CoordinateReferenceSystem coordinateReferenceSystem) {
-        super(coordinateReferenceSystem);
-        List<List<Position>> coordsCopy = new ArrayList<>();
-        for (List<Position> ring : coordinates) {
-            coordsCopy.add(List.copyOf(ring));
+    override fun getExactDistanceTo(other: Geometry): Double {
+        throw UnsupportedOperationException("Exact distance calculation not implemented yet")
+    }
+
+    val exteriorRing: List<Position>
+        get() {
+            if (this.coordinates.isEmpty()) {
+                return emptyList()
+            }
+            return this.coordinates[0]
         }
-        this.coordinates = List.copyOf(coordsCopy);
-    }
-
-    @Override
-    public double getFastDistanceTo(Geometry other) {
-        throw new UnsupportedOperationException("Fast distance calculation not implemented yet");
-    }
-
-    @Override
-    public double getExactDistanceTo(Geometry other) {
-        throw new UnsupportedOperationException("Exact distance calculation not implemented yet");
-    }
-
-    public List<Position> getExteriorRing() {
-        if (this.coordinates.isEmpty()) {
-            return null;
-        }
-        return this.coordinates.getFirst();
-    }
-
-    public List<List<Position>> getCoordinates() {
-        return this.coordinates;
-    }
 }

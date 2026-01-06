@@ -122,13 +122,9 @@ class WktSerializer {
         val sb = StringBuilder("POINT")
         val pos = point.coordinates
 
-        if (pos == null) {
-            sb.append(" EMPTY")
-        } else {
-            sb.append(" (")
-            appendPosition(sb, pos)
-            sb.append(")")
-        }
+        sb.append(" (")
+        appendPosition(sb, pos)
+        sb.append(")")
 
         return sb.toString()
     }
@@ -137,7 +133,7 @@ class WktSerializer {
         val sb = StringBuilder("LINESTRING")
         val coords = lineString.coordinates
 
-        if (coords == null || coords.isEmpty()) {
+        if (coords.isEmpty()) {
             sb.append(" EMPTY")
         } else {
             sb.append(" (")
@@ -152,7 +148,7 @@ class WktSerializer {
         val sb = StringBuilder("POLYGON")
         val coords = polygon.coordinates
 
-        if (coords == null || coords.isEmpty()) {
+        if (coords.isEmpty()) {
             sb.append(" EMPTY")
         } else {
             sb.append(" (")
@@ -174,7 +170,7 @@ class WktSerializer {
         val sb = StringBuilder("MULTIPOINT")
         val coords = multiPoint.coordinates
 
-        if (coords == null || coords.isEmpty()) {
+        if (coords.isEmpty()) {
             sb.append(" EMPTY")
         } else {
             sb.append(" (")
@@ -196,7 +192,7 @@ class WktSerializer {
         val sb = StringBuilder("MULTILINESTRING")
         val coords = multiLineString.coordinates
 
-        if (coords == null || coords.isEmpty()) {
+        if (coords.isEmpty()) {
             sb.append(" EMPTY")
         } else {
             sb.append(" (")
@@ -218,7 +214,7 @@ class WktSerializer {
         val sb = StringBuilder("MULTIPOLYGON")
         val coords = multiPolygon.coordinates
 
-        if (coords == null || coords.isEmpty()) {
+        if (coords.isEmpty()) {
             sb.append(" EMPTY")
         } else {
             sb.append(" (")

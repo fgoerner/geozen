@@ -1,49 +1,21 @@
-package dev.goerner.geozen.model.collections;
+package dev.goerner.geozen.model.collections
 
-import dev.goerner.geozen.model.CoordinateReferenceSystem;
-import dev.goerner.geozen.model.Geometry;
-
-import java.util.List;
+import dev.goerner.geozen.model.CoordinateReferenceSystem
+import dev.goerner.geozen.model.Geometry
 
 /**
- * A {@link GeometryCollection} is a collection of {@link Geometry Geometries}.
+ * A [GeometryCollection] is a collection of [Geometries][Geometry].
  */
-public class GeometryCollection extends Geometry {
+class GeometryCollection(
+    val geometries: List<Geometry>,
+    coordinateReferenceSystem: CoordinateReferenceSystem = CoordinateReferenceSystem.WGS_84
+) : Geometry(coordinateReferenceSystem) {
 
-    private final List<Geometry> geometries;
-
-    /**
-     * Creates a new {@link GeometryCollection} with the given list of {@link Geometry Geometries} and the default WGS 84
-     * {@link CoordinateReferenceSystem}.
-     *
-     * @param geometries The list of {@link Geometry Geometries} representing the {@link GeometryCollection}.
-     */
-    public GeometryCollection(List<Geometry> geometries) {
-        this(geometries, CoordinateReferenceSystem.WGS_84);
+    override fun getFastDistanceTo(other: Geometry): Double {
+        throw UnsupportedOperationException("Fast distance calculation not implemented yet")
     }
 
-    /**
-     * Creates a new {@link GeometryCollection} with the given list of {@link Geometry Geometries} and the given {@link CoordinateReferenceSystem}.
-     *
-     * @param geometries                The list of {@link Geometry Geometries} representing the {@link GeometryCollection}.
-     * @param coordinateReferenceSystem The {@link CoordinateReferenceSystem} of the {@link GeometryCollection}.
-     */
-    public GeometryCollection(List<Geometry> geometries, CoordinateReferenceSystem coordinateReferenceSystem) {
-        super(coordinateReferenceSystem);
-        this.geometries = List.copyOf(geometries);
-    }
-
-    @Override
-    public double getFastDistanceTo(Geometry other) {
-        throw new UnsupportedOperationException("Fast distance calculation not implemented yet");
-    }
-
-    @Override
-    public double getExactDistanceTo(Geometry other) {
-        throw new UnsupportedOperationException("Exact distance calculation not implemented yet");
-    }
-
-    public List<Geometry> getGeometries() {
-        return geometries;
+    override fun getExactDistanceTo(other: Geometry): Double {
+        throw UnsupportedOperationException("Exact distance calculation not implemented yet")
     }
 }

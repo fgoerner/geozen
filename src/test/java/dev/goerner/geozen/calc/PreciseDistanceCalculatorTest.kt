@@ -1,49 +1,47 @@
-package dev.goerner.geozen.calc;
+package dev.goerner.geozen.calc
 
-import dev.goerner.geozen.model.Position;
-import dev.goerner.geozen.model.simple_geometry.LineString;
-import dev.goerner.geozen.model.simple_geometry.Point;
-import org.junit.jupiter.api.Test;
+import dev.goerner.geozen.calc.PreciseDistanceCalculator.karneyDistance
+import dev.goerner.geozen.model.Position
+import dev.goerner.geozen.model.simple_geometry.LineString
+import dev.goerner.geozen.model.simple_geometry.Point
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
 
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-public class PreciseDistanceCalculatorTest {
+class PreciseDistanceCalculatorTest {
 
     @Test
-    void testKarneyDistance() {
-        Position p1 = new Position(11.4694, 49.2965);
-        Position p2 = new Position(11.0549, 49.4532);
+    fun `test karney distance`() {
+        val p1 = Position(11.4694, 49.2965)
+        val p2 = Position(11.0549, 49.4532)
 
-        double distance = PreciseDistanceCalculator.INSTANCE.karneyDistance(p1, p2);
+        val distance = karneyDistance(p1, p2)
 
-        assertEquals(34782.42347014982, distance);
+        assertEquals(34782.42347014982, distance)
     }
 
     @Test
-    void testCalculate() {
-        Point p1 = new Point(11.4694, 49.2965);
-        Point p2 = new Point(11.0549, 49.4532);
+    fun `test Point to Point distance`() {
+        val p1 = Point(11.4694, 49.2965)
+        val p2 = Point(11.0549, 49.4532)
 
-        double preciseDistance = PreciseDistanceCalculator.INSTANCE.calculate(p1, p2);
+        val preciseDistance = PreciseDistanceCalculator.calculate(p1, p2)
 
-        assertEquals(34782.42347014982, preciseDistance);
+        assertEquals(34782.42347014982, preciseDistance)
     }
 
     @Test
-    void testCalculateLineString() {
-        Point p1 = new Point(11.4694, 49.2965);
-        LineString lineString = new LineString(
-                List.of(
-                        new Position(11.4432, 49.3429),
-                        new Position(11.4463, 49.1877),
-                        new Position(11.5161, 49.1239)
-                )
-        );
+    fun `test Point to LineString distance`() {
+        val p1 = Point(11.4694, 49.2965)
+        val lineString = LineString(
+            listOf(
+                Position(11.4432, 49.3429),
+                Position(11.4463, 49.1877),
+                Position(11.5161, 49.1239)
+            )
+        )
 
-        double preciseDistance = PreciseDistanceCalculator.INSTANCE.calculate(p1, lineString);
+        val preciseDistance = PreciseDistanceCalculator.calculate(p1, lineString)
 
-        assertEquals(1874.0229499712636, preciseDistance);
+        assertEquals(1874.0229499712636, preciseDistance)
     }
 }

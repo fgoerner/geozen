@@ -1,41 +1,38 @@
-package dev.goerner.geozen.model.multi_geometry;
+package dev.goerner.geozen.model.multi_geometry
 
-import dev.goerner.geozen.model.CoordinateReferenceSystem;
-import dev.goerner.geozen.model.Position;
-import org.junit.jupiter.api.Test;
+import dev.goerner.geozen.model.CoordinateReferenceSystem
+import dev.goerner.geozen.model.Position
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-public class MultiLineStringTest {
-
+class MultiLineStringTest {
     @Test
-    public void testCoordinatesConstructor() {
-        List<List<Position>> coordinates = new ArrayList<>();
-        List<Position> lineString = new ArrayList<>();
-        lineString.add(new Position(1.0, 2.0, 3.0));
-        lineString.add(new Position(4.0, 5.0, 6.0));
-        coordinates.add(lineString);
+    fun testCoordinatesConstructor() {
+        val coordinates = listOf(
+            listOf(
+                Position(1.0, 2.0, 3.0),
+                Position(4.0, 5.0, 6.0)
+            )
+        )
 
-        MultiLineString multiLineString = new MultiLineString(coordinates);
+        val multiLineString = MultiLineString(coordinates)
 
-        assertEquals(1, multiLineString.getCoordinates().size());
-        assertEquals(CoordinateReferenceSystem.WGS_84, multiLineString.getCoordinateReferenceSystem());
+        Assertions.assertEquals(1, multiLineString.coordinates.size)
+        Assertions.assertEquals(CoordinateReferenceSystem.WGS_84, multiLineString.coordinateReferenceSystem)
     }
 
     @Test
-    public void testCoordinatesAndReferenceSystemConstructor() {
-        List<List<Position>> coordinates = new ArrayList<>();
-        List<Position> lineString = new ArrayList<>();
-        lineString.add(new Position(1.0, 2.0, 3.0));
-        lineString.add(new Position(4.0, 5.0, 6.0));
-        coordinates.add(lineString);
+    fun testCoordinatesAndReferenceSystemConstructor() {
+        val coordinates = listOf(
+            listOf(
+                Position(1.0, 2.0, 3.0),
+                Position(4.0, 5.0, 6.0)
+            )
+        )
 
-        MultiLineString multiLineString = new MultiLineString(coordinates, CoordinateReferenceSystem.WEB_MERCATOR);
+        val multiLineString = MultiLineString(coordinates, CoordinateReferenceSystem.WEB_MERCATOR)
 
-        assertEquals(1, multiLineString.getCoordinates().size());
-        assertEquals(CoordinateReferenceSystem.WEB_MERCATOR, multiLineString.getCoordinateReferenceSystem());
+        Assertions.assertEquals(1, multiLineString.coordinates.size)
+        Assertions.assertEquals(CoordinateReferenceSystem.WEB_MERCATOR, multiLineString.coordinateReferenceSystem)
     }
 }

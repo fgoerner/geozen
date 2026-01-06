@@ -282,13 +282,19 @@ class WktDeserializer {
 
         for (i in 0..<input.length) {
             val c: Char = input[i]
-            if (c == '(') {
-                depth++
-            } else if (c == ')') {
-                depth--
-            } else if (c == ',' && depth == 0) {
-                result.add(input.substring(start, i))
-                start = i + 1
+            when (c) {
+                '(' -> {
+                    depth++
+                }
+
+                ')' -> {
+                    depth--
+                }
+
+                ',' if depth == 0 -> {
+                    result.add(input.substring(start, i))
+                    start = i + 1
+                }
             }
         }
 

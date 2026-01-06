@@ -1,68 +1,66 @@
-package dev.goerner.geozen.model.simple_geometry;
+package dev.goerner.geozen.model.simple_geometry
 
-import dev.goerner.geozen.model.CoordinateReferenceSystem;
-import dev.goerner.geozen.model.Position;
-import org.junit.jupiter.api.Test;
+import dev.goerner.geozen.model.CoordinateReferenceSystem
+import dev.goerner.geozen.model.Position
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-public class PointTest {
-
+class PointTest {
     @Test
-    public void testLongitudeAndLatitudeConstructor() {
-        Point point = new Point(1.0, 2.0);
+    fun testLongitudeAndLatitudeConstructor() {
+        val point = Point(1.0, 2.0)
 
-        assertEquals(1.0, point.getLongitude());
-        assertEquals(2.0, point.getLatitude());
-        assertEquals(0, point.getAltitude());
-        assertEquals(CoordinateReferenceSystem.WGS_84, point.getCoordinateReferenceSystem());
+        Assertions.assertEquals(1.0, point.longitude)
+        Assertions.assertEquals(2.0, point.latitude)
+        Assertions.assertEquals(0.0, point.altitude)
+        Assertions.assertEquals(CoordinateReferenceSystem.WGS_84, point.coordinateReferenceSystem)
     }
 
     @Test
-    public void testLongitudeAndLatitudeAndAltitudeConstructor() {
-        Point point = new Point(1.0, 2.0, 3.0);
+    fun testLongitudeAndLatitudeAndAltitudeConstructor() {
+        val point = Point(1.0, 2.0, 3.0)
 
-        assertEquals(1.0, point.getLongitude());
-        assertEquals(2.0, point.getLatitude());
-        assertEquals(3.0, point.getAltitude());
-        assertEquals(CoordinateReferenceSystem.WGS_84, point.getCoordinateReferenceSystem());
+        Assertions.assertEquals(1.0, point.longitude)
+        Assertions.assertEquals(2.0, point.latitude)
+        Assertions.assertEquals(3.0, point.altitude)
+        Assertions.assertEquals(CoordinateReferenceSystem.WGS_84, point.coordinateReferenceSystem)
     }
 
     @Test
-    public void testCoordinatesConstructor() {
-        Position coordinates = new Position(1.0, 2.0, 3.0);
-        Point point = new Point(coordinates);
+    fun testCoordinatesConstructor() {
+        val coordinates = Position(1.0, 2.0, 3.0)
+        val point = Point(coordinates)
 
-        assertEquals(coordinates, point.getCoordinates());
-        assertEquals(CoordinateReferenceSystem.WGS_84, point.getCoordinateReferenceSystem());
+        Assertions.assertEquals(coordinates, point.coordinates)
+        Assertions.assertEquals(CoordinateReferenceSystem.WGS_84, point.coordinateReferenceSystem)
     }
 
     @Test
-    public void testLongitudeAndLatitudeAndReferenceSystemConstructor() {
-        Point point = new Point(1.0, 2.0, CoordinateReferenceSystem.WEB_MERCATOR);
+    fun testLongitudeAndLatitudeAndReferenceSystemConstructor() {
+        val point = Point(1.0, 2.0, 0.0, CoordinateReferenceSystem.WEB_MERCATOR)
 
-        assertEquals(1.0, point.getLongitude());
-        assertEquals(2.0, point.getLatitude());
-        assertEquals(0, point.getAltitude());
-        assertEquals(CoordinateReferenceSystem.WEB_MERCATOR, point.getCoordinateReferenceSystem());
+        Assertions.assertEquals(1.0, point.longitude)
+        Assertions.assertEquals(2.0, point.latitude)
+        Assertions.assertEquals(0.0, point.altitude)
+        Assertions.assertEquals(CoordinateReferenceSystem.WEB_MERCATOR, point.coordinateReferenceSystem)
     }
 
     @Test
-    public void testLongitudeAndLatitudeAndAltitudeAndReferenceSystemConstructor() {
-        Point point = new Point(1.0, 2.0, 3.0, CoordinateReferenceSystem.WEB_MERCATOR);
+    fun testLongitudeAndLatitudeAndAltitudeAndReferenceSystemConstructor() {
+        val point = Point(1.0, 2.0, 3.0, CoordinateReferenceSystem.WEB_MERCATOR)
 
-        assertEquals(1.0, point.getLongitude());
-        assertEquals(2.0, point.getLatitude());
-        assertEquals(3.0, point.getAltitude());
-        assertEquals(CoordinateReferenceSystem.WEB_MERCATOR, point.getCoordinateReferenceSystem());
+        Assertions.assertEquals(1.0, point.longitude)
+        Assertions.assertEquals(2.0, point.latitude)
+        Assertions.assertEquals(3.0, point.altitude)
+        Assertions.assertEquals(CoordinateReferenceSystem.WEB_MERCATOR, point.coordinateReferenceSystem)
     }
 
     @Test
-    public void testCoordinatesAndReferenceSystemConstructor() {
-        Position coordinates = new Position(1.0, 2.0, 3.0);
-        Point point = new Point(coordinates, CoordinateReferenceSystem.WEB_MERCATOR);
+    fun testCoordinatesAndReferenceSystemConstructor() {
+        val coordinates = Position(1.0, 2.0, 3.0)
+        val point = Point(coordinates, CoordinateReferenceSystem.WEB_MERCATOR)
 
-        assertEquals(coordinates, point.getCoordinates());
-        assertEquals(CoordinateReferenceSystem.WEB_MERCATOR, point.getCoordinateReferenceSystem());
+        Assertions.assertEquals(coordinates, point.coordinates)
+        Assertions.assertEquals(CoordinateReferenceSystem.WEB_MERCATOR, point.coordinateReferenceSystem)
     }
 }

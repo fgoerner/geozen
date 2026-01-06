@@ -1,47 +1,45 @@
-package dev.goerner.geozen.model;
+package dev.goerner.geozen.model
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-public class PositionTest {
-
+class PositionTest {
     @Test
-    public void testLongitudeAndLatitudeConstructor() {
-        Position position = new Position(1.0, 2.0);
+    fun testLongitudeAndLatitudeConstructor() {
+        val position = Position(1.0, 2.0)
 
-        assertEquals(1.0, position.getLongitude());
-        assertEquals(2.0, position.getLatitude());
-        assertEquals(0, position.getAltitude());
+        Assertions.assertEquals(1.0, position.longitude)
+        Assertions.assertEquals(2.0, position.latitude)
+        Assertions.assertEquals(0.0, position.altitude)
     }
 
     @Test
-    public void testLongitudeAndLatitudeAndAltitudeConstructor() {
-        Position position = new Position(1.0, 2.0, 3.0);
+    fun testLongitudeAndLatitudeAndAltitudeConstructor() {
+        val position = Position(1.0, 2.0, 3.0)
 
-        assertEquals(1.0, position.getLongitude());
-        assertEquals(2.0, position.getLatitude());
-        assertEquals(3.0, position.getAltitude());
+        Assertions.assertEquals(1.0, position.longitude)
+        Assertions.assertEquals(2.0, position.latitude)
+        Assertions.assertEquals(3.0, position.altitude)
     }
 
     @Test
-    public void testGetLongitude() {
-        Position position = new Position(1.0, 2.0, 3.0);
+    fun testGetLongitude() {
+        val position = Position(1.0, 2.0, 3.0)
 
-        assertEquals(1.0, position.getLongitude());
+        Assertions.assertEquals(1.0, position.longitude)
     }
 
     @Test
-    public void testGetLatitude() {
-        Position position = new Position(1.0, 2.0, 3.0);
+    fun testGetLatitude() {
+        val position = Position(1.0, 2.0, 3.0)
 
-        assertEquals(2.0, position.getLatitude());
+        Assertions.assertEquals(2.0, position.latitude)
     }
 
     @Test
-    public void testGetAltitude() {
-        Position position = new Position(1.0, 2.0, 3.0);
+    fun testGetAltitude() {
+        val position = Position(1.0, 2.0, 3.0)
 
-        assertEquals(3.0, position.getAltitude());
+        Assertions.assertEquals(3.0, position.altitude)
     }
 }

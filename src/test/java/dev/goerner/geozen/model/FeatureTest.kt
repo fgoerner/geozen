@@ -1,79 +1,54 @@
-package dev.goerner.geozen.model;
+package dev.goerner.geozen.model
 
-import dev.goerner.geozen.model.simple_geometry.Point;
-import org.junit.jupiter.api.Test;
+import dev.goerner.geozen.model.simple_geometry.Point
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertNull
 
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-
-public class FeatureTest {
-
+class FeatureTest {
     @Test
-    public void testGeometryConstructor() {
-        Geometry geometry = new Point(0.0, 0.0);
-        Feature feature = new Feature(geometry);
+    fun testGeometryConstructor() {
+        val geometry: Geometry = Point(0.0, 0.0)
+        val feature = Feature(geometry)
 
-        assertNull(feature.getId());
-        assertEquals(geometry, feature.getGeometry());
-        assertNull(feature.getProperties());
+        assertNull(feature.id)
+        assertEquals(geometry, feature.geometry)
+        assertEquals(emptyMap<String, String>(), feature.properties)
     }
 
     @Test
-    public void testPropertiesConstructor() {
-        Map<String, String> properties = new HashMap<>();
-        properties.put("key", "value");
-        Feature feature = new Feature(properties);
+    fun testIdAndGeometryConstructor() {
+        val geometry: Geometry = Point(0.0, 0.0)
+        val feature = Feature(geometry, "123")
 
-        assertNull(feature.getId());
-        assertNull(feature.getGeometry());
-        assertEquals(properties, feature.getProperties());
+        assertEquals("123", feature.id)
+        assertEquals(geometry, feature.geometry)
+        assertEquals(emptyMap<String, String>(), feature.properties)
     }
 
     @Test
-    public void testIdAndPropertiesConstructor() {
-        Map<String, String> properties = new HashMap<>();
-        properties.put("key", "value");
-        Feature feature = new Feature("123", properties);
+    fun testGeometryAndPropertiesConstructor() {
+        val geometry: Geometry = Point(0.0, 0.0)
+        val properties = mapOf(
+            "key" to "value"
+        )
+        val feature = Feature(geometry, null, properties)
 
-        assertEquals("123", feature.getId());
-        assertNull(feature.getGeometry());
-        assertEquals(properties, feature.getProperties());
+        assertNull(feature.id)
+        assertEquals(geometry, feature.geometry)
+        assertEquals(properties, feature.properties)
     }
 
     @Test
-    public void testIdAndGeometryConstructor() {
-        Geometry geometry = new Point(0.0, 0.0);
-        Feature feature = new Feature("123", geometry);
+    fun testIdAndGeometryAndPropertiesConstructor() {
+        val geometry: Geometry = Point(0.0, 0.0)
+        val properties = mapOf(
+            "key" to "value"
+        )
+        val feature = Feature(geometry, "123", properties)
 
-        assertEquals("123", feature.getId());
-        assertEquals(geometry, feature.getGeometry());
-        assertNull(feature.getProperties());
-    }
-
-    @Test
-    public void testGeometryAndPropertiesConstructor() {
-        Geometry geometry = new Point(0.0, 0.0);
-        Map<String, String> properties = new HashMap<>();
-        properties.put("key", "value");
-        Feature feature = new Feature(geometry, properties);
-
-        assertNull(feature.getId());
-        assertEquals(geometry, feature.getGeometry());
-        assertEquals(properties, feature.getProperties());
-    }
-
-    @Test
-    public void testIdAndGeometryAndPropertiesConstructor() {
-        Geometry geometry = new Point(0.0, 0.0);
-        Map<String, String> properties = new HashMap<>();
-        properties.put("key", "value");
-        Feature feature = new Feature("123", geometry, properties);
-
-        assertEquals("123", feature.getId());
-        assertEquals(geometry, feature.getGeometry());
-        assertEquals(properties, feature.getProperties());
+        assertEquals("123", feature.id)
+        assertEquals(geometry, feature.geometry)
+        assertEquals(properties, feature.properties)
     }
 }

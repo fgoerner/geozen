@@ -1,124 +1,61 @@
-package dev.goerner.geozen.model.simple_geometry;
+package dev.goerner.geozen.model.simple_geometry
 
-import dev.goerner.geozen.calc.ApproximateDistanceCalculator;
-import dev.goerner.geozen.calc.PreciseDistanceCalculator;
-import dev.goerner.geozen.model.CoordinateReferenceSystem;
-import dev.goerner.geozen.model.Geometry;
-import dev.goerner.geozen.model.Position;
+import dev.goerner.geozen.calc.ApproximateDistanceCalculator
+import dev.goerner.geozen.calc.PreciseDistanceCalculator
+import dev.goerner.geozen.model.CoordinateReferenceSystem
+import dev.goerner.geozen.model.Geometry
+import dev.goerner.geozen.model.Position
 
 /**
- * A {@link Point} is a {@link Geometry} that represents a single position in space. It is defined by a single
- * {@link Position} and a {@link CoordinateReferenceSystem}.
+ * A [Point] is a [Geometry] that represents a single position in space. It is defined by a single
+ * [Position] and a [CoordinateReferenceSystem].
  */
-public class Point extends Geometry {
+class Point(
+    val coordinates: Position,
+    coordinateReferenceSystem: CoordinateReferenceSystem = CoordinateReferenceSystem.WGS_84
+) : Geometry(coordinateReferenceSystem) {
 
-    private final Position coordinates;
+    constructor(longitude: Double, latitude: Double, altitude: Double = 0.0) : this(
+        Position(longitude, latitude, altitude),
+        CoordinateReferenceSystem.WGS_84
+    )
 
-    /**
-     * Creates a new {@link Point} at the given coordinates with the default WGS 84 {@link CoordinateReferenceSystem}.
-     *
-     * @param longitude The longitude of the {@link Point}.
-     * @param latitude  The latitude of the {@link Point}.
-     */
-    public Point(double longitude, double latitude) {
-        this(longitude, latitude, CoordinateReferenceSystem.WGS_84);
-    }
+    constructor(
+        longitude: Double,
+        latitude: Double,
+        altitude: Double = 0.0,
+        coordinateReferenceSystem: CoordinateReferenceSystem = CoordinateReferenceSystem.WGS_84
+    ) : this(
+        Position(longitude, latitude, altitude),
+        coordinateReferenceSystem
+    )
 
-    /**
-     * Creates a new {@link Point} at the given coordinates with the default WGS 84 {@link CoordinateReferenceSystem}.
-     *
-     * @param longitude The longitude of the {@link Point}.
-     * @param latitude  The latitude of the {@link Point}.
-     * @param altitude  The altitude of the {@link Point}.
-     */
-    public Point(double longitude, double latitude, double altitude) {
-        this(longitude, latitude, altitude, CoordinateReferenceSystem.WGS_84);
-    }
-
-    /**
-     * Creates a new {@link Point} at the given {@link Position} with the default WGS 84 {@link CoordinateReferenceSystem}.
-     *
-     * @param coordinates The {@link Position} of the {@link Point}.
-     */
-    public Point(Position coordinates) {
-        this(coordinates, CoordinateReferenceSystem.WGS_84);
-    }
-
-    /**
-     * Creates a new {@link Point} at the given coordinates with the given {@link CoordinateReferenceSystem}.
-     *
-     * @param longitude                 The longitude of the {@link Point}.
-     * @param latitude                  The latitude of the {@link Point}.
-     * @param coordinateReferenceSystem The {@link CoordinateReferenceSystem} of the {@link Point}.
-     */
-    public Point(double longitude, double latitude, CoordinateReferenceSystem coordinateReferenceSystem) {
-        this(longitude, latitude, 0, coordinateReferenceSystem);
-    }
-
-    /**
-     * Creates a new {@link Point} at the given coordinates with the given {@link CoordinateReferenceSystem}.
-     *
-     * @param longitude                 The longitude of the {@link Point}.
-     * @param latitude                  The latitude of the {@link Point}.
-     * @param altitude                  The altitude of the {@link Point}.
-     * @param coordinateReferenceSystem The {@link CoordinateReferenceSystem} of the {@link Point}.
-     */
-    public Point(double longitude, double latitude, double altitude, CoordinateReferenceSystem coordinateReferenceSystem) {
-        this(new Position(longitude, latitude, altitude), coordinateReferenceSystem);
-    }
-
-    /**
-     * Creates a new {@link Point} at the given {@link Position} with the given {@link CoordinateReferenceSystem}.
-     *
-     * @param coordinates               The {@link Position} of the {@link Point}.
-     * @param coordinateReferenceSystem The {@link CoordinateReferenceSystem} of the {@link Point}.
-     */
-    public Point(Position coordinates, CoordinateReferenceSystem coordinateReferenceSystem) {
-        super(coordinateReferenceSystem);
-        this.coordinates = coordinates;
-    }
-
-    @Override
-    public double getFastDistanceTo(Geometry other) {
-        switch (other) {
-            case Point otherPoint -> {
-                return ApproximateDistanceCalculator.INSTANCE.calculate(this, otherPoint);
-            }
-            case LineString otherLineString -> {
-                return ApproximateDistanceCalculator.INSTANCE.calculate(this, otherLineString);
-            }
-            default ->
-                    throw new UnsupportedOperationException("Fast distance calculation is not supported for geometry type: " + other.getClass().getSimpleName());
+    override fun getFastDistanceTo(other: Geometry): Double {
+        return when (other) {
+            is Point -> ApproximateDistanceCalculator.calculate(this, other)
+            is LineString -> ApproximateDistanceCalculator.calculate(this, other)
+            else -> throw UnsupportedOperationException(
+                "Fast distance calculation is not supported for geometry type: " + other.javaClass.getSimpleName()
+            )
         }
     }
 
-    @Override
-    public double getExactDistanceTo(Geometry other) {
-        switch (other) {
-            case Point otherPoint -> {
-                return PreciseDistanceCalculator.INSTANCE.calculate(this, otherPoint);
-            }
-            case LineString otherLineString -> {
-                return PreciseDistanceCalculator.INSTANCE.calculate(this, otherLineString);
-            }
-            default ->
-                    throw new UnsupportedOperationException("Exact distance calculation is not supported for geometry type: " + other.getClass().getSimpleName());
+    override fun getExactDistanceTo(other: Geometry): Double {
+        return when (other) {
+            is Point -> PreciseDistanceCalculator.calculate(this, other)
+            is LineString -> PreciseDistanceCalculator.calculate(this, other)
+            else -> throw UnsupportedOperationException(
+                "Exact distance calculation is not supported for geometry type: " + other.javaClass.getSimpleName()
+            )
         }
     }
 
-    public double getLongitude() {
-        return this.coordinates.getLongitude();
-    }
+    val longitude: Double
+        get() = this.coordinates.longitude
 
-    public double getLatitude() {
-        return this.coordinates.getLatitude();
-    }
+    val latitude: Double
+        get() = this.coordinates.latitude
 
-    public double getAltitude() {
-        return this.coordinates.getAltitude();
-    }
-
-    public Position getCoordinates() {
-        return this.coordinates;
-    }
+    val altitude: Double
+        get() = this.coordinates.altitude
 }
