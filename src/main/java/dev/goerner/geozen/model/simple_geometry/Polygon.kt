@@ -13,9 +13,9 @@ import dev.goerner.geozen.model.Position
  * The first ring is the exterior ring, defining the outer boundary of the polygon. Any subsequent rings are interior
  * rings, defining holes within the polygon.
  */
-class Polygon(
+data class Polygon(
     val coordinates: List<List<Position>>,
-    coordinateReferenceSystem: CoordinateReferenceSystem = CoordinateReferenceSystem.WGS_84
+    override val coordinateReferenceSystem: CoordinateReferenceSystem = CoordinateReferenceSystem.WGS_84
 ) : Geometry(coordinateReferenceSystem) {
 
     override fun getFastDistanceTo(other: Geometry): Double {

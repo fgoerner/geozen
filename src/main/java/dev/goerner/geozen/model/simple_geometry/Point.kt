@@ -10,9 +10,9 @@ import dev.goerner.geozen.model.Position
  * A [Point] is a [Geometry] that represents a single position in space. It is defined by a single
  * [Position] and a [CoordinateReferenceSystem].
  */
-class Point(
+data class Point(
     val coordinates: Position,
-    coordinateReferenceSystem: CoordinateReferenceSystem = CoordinateReferenceSystem.WGS_84
+    override val coordinateReferenceSystem: CoordinateReferenceSystem = CoordinateReferenceSystem.WGS_84
 ) : Geometry(coordinateReferenceSystem) {
 
     constructor(longitude: Double, latitude: Double, altitude: Double = 0.0) : this(

@@ -8,9 +8,9 @@ import dev.goerner.geozen.model.Position
  * A [MultiPolygon] is a [Geometry] that represents a collection of [Polygons][dev.goerner.geozen.model.simple_geometry.Polygon] in space. It is
  * defined by a list of [Polygons][dev.goerner.geozen.model.simple_geometry.Polygon] and a [CoordinateReferenceSystem].
  */
-class MultiPolygon(
+data class MultiPolygon(
     val coordinates: List<List<List<Position>>>,
-    coordinateReferenceSystem: CoordinateReferenceSystem = CoordinateReferenceSystem.WGS_84
+    override val coordinateReferenceSystem: CoordinateReferenceSystem = CoordinateReferenceSystem.WGS_84
 ) : Geometry(coordinateReferenceSystem) {
 
     override fun getFastDistanceTo(other: Geometry): Double {

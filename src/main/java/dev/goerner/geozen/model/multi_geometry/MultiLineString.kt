@@ -8,9 +8,9 @@ import dev.goerner.geozen.model.Position
  * A [MultiLineString] is a [Geometry] that represents a collection of [LineStrings][dev.goerner.geozen.model.simple_geometry.LineString] in
  * space. It is defined by a list of [LineStrings][dev.goerner.geozen.model.simple_geometry.LineString] and a [CoordinateReferenceSystem].
  */
-class MultiLineString(
+data class MultiLineString(
     val coordinates: List<List<Position>>,
-    coordinateReferenceSystem: CoordinateReferenceSystem = CoordinateReferenceSystem.WGS_84
+    override val coordinateReferenceSystem: CoordinateReferenceSystem = CoordinateReferenceSystem.WGS_84
 ) : Geometry(coordinateReferenceSystem) {
 
     override fun getFastDistanceTo(other: Geometry): Double {

@@ -8,9 +8,9 @@ import dev.goerner.geozen.model.Position
  * A [MultiPoint] is a [Geometry] that represents a collection of [Positions][Position] in space. It is
  * defined by a list of [Positions][Position] and a [CoordinateReferenceSystem].
  */
-class MultiPoint(
+data class MultiPoint(
     val coordinates: List<Position>,
-    coordinateReferenceSystem: CoordinateReferenceSystem = CoordinateReferenceSystem.WGS_84
+    override val coordinateReferenceSystem: CoordinateReferenceSystem = CoordinateReferenceSystem.WGS_84
 ) : Geometry(coordinateReferenceSystem) {
 
     override fun getFastDistanceTo(other: Geometry): Double {

@@ -5,7 +5,7 @@ package dev.goerner.geozen.model
  * some data structure of [Positions][Position] provided by its descendants, that define the shape of the spatial
  * object.
  */
-abstract class Geometry(val coordinateReferenceSystem: CoordinateReferenceSystem) {
+abstract class Geometry(open val coordinateReferenceSystem: CoordinateReferenceSystem) {
 
     /**
      * Calculates an approximate distance to another [Geometry].

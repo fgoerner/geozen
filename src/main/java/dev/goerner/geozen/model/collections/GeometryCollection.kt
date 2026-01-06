@@ -6,9 +6,9 @@ import dev.goerner.geozen.model.Geometry
 /**
  * A [GeometryCollection] is a collection of [Geometries][Geometry].
  */
-class GeometryCollection(
+data class GeometryCollection(
     val geometries: List<Geometry>,
-    coordinateReferenceSystem: CoordinateReferenceSystem = CoordinateReferenceSystem.WGS_84
+    override val coordinateReferenceSystem: CoordinateReferenceSystem = CoordinateReferenceSystem.WGS_84
 ) : Geometry(coordinateReferenceSystem) {
 
     override fun getFastDistanceTo(other: Geometry): Double {
