@@ -7,5 +7,5 @@ package dev.goerner.geozen.model
 class Feature(
     val id: String? = null,
     val geometry: Geometry? = null,
-    val properties: Map<String, String>? = emptyMap()
+    val properties: Map<String, String> = emptyMap()
 )
