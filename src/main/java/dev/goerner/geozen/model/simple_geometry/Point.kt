@@ -15,11 +15,6 @@ data class Point(
     override val coordinateReferenceSystem: CoordinateReferenceSystem = CoordinateReferenceSystem.WGS_84
 ) : Geometry(coordinateReferenceSystem) {
 
-    constructor(longitude: Double, latitude: Double, altitude: Double = 0.0) : this(
-        Position(longitude, latitude, altitude),
-        CoordinateReferenceSystem.WGS_84
-    )
-
     constructor(
         longitude: Double,
         latitude: Double,
