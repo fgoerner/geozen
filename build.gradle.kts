@@ -1,6 +1,7 @@
 plugins {
     id("java-library")
     id("com.vanniktech.maven.publish") version "0.34.0"
+    kotlin("jvm")
 }
 
 group = "dev.goerner.geozen"
@@ -23,6 +24,7 @@ dependencies {
     implementation(platform("tools.jackson:jackson-bom:3.0.0"))
     implementation("tools.jackson.core:jackson-databind")
     implementation("net.sf.geographiclib:GeographicLib-Java:2.1")
+    implementation(kotlin("stdlib"))
 }
 
 tasks.test {
