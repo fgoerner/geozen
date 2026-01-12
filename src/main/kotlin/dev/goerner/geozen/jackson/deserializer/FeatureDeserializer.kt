@@ -17,19 +17,23 @@ class FeatureDeserializer : ValueDeserializer<Feature>() {
         val type = typeNode.asString()
         require(type == "Feature") { "Invalid GeoJSON type: $type. Expected 'Feature'." }
 
-        val idNode = rootNode["id"]
-        require(idNode != null && idNode.isString) { "Missing or invalid 'id' field in GeoJSON Feature." }
-        val id = idNode.asString()
+        val id = rootNode["id"]?.asString()
 
         val geometryNode = rootNode["geometry"]
-        require(geometryNode != null && geometryNode.isObject) { "Missing or invalid 'geometry' field in GeoJSON Feature." }
-        val geometryDeserializer = ctxt.findRootValueDeserializer(ctxt.constructType(Geometry::class.java))
-        val geometry = geometryDeserializer.deserialize(geometryNode.traverse(ctxt), ctxt) as Geometry
+        val geometry = if (geometryNode != null && !geometryNode.isNull) {
+            ctxt.readValue(geometryNode.traverse(ctxt), Geometry::class.java)
+        } else {
+            null
+        }
 
         val propertiesNode = rootNode["properties"]
-        require(propertiesNode != null && propertiesNode.isObject) { "Missing or invalid 'properties' field in GeoJSON Feature." }
-        val properties = propertiesNode.properties().associate { it.key to it.value.asString() }
+        val properties = if (propertiesNode != null && propertiesNode.isObject) {
+            propertiesNode.properties().associate { it.key to it.value.asString() }
+        } else {
+            emptyMap()
+        }
 
         return Feature(id, geometry, properties)
     }
 }
+

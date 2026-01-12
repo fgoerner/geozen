@@ -10,8 +10,6 @@ import dev.goerner.geozen.model.multi_geometry.MultiPolygon
 import dev.goerner.geozen.model.simple_geometry.LineString
 import dev.goerner.geozen.model.simple_geometry.Point
 import dev.goerner.geozen.model.simple_geometry.Polygon
-import java.util.regex.Matcher
-import java.util.regex.Pattern
 
 /**
  * Deserializes WKT (Well-Known Text) and EWKT (Extended Well-Known Text) strings to [Geometry] objects.
@@ -27,8 +25,8 @@ class WktDeserializer {
         private const val WGS_84_SRID = 4326
         private const val WEB_MERCATOR_SRID = 3857
 
-        private val SRID_PATTERN: Pattern = Pattern.compile("^SRID=(\\d+);(.*)$", Pattern.CASE_INSENSITIVE)
-        private val GEOMETRY_TYPE_PATTERN: Pattern = Pattern.compile("^(\\w+)\\s*(.*)$", Pattern.CASE_INSENSITIVE)
+        private val SRID_PATTERN = Regex("^SRID=(\\d+);(.*)$", RegexOption.IGNORE_CASE)
+        private val GEOMETRY_TYPE_PATTERN = Regex("^(\\w+)\\s*(.*)$", RegexOption.IGNORE_CASE)
     }
 
     /**
@@ -43,50 +41,21 @@ class WktDeserializer {
             throw WktException("WKT string cannot be null or empty")
         }
 
-        var trimmed = wkt.trim()
-        var crs = CoordinateReferenceSystem.WGS_84
-
-        // Check for SRID prefix (EWKT)
-        val sridMatcher: Matcher = SRID_PATTERN.matcher(trimmed)
-        if (sridMatcher.matches()) {
-            val srid = Integer.parseInt(sridMatcher.group(1))
-            crs = getCrsFromSrid(srid)
-            trimmed = sridMatcher.group(2).trim()
-        }
-
+        val (trimmed, crs) = extractSrid(wkt)
         return parseGeometry(trimmed, crs)
     }
 
-    /**
-     * Deserializes a WKT or EWKT string to a [GeometryCollection] object.
-     * 
-     * @param wkt The WKT or EWKT string representing a geometry collection
-     * @return The deserialized geometry collection
-     * @throws WktException if the WKT string is invalid or is not a GEOMETRYCOLLECTION
-     */
     fun fromWktAsCollection(wkt: String): GeometryCollection {
         if (wkt.isBlank()) {
             throw WktException("WKT string cannot be null or empty")
         }
 
-        var trimmed = wkt.trim()
-        var crs = CoordinateReferenceSystem.WGS_84
+        val (trimmed, crs) = extractSrid(wkt)
 
-        // Check for SRID prefix (EWKT)
-        val sridMatcher: Matcher = SRID_PATTERN.matcher(trimmed)
-        if (sridMatcher.matches()) {
-            val srid = Integer.parseInt(sridMatcher.group(1))
-            crs = getCrsFromSrid(srid)
-            trimmed = sridMatcher.group(2).trim()
-        }
+        val match = GEOMETRY_TYPE_PATTERN.matchEntire(trimmed) ?: throw WktException("Invalid WKT format")
 
-        val typeMatcher: Matcher = GEOMETRY_TYPE_PATTERN.matcher(trimmed)
-        if (!typeMatcher.matches()) {
-            throw WktException("Invalid WKT format")
-        }
-
-        val type = typeMatcher.group(1).uppercase()
-        val coordinates = typeMatcher.group(2).trim()
+        val type = match.groupValues[1].uppercase()
+        val coordinates = match.groupValues[2].trim()
 
         if (type != "GEOMETRYCOLLECTION") {
             throw WktException("Expected GEOMETRYCOLLECTION but got $type")
@@ -95,14 +64,24 @@ class WktDeserializer {
         return parseGeometryCollection(coordinates, crs)
     }
 
-    private fun parseGeometry(wkt: String, crs: CoordinateReferenceSystem): Geometry {
-        val matcher: Matcher = GEOMETRY_TYPE_PATTERN.matcher(wkt)
-        if (!matcher.matches()) {
-            throw WktException("Invalid WKT format")
-        }
+    private fun extractSrid(wkt: String): Pair<String, CoordinateReferenceSystem> {
+        var trimmed = wkt.trim()
+        var crs = CoordinateReferenceSystem.WGS_84
 
-        val type = matcher.group(1).uppercase()
-        val coordinates = matcher.group(2).trim()
+        val match = SRID_PATTERN.matchEntire(trimmed)
+        if (match != null) {
+            val srid = match.groupValues[1].toInt()
+            crs = getCrsFromSrid(srid)
+            trimmed = match.groupValues[2].trim()
+        }
+        return trimmed to crs
+    }
+
+    private fun parseGeometry(wkt: String, crs: CoordinateReferenceSystem): Geometry {
+        val match = GEOMETRY_TYPE_PATTERN.matchEntire(wkt) ?: throw WktException("Invalid WKT format")
+
+        val type = match.groupValues[1].uppercase()
+        val coordinates = match.groupValues[2].trim()
 
         return when (type) {
             "POINT" -> parsePoint(coordinates, crs)
@@ -189,34 +168,8 @@ class WktDeserializer {
         }
 
         coords = stripParentheses(coords)
-        val geometries: MutableList<Geometry> = ArrayList()
-
-        var depth = 0
-        var start = 0
-
-        for (i in 0..<coords.length) {
-            val c: Char = coords[i]
-            when (c) {
-                '(' -> {
-                    depth++
-                }
-
-                ')' -> {
-                    depth--
-                }
-
-                ',' if depth == 0 -> {
-                    val geomWkt = coords.substring(start, i).trim()
-                    geometries.add(parseGeometry(geomWkt, crs))
-                    start = i + 1
-                }
-            }
-        }
-
-        // Add the last geometry
-        if (start < coords.length) {
-            val geomWkt = coords.substring(start).trim()
-            geometries.add(parseGeometry(geomWkt, crs))
+        val geometries = splitByCommaRespectingParentheses(coords).map {
+            parseGeometry(it.trim(), crs)
         }
 
         return GeometryCollection(geometries, crs)
@@ -275,24 +228,17 @@ class WktDeserializer {
         }
     }
 
-    private fun splitByCommaRespectingParentheses(input: String): List<String> {
-        val result: MutableList<String> = ArrayList()
+    private fun splitByCommaRespectingParentheses(input: String): List<String> = buildList {
         var depth = 0
         var start = 0
 
-        for (i in 0..<input.length) {
-            val c: Char = input[i]
+        for (i in input.indices) {
+            val c = input[i]
             when (c) {
-                '(' -> {
-                    depth++
-                }
-
-                ')' -> {
-                    depth--
-                }
-
-                ',' if depth == 0 -> {
-                    result.add(input.substring(start, i))
+                '(' -> depth++
+                ')' -> depth--
+                ',' -> if (depth == 0) {
+                    add(input.substring(start, i))
                     start = i + 1
                 }
             }
@@ -300,10 +246,8 @@ class WktDeserializer {
 
         // Add the last part
         if (start < input.length) {
-            result.add(input.substring(start))
+            add(input.substring(start))
         }
-
-        return result
     }
 
     private fun stripParentheses(input: String): String {

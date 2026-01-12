@@ -63,7 +63,6 @@ object PreciseDistanceCalculator {
      * @return the precise distance in meters
      */
     fun calculate(p: Point, lineString: LineString): Double {
-        var minDistance = Double.MAX_VALUE
         val positions = lineString.coordinates
 
         require(positions.isNotEmpty()) { "LineString must contain at least one position." }
@@ -71,10 +70,7 @@ object PreciseDistanceCalculator {
             return karneyDistance(p.coordinates, positions[0])
         }
 
-        for (i in 0..<positions.size - 1) {
-            val p1 = positions[i]
-            val p2 = positions[i + 1]
-
+        return positions.zipWithNext { p1, p2 ->
             val gAP = Geodesic.WGS84.Inverse(
                 p1.latitude,
                 p1.longitude,
@@ -93,10 +89,9 @@ object PreciseDistanceCalculator {
             var azDiffA = abs(gAP.azi1 - gAB.azi1)
             if (azDiffA > 180) azDiffA = 360 - azDiffA
 
-            val dist: Double
             if (azDiffA > 90) {
                 // Closest is p1
-                dist = gAP.s12
+                gAP.s12
             } else {
                 val gBP = Geodesic.WGS84.Inverse(
                     p2.latitude,
@@ -116,7 +111,7 @@ object PreciseDistanceCalculator {
                 var azDiffB = abs(gBP.azi1 - gBA.azi1)
                 if (azDiffB > 180) azDiffB = 360 - azDiffB
 
-                dist = if (azDiffB > 90) {
+                if (azDiffB > 90) {
                     // Closest is p2
                     gBP.s12
                 } else {
@@ -125,11 +120,6 @@ object PreciseDistanceCalculator {
                     abs(Math.toRadians(azDiffA) * gAP.m12)
                 }
             }
-
-            if (dist < minDistance) {
-                minDistance = dist
-            }
-        }
-        return minDistance
+        }.min()
     }
 }

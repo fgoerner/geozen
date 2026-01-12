@@ -68,7 +68,6 @@ object ApproximateDistanceCalculator {
      * @return the approximate distance in meters
      */
     fun calculate(p: Point, lineString: LineString): Double {
-        var minDistance = Double.MAX_VALUE
         val positions = lineString.coordinates
 
         require(positions.isNotEmpty()) { "LineString must contain at least one position." }
@@ -76,10 +75,7 @@ object ApproximateDistanceCalculator {
             return haversineDistance(p.coordinates, positions[0])
         }
 
-        for (i in 0..<positions.size - 1) {
-            val p1 = positions[i]
-            val p2 = positions[i + 1]
-
+        return positions.zipWithNext { p1, p2 ->
             // Equirectangular projection approximation for the segment
             val projectionFactor = getSegmentProjectionFactor(p, p1, p2)
 
@@ -98,12 +94,8 @@ object ApproximateDistanceCalculator {
             }
 
             // Use Haversine for the actual distance measurement to the closest point
-            val dist = haversineDistance(p.coordinates, Position(closestLon, closestLat))
-            if (dist < minDistance) {
-                minDistance = dist
-            }
-        }
-        return minDistance
+            haversineDistance(p.coordinates, Position(closestLon, closestLat))
+        }.min()
     }
 
     private fun getSegmentProjectionFactor(p: Point, p1: Position, p2: Position): Double {

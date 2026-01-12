@@ -17,12 +17,14 @@ class FeatureCollectionDeserializer : ValueDeserializer<FeatureCollection>() {
         val type = typeNode.asString()
         require(type == "FeatureCollection") { "Invalid GeoJSON type: $type. Expected 'FeatureCollection'." }
 
-        val featureDeserializer = ctxt.findRootValueDeserializer(ctxt.constructType(Feature::class.java))
-
         val featuresNode = rootNode["features"]
         require(featuresNode != null && featuresNode.isArray) { "Missing or invalid 'features' field in FeatureCollection." }
-        val features = featuresNode.map { featureDeserializer.deserialize(it.traverse(ctxt), ctxt) as Feature }
+
+        val features = featuresNode.map {
+            ctxt.readValue(it.traverse(ctxt), Feature::class.java)
+        }
 
         return FeatureCollection(features)
     }
 }
+

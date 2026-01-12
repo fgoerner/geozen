@@ -12,6 +12,9 @@ class PointDeserializer : AbstractGeometryDeserializer<Point>() {
 
         checkType(rootNode, "Point")
 
-        return Point(parsePosition(rootNode["coordinates"]))
+        val coordinates = rootNode["coordinates"]
+        require(coordinates != null) { "Missing 'coordinates' field" }
+
+        return Point(parsePosition(coordinates))
     }
 }

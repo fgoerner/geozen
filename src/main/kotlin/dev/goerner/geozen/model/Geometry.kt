@@ -18,7 +18,7 @@ abstract class Geometry(open val coordinateReferenceSystem: CoordinateReferenceS
      * @param other The other [Geometry] to which the distance is calculated.
      * @return An approximate distance to the other [Geometry].
      */
-    abstract fun getFastDistanceTo(other: Geometry): Double
+    abstract fun fastDistanceTo(other: Geometry): Double
 
     /**
      * Calculates the exact distance to another [Geometry].
@@ -31,5 +31,5 @@ abstract class Geometry(open val coordinateReferenceSystem: CoordinateReferenceS
      * @param other The other [Geometry] to which the distance is calculated.
      * @return The exact distance to the other [Geometry].
      */
-    abstract fun getExactDistanceTo(other: Geometry): Double
+    abstract fun exactDistanceTo(other: Geometry): Double
 }

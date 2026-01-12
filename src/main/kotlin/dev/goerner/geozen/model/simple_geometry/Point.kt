@@ -25,23 +25,19 @@ data class Point(
         coordinateReferenceSystem
     )
 
-    override fun getFastDistanceTo(other: Geometry): Double {
+    override fun fastDistanceTo(other: Geometry): Double {
         return when (other) {
             is Point -> ApproximateDistanceCalculator.calculate(this, other)
             is LineString -> ApproximateDistanceCalculator.calculate(this, other)
-            else -> throw UnsupportedOperationException(
-                "Fast distance calculation is not supported for geometry type: " + other.javaClass.getSimpleName()
-            )
+            else -> TODO("Fast distance calculation is not supported for geometry type: ${other::class.simpleName}")
         }
     }
 
-    override fun getExactDistanceTo(other: Geometry): Double {
+    override fun exactDistanceTo(other: Geometry): Double {
         return when (other) {
             is Point -> PreciseDistanceCalculator.calculate(this, other)
             is LineString -> PreciseDistanceCalculator.calculate(this, other)
-            else -> throw UnsupportedOperationException(
-                "Exact distance calculation is not supported for geometry type: " + other.javaClass.getSimpleName()
-            )
+            else -> TODO("Exact distance calculation is not supported for geometry type: ${other::class.simpleName}")
         }
     }
 

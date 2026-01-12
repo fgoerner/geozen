@@ -13,11 +13,11 @@ data class MultiPolygon(
     override val coordinateReferenceSystem: CoordinateReferenceSystem = CoordinateReferenceSystem.WGS_84
 ) : Geometry(coordinateReferenceSystem) {
 
-    override fun getFastDistanceTo(other: Geometry): Double {
-        throw UnsupportedOperationException("Fast distance calculation not implemented yet")
+    override fun fastDistanceTo(other: Geometry): Double {
+        TODO("Fast distance calculation not implemented yet")
     }
 
-    override fun getExactDistanceTo(other: Geometry): Double {
-        throw UnsupportedOperationException("Exact distance calculation not implemented yet")
+    override fun exactDistanceTo(other: Geometry): Double {
+        TODO("Exact distance calculation not implemented yet")
     }
 }

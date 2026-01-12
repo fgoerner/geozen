@@ -1,6 +1,5 @@
 package dev.goerner.geozen.jackson.serializer
 
-import dev.goerner.geozen.model.Feature
 import dev.goerner.geozen.model.collections.FeatureCollection
 import tools.jackson.core.JsonGenerator
 import tools.jackson.databind.SerializationContext
@@ -14,9 +13,8 @@ class FeatureCollectionSerializer : ValueSerializer<FeatureCollection>() {
         gen.writeStringProperty("type", "FeatureCollection")
 
         gen.writeArrayPropertyStart("features")
-        val featureSerializer = ctxt.findValueSerializer(Feature::class.java)
         for (feature in value.features) {
-            featureSerializer.serialize(feature, gen, ctxt)
+            gen.writePOJO(feature)
         }
         gen.writeEndArray()
 

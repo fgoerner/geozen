@@ -21,10 +21,7 @@ abstract class AbstractGeometryDeserializer<T : Geometry> : ValueDeserializer<T>
 
         val longitude = coordinates[0].asDouble()
         val latitude = coordinates[1].asDouble()
-        var altitude = 0.0
-        if (coordinates.size() > 2) {
-            altitude = coordinates[2].asDouble()
-        }
+        val altitude = if (coordinates.size() > 2) coordinates[2].asDouble() else 0.0
         return Position(longitude, latitude, altitude)
     }
 }

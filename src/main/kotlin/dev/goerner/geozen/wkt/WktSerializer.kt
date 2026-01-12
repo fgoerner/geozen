@@ -28,231 +28,111 @@ class WktSerializer {
 
     /**
      * Serializes a [Geometry] to WKT format.
-     * 
+     *
      * @param geometry The geometry to serialize
      * @return WKT representation of the geometry
      * @throws WktException if the geometry type is not supported
      */
-    fun toWkt(geometry: Geometry): String {
-        return toWkt(geometry, false)
-    }
+    fun toWkt(geometry: Geometry): String = serialize(geometry, includeExtended = false)
 
     /**
      * Serializes a [Geometry] to EWKT format (including SRID).
-     * 
+     *
      * @param geometry The geometry to serialize
      * @return EWKT representation of the geometry
      * @throws WktException if the geometry type is not supported
      */
-    fun toEwkt(geometry: Geometry): String {
-        return toWkt(geometry, true)
-    }
+    fun toEwkt(geometry: Geometry): String = serialize(geometry, includeExtended = true)
 
     /**
      * Serializes a [GeometryCollection] to WKT format.
-     * 
+     *
      * @param collection The geometry collection to serialize
      * @return WKT representation of the geometry collection
      * @throws WktException if any geometry type is not supported
      */
-    fun toWkt(collection: GeometryCollection): String {
-        return toWkt(collection, false)
-    }
+    fun toWkt(collection: GeometryCollection): String = serialize(collection, includeExtended = false)
 
     /**
      * Serializes a [GeometryCollection] to EWKT format (including SRID).
-     * 
+     *
      * @param collection The geometry collection to serialize
      * @return EWKT representation of the geometry collection
      * @throws WktException if any geometry type is not supported
      */
-    fun toEwkt(collection: GeometryCollection): String {
-        return toWkt(collection, true)
-    }
+    fun toEwkt(collection: GeometryCollection): String = serialize(collection, includeExtended = true)
 
-    private fun toWkt(geometry: Geometry, includeExtended: Boolean): String {
-        val sb = StringBuilder()
-
-        if (includeExtended) {
-            sb.append("SRID=").append(getSrid(geometry.coordinateReferenceSystem)).append(";")
+    private fun serialize(geometry: Geometry, includeExtended: Boolean): String {
+        val wkt = when (geometry) {
+            is Point -> serializePoint(geometry)
+            is LineString -> serializeLineString(geometry)
+            is Polygon -> serializePolygon(geometry)
+            is MultiPoint -> serializeMultiPoint(geometry)
+            is MultiLineString -> serializeMultiLineString(geometry)
+            is MultiPolygon -> serializeMultiPolygon(geometry)
+            is GeometryCollection -> serializeGeometryCollection(geometry)
+            else -> throw WktException("Unsupported geometry type: ${geometry::class.simpleName}")
         }
 
-        when (geometry) {
-            is Point -> sb.append(serializePoint(geometry))
-            is LineString -> sb.append(serializeLineString(geometry))
-            is Polygon -> sb.append(serializePolygon(geometry))
-            is MultiPoint -> sb.append(serializeMultiPoint(geometry))
-            is MultiLineString -> sb.append(serializeMultiLineString(geometry))
-            is MultiPolygon -> sb.append(serializeMultiPolygon(geometry))
-            is GeometryCollection -> sb.append(toWkt(geometry, includeExtended))
-            else -> throw WktException("Unsupported geometry type: " + geometry.javaClass.getName())
-        }
-
-        return sb.toString()
-    }
-
-    private fun toWkt(collection: GeometryCollection, includeExtended: Boolean): String {
-
-        val sb = StringBuilder()
-
-        if (includeExtended) {
-            sb.append("SRID=").append(getSrid(collection.coordinateReferenceSystem)).append(";")
-        }
-
-        sb.append("GEOMETRYCOLLECTION")
-
-        if (collection.geometries.isEmpty()) {
-            sb.append(" EMPTY")
+        return if (includeExtended) {
+            "SRID=${getSrid(geometry.coordinateReferenceSystem)};$wkt"
         } else {
-            sb.append(" (")
-            for (i in collection.geometries.indices) {
-                if (i > 0) {
-                    sb.append(", ")
-                }
-                val geom = collection.geometries[i]
-                sb.append(toWkt(geom, false))
-            }
-            sb.append(")")
+            wkt
         }
-
-        return sb.toString()
     }
 
     private fun serializePoint(point: Point): String {
-        val sb = StringBuilder("POINT")
-        val pos = point.coordinates
-
-        sb.append(" (")
-        appendPosition(sb, pos)
-        sb.append(")")
-
-        return sb.toString()
+        return "POINT (${formatPosition(point.coordinates)})"
     }
 
     private fun serializeLineString(lineString: LineString): String {
-        val sb = StringBuilder("LINESTRING")
         val coords = lineString.coordinates
-
-        if (coords.isEmpty()) {
-            sb.append(" EMPTY")
-        } else {
-            sb.append(" (")
-            appendPositionList(sb, coords)
-            sb.append(")")
-        }
-
-        return sb.toString()
+        if (coords.isEmpty()) return "LINESTRING EMPTY"
+        return "LINESTRING (${coords.joinToString(", ") { formatPosition(it) }})"
     }
 
     private fun serializePolygon(polygon: Polygon): String {
-        val sb = StringBuilder("POLYGON")
         val coords = polygon.coordinates
-
-        if (coords.isEmpty()) {
-            sb.append(" EMPTY")
-        } else {
-            sb.append(" (")
-            for (i in coords.indices) {
-                if (i > 0) {
-                    sb.append(", ")
-                }
-                sb.append("(")
-                appendPositionList(sb, coords[i])
-                sb.append(")")
-            }
-            sb.append(")")
-        }
-
-        return sb.toString()
+        if (coords.isEmpty()) return "POLYGON EMPTY"
+        return "POLYGON (${coords.joinToString(", ") { ring ->
+            "(${ring.joinToString(", ") { formatPosition(it) }})"
+        }})"
     }
 
     private fun serializeMultiPoint(multiPoint: MultiPoint): String {
-        val sb = StringBuilder("MULTIPOINT")
         val coords = multiPoint.coordinates
-
-        if (coords.isEmpty()) {
-            sb.append(" EMPTY")
-        } else {
-            sb.append(" (")
-            for (i in coords.indices) {
-                if (i > 0) {
-                    sb.append(", ")
-                }
-                sb.append("(")
-                appendPosition(sb, coords[i])
-                sb.append(")")
-            }
-            sb.append(")")
-        }
-
-        return sb.toString()
+        if (coords.isEmpty()) return "MULTIPOINT EMPTY"
+        return "MULTIPOINT (${coords.joinToString(", ") { "(${formatPosition(it)})" }})"
     }
 
     private fun serializeMultiLineString(multiLineString: MultiLineString): String {
-        val sb = StringBuilder("MULTILINESTRING")
         val coords = multiLineString.coordinates
-
-        if (coords.isEmpty()) {
-            sb.append(" EMPTY")
-        } else {
-            sb.append(" (")
-            for (i in coords.indices) {
-                if (i > 0) {
-                    sb.append(", ")
-                }
-                sb.append("(")
-                appendPositionList(sb, coords[i])
-                sb.append(")")
-            }
-            sb.append(")")
-        }
-
-        return sb.toString()
+        if (coords.isEmpty()) return "MULTILINESTRING EMPTY"
+        return "MULTILINESTRING (${coords.joinToString(", ") { line ->
+            "(${line.joinToString(", ") { formatPosition(it) }})"
+        }})"
     }
 
     private fun serializeMultiPolygon(multiPolygon: MultiPolygon): String {
-        val sb = StringBuilder("MULTIPOLYGON")
         val coords = multiPolygon.coordinates
+        if (coords.isEmpty()) return "MULTIPOLYGON EMPTY"
+        return "MULTIPOLYGON (${coords.joinToString(", ") { polygon ->
+            "(${polygon.joinToString(", ") { ring ->
+                "(${ring.joinToString(", ") { formatPosition(it) }})"
+            }})"
+        }})"
+    }
 
-        if (coords.isEmpty()) {
-            sb.append(" EMPTY")
+    private fun serializeGeometryCollection(collection: GeometryCollection): String {
+        if (collection.geometries.isEmpty()) return "GEOMETRYCOLLECTION EMPTY"
+        return "GEOMETRYCOLLECTION (${collection.geometries.joinToString(", ") { serialize(it, false) }})"
+    }
+
+    private fun formatPosition(pos: Position): String {
+        return if (pos.altitude != 0.0) {
+            "${pos.longitude} ${pos.latitude} ${pos.altitude}"
         } else {
-            sb.append(" (")
-            for (i in coords.indices) {
-                if (i > 0) {
-                    sb.append(", ")
-                }
-                sb.append("(")
-                val polygon = coords[i]
-                for (j in polygon.indices) {
-                    if (j > 0) {
-                        sb.append(", ")
-                    }
-                    sb.append("(")
-                    appendPositionList(sb, polygon[j])
-                    sb.append(")")
-                }
-                sb.append(")")
-            }
-            sb.append(")")
-        }
-
-        return sb.toString()
-    }
-
-    private fun appendPosition(sb: StringBuilder, pos: Position) {
-        sb.append(pos.longitude).append(" ").append(pos.latitude)
-        if (pos.altitude != 0.0) {
-            sb.append(" ").append(pos.altitude)
-        }
-    }
-
-    private fun appendPositionList(sb: StringBuilder, positions: List<Position>) {
-        for (i in positions.indices) {
-            if (i > 0) {
-                sb.append(", ")
-            }
-            appendPosition(sb, positions[i])
+            "${pos.longitude} ${pos.latitude}"
         }
     }
 

@@ -20,18 +20,17 @@ class GeometryDeserializer : AbstractGeometryDeserializer<Geometry>() {
         val typeNode = rootNode["type"]
         require(typeNode != null && typeNode.isString) { "Geometry must have a valid 'type' field." }
 
-        val javaType = when (val type = typeNode.asString()) {
-            "Point" -> ctxt.constructType(Point::class.java)
-            "LineString" -> ctxt.constructType(LineString::class.java)
-            "Polygon" -> ctxt.constructType(Polygon::class.java)
-            "MultiPoint" -> ctxt.constructType(MultiPoint::class.java)
-            "MultiLineString" -> ctxt.constructType(MultiLineString::class.java)
-            "MultiPolygon" -> ctxt.constructType(MultiPolygon::class.java)
-            "GeometryCollection" -> ctxt.constructType(GeometryCollection::class.java)
+        val typeClass = when (val type = typeNode.asString()) {
+            "Point" -> Point::class.java
+            "LineString" -> LineString::class.java
+            "Polygon" -> Polygon::class.java
+            "MultiPoint" -> MultiPoint::class.java
+            "MultiLineString" -> MultiLineString::class.java
+            "MultiPolygon" -> MultiPolygon::class.java
+            "GeometryCollection" -> GeometryCollection::class.java
             else -> throw IllegalArgumentException("Invalid GeoJSON type: $type.")
         }
-        val deserializer = ctxt.findRootValueDeserializer(javaType)
 
-        return deserializer.deserialize(rootNode.traverse(ctxt), ctxt) as Geometry
+        return ctxt.readValue(rootNode.traverse(ctxt), typeClass)
     }
 }
