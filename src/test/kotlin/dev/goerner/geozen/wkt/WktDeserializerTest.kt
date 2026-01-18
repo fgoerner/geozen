@@ -13,12 +13,11 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 internal class WktDeserializerTest {
-    private val deserializer = WktDeserializer()
 
     // Point Tests
     @Test
     fun testDeserializePoint() {
-        val geom = deserializer.fromWkt("POINT (10.5 20.3)")
+        val geom = WktDeserializer.fromWkt("POINT (10.5 20.3)")
         Assertions.assertInstanceOf<Point?>(Point::class.java, geom)
         val point = geom as Point
         Assertions.assertEquals(10.5, point.coordinates.longitude)
@@ -28,7 +27,7 @@ internal class WktDeserializerTest {
 
     @Test
     fun testDeserializePointWithAltitude() {
-        val geom = deserializer.fromWkt("POINT (10.5 20.3 100.0)")
+        val geom = WktDeserializer.fromWkt("POINT (10.5 20.3 100.0)")
         Assertions.assertInstanceOf<Point?>(Point::class.java, geom)
         val point = geom as Point
         Assertions.assertEquals(10.5, point.coordinates.longitude)
@@ -38,7 +37,7 @@ internal class WktDeserializerTest {
 
     @Test
     fun testDeserializePointCaseInsensitive() {
-        val geom = deserializer.fromWkt("point (10.5 20.3)")
+        val geom = WktDeserializer.fromWkt("point (10.5 20.3)")
         Assertions.assertInstanceOf<Point?>(Point::class.java, geom)
         val point = geom as Point
         Assertions.assertEquals(10.5, point.coordinates.longitude)
@@ -47,7 +46,7 @@ internal class WktDeserializerTest {
 
     @Test
     fun testDeserializePointEwktWgs84() {
-        val geom = deserializer.fromWkt("SRID=4326;POINT (10.5 20.3)")
+        val geom = WktDeserializer.fromWkt("SRID=4326;POINT (10.5 20.3)")
         Assertions.assertInstanceOf<Point?>(Point::class.java, geom)
         val point = geom as Point
         Assertions.assertEquals(10.5, point.coordinates.longitude)
@@ -57,7 +56,7 @@ internal class WktDeserializerTest {
 
     @Test
     fun testDeserializePointEwktWebMercator() {
-        val geom = deserializer.fromWkt("SRID=3857;POINT (10.5 20.3)")
+        val geom = WktDeserializer.fromWkt("SRID=3857;POINT (10.5 20.3)")
         Assertions.assertInstanceOf<Point?>(Point::class.java, geom)
         val point = geom as Point
         Assertions.assertEquals(CoordinateReferenceSystem.WEB_MERCATOR, point.coordinateReferenceSystem)
@@ -65,7 +64,7 @@ internal class WktDeserializerTest {
 
     @Test
     fun testDeserializePointEmpty() {
-        val geom = deserializer.fromWkt("POINT EMPTY")
+        val geom = WktDeserializer.fromWkt("POINT EMPTY")
         Assertions.assertInstanceOf<Point?>(Point::class.java, geom)
         val point = geom as Point
         Assertions.assertEquals(Double.NaN, point.coordinates.longitude)
@@ -74,7 +73,7 @@ internal class WktDeserializerTest {
 
     @Test
     fun testDeserializePointNegativeCoordinates() {
-        val geom = deserializer.fromWkt("POINT (-122.4194 37.7749)")
+        val geom = WktDeserializer.fromWkt("POINT (-122.4194 37.7749)")
         Assertions.assertInstanceOf<Point?>(Point::class.java, geom)
         val point = geom as Point
         Assertions.assertEquals(-122.4194, point.coordinates.longitude)
@@ -84,7 +83,7 @@ internal class WktDeserializerTest {
     // LineString Tests
     @Test
     fun testDeserializeLineString() {
-        val geom = deserializer.fromWkt("LINESTRING (10.0 20.0, 30.0 40.0, 50.0 60.0)")
+        val geom = WktDeserializer.fromWkt("LINESTRING (10.0 20.0, 30.0 40.0, 50.0 60.0)")
         Assertions.assertInstanceOf<LineString?>(LineString::class.java, geom)
         val lineString = geom as LineString
         Assertions.assertEquals(3, lineString.coordinates.size)
@@ -96,7 +95,7 @@ internal class WktDeserializerTest {
 
     @Test
     fun testDeserializeLineStringEmpty() {
-        val geom = deserializer.fromWkt("LINESTRING EMPTY")
+        val geom = WktDeserializer.fromWkt("LINESTRING EMPTY")
         Assertions.assertInstanceOf<LineString?>(LineString::class.java, geom)
         val lineString = geom as LineString
         Assertions.assertTrue(lineString.coordinates.isEmpty())
@@ -104,7 +103,7 @@ internal class WktDeserializerTest {
 
     @Test
     fun testDeserializeLineStringWithAltitude() {
-        val geom = deserializer.fromWkt("LINESTRING (10.0 20.0 5.0, 30.0 40.0 10.0)")
+        val geom = WktDeserializer.fromWkt("LINESTRING (10.0 20.0 5.0, 30.0 40.0 10.0)")
         Assertions.assertInstanceOf<LineString?>(LineString::class.java, geom)
         val lineString = geom as LineString
         Assertions.assertEquals(2, lineString.coordinates.size)
@@ -114,7 +113,7 @@ internal class WktDeserializerTest {
 
     @Test
     fun testDeserializeLineStringEwkt() {
-        val geom = deserializer.fromWkt("SRID=3857;LINESTRING (10.0 20.0, 30.0 40.0)")
+        val geom = WktDeserializer.fromWkt("SRID=3857;LINESTRING (10.0 20.0, 30.0 40.0)")
         Assertions.assertInstanceOf<LineString?>(LineString::class.java, geom)
         val lineString = geom as LineString
         Assertions.assertEquals(CoordinateReferenceSystem.WEB_MERCATOR, lineString.coordinateReferenceSystem)
@@ -123,7 +122,7 @@ internal class WktDeserializerTest {
     // Polygon Tests
     @Test
     fun testDeserializePolygon() {
-        val geom = deserializer.fromWkt("POLYGON ((0.0 0.0, 10.0 0.0, 10.0 10.0, 0.0 10.0, 0.0 0.0))")
+        val geom = WktDeserializer.fromWkt("POLYGON ((0.0 0.0, 10.0 0.0, 10.0 10.0, 0.0 10.0, 0.0 0.0))")
         Assertions.assertInstanceOf<Polygon?>(Polygon::class.java, geom)
         val polygon = geom as Polygon
         Assertions.assertEquals(1, polygon.coordinates.size)
@@ -134,7 +133,7 @@ internal class WktDeserializerTest {
 
     @Test
     fun testDeserializePolygonWithHole() {
-        val geom = deserializer.fromWkt(
+        val geom = WktDeserializer.fromWkt(
             "POLYGON ((0.0 0.0, 10.0 0.0, 10.0 10.0, 0.0 10.0, 0.0 0.0), " +
                     "(2.0 2.0, 8.0 2.0, 8.0 8.0, 2.0 8.0, 2.0 2.0))"
         )
@@ -147,7 +146,7 @@ internal class WktDeserializerTest {
 
     @Test
     fun testDeserializePolygonEmpty() {
-        val geom = deserializer.fromWkt("POLYGON EMPTY")
+        val geom = WktDeserializer.fromWkt("POLYGON EMPTY")
         Assertions.assertInstanceOf<Polygon?>(Polygon::class.java, geom)
         val polygon = geom as Polygon
         Assertions.assertTrue(polygon.coordinates.isEmpty())
@@ -155,7 +154,7 @@ internal class WktDeserializerTest {
 
     @Test
     fun testDeserializePolygonEwkt() {
-        val geom = deserializer.fromWkt("SRID=4326;POLYGON ((0.0 0.0, 10.0 0.0, 10.0 10.0, 0.0 0.0))")
+        val geom = WktDeserializer.fromWkt("SRID=4326;POLYGON ((0.0 0.0, 10.0 0.0, 10.0 10.0, 0.0 0.0))")
         Assertions.assertInstanceOf<Polygon?>(Polygon::class.java, geom)
         val polygon = geom as Polygon
         Assertions.assertEquals(CoordinateReferenceSystem.WGS_84, polygon.coordinateReferenceSystem)
@@ -164,7 +163,7 @@ internal class WktDeserializerTest {
     // MultiPoint Tests
     @Test
     fun testDeserializeMultiPoint() {
-        val geom = deserializer.fromWkt("MULTIPOINT ((10.0 20.0), (30.0 40.0))")
+        val geom = WktDeserializer.fromWkt("MULTIPOINT ((10.0 20.0), (30.0 40.0))")
         Assertions.assertInstanceOf<MultiPoint?>(MultiPoint::class.java, geom)
         val multiPoint = geom as MultiPoint
         Assertions.assertEquals(2, multiPoint.coordinates.size)
@@ -176,7 +175,7 @@ internal class WktDeserializerTest {
 
     @Test
     fun testDeserializeMultiPointSingle() {
-        val geom = deserializer.fromWkt("MULTIPOINT ((10.0 20.0))")
+        val geom = WktDeserializer.fromWkt("MULTIPOINT ((10.0 20.0))")
         Assertions.assertInstanceOf<MultiPoint?>(MultiPoint::class.java, geom)
         val multiPoint = geom as MultiPoint
         Assertions.assertEquals(1, multiPoint.coordinates.size)
@@ -184,7 +183,7 @@ internal class WktDeserializerTest {
 
     @Test
     fun testDeserializeMultiPointEmpty() {
-        val geom = deserializer.fromWkt("MULTIPOINT EMPTY")
+        val geom = WktDeserializer.fromWkt("MULTIPOINT EMPTY")
         Assertions.assertInstanceOf<MultiPoint?>(MultiPoint::class.java, geom)
         val multiPoint = geom as MultiPoint
         Assertions.assertTrue(multiPoint.coordinates.isEmpty())
@@ -192,7 +191,7 @@ internal class WktDeserializerTest {
 
     @Test
     fun testDeserializeMultiPointWithAltitude() {
-        val geom = deserializer.fromWkt("MULTIPOINT ((10.0 20.0 5.0), (30.0 40.0 15.0))")
+        val geom = WktDeserializer.fromWkt("MULTIPOINT ((10.0 20.0 5.0), (30.0 40.0 15.0))")
         Assertions.assertInstanceOf<MultiPoint?>(MultiPoint::class.java, geom)
         val multiPoint = geom as MultiPoint
         Assertions.assertEquals(5.0, multiPoint.coordinates[0].altitude)
@@ -201,7 +200,7 @@ internal class WktDeserializerTest {
 
     @Test
     fun testDeserializeMultiPointEwkt() {
-        val geom = deserializer.fromWkt("SRID=3857;MULTIPOINT ((10.0 20.0), (30.0 40.0))")
+        val geom = WktDeserializer.fromWkt("SRID=3857;MULTIPOINT ((10.0 20.0), (30.0 40.0))")
         Assertions.assertInstanceOf<MultiPoint?>(MultiPoint::class.java, geom)
         val multiPoint = geom as MultiPoint
         Assertions.assertEquals(CoordinateReferenceSystem.WEB_MERCATOR, multiPoint.coordinateReferenceSystem)
@@ -210,7 +209,7 @@ internal class WktDeserializerTest {
     // MultiLineString Tests
     @Test
     fun testDeserializeMultiLineString() {
-        val geom = deserializer.fromWkt("MULTILINESTRING ((10.0 20.0, 30.0 40.0), (50.0 60.0, 70.0 80.0))")
+        val geom = WktDeserializer.fromWkt("MULTILINESTRING ((10.0 20.0, 30.0 40.0), (50.0 60.0, 70.0 80.0))")
         Assertions.assertInstanceOf<MultiLineString?>(MultiLineString::class.java, geom)
         val multiLineString = geom as MultiLineString
         Assertions.assertEquals(2, multiLineString.coordinates.size)
@@ -222,7 +221,7 @@ internal class WktDeserializerTest {
 
     @Test
     fun testDeserializeMultiLineStringSingle() {
-        val geom = deserializer.fromWkt("MULTILINESTRING ((10.0 20.0, 30.0 40.0, 50.0 60.0))")
+        val geom = WktDeserializer.fromWkt("MULTILINESTRING ((10.0 20.0, 30.0 40.0, 50.0 60.0))")
         Assertions.assertInstanceOf<MultiLineString?>(MultiLineString::class.java, geom)
         val multiLineString = geom as MultiLineString
         Assertions.assertEquals(1, multiLineString.coordinates.size)
@@ -231,7 +230,7 @@ internal class WktDeserializerTest {
 
     @Test
     fun testDeserializeMultiLineStringEmpty() {
-        val geom = deserializer.fromWkt("MULTILINESTRING EMPTY")
+        val geom = WktDeserializer.fromWkt("MULTILINESTRING EMPTY")
         Assertions.assertInstanceOf<MultiLineString?>(MultiLineString::class.java, geom)
         val multiLineString = geom as MultiLineString
         Assertions.assertTrue(multiLineString.coordinates.isEmpty())
@@ -239,7 +238,7 @@ internal class WktDeserializerTest {
 
     @Test
     fun testDeserializeMultiLineStringEwkt() {
-        val geom = deserializer.fromWkt("SRID=4326;MULTILINESTRING ((10.0 20.0, 30.0 40.0))")
+        val geom = WktDeserializer.fromWkt("SRID=4326;MULTILINESTRING ((10.0 20.0, 30.0 40.0))")
         Assertions.assertInstanceOf<MultiLineString?>(MultiLineString::class.java, geom)
         val multiLineString = geom as MultiLineString
         Assertions.assertEquals(CoordinateReferenceSystem.WGS_84, multiLineString.coordinateReferenceSystem)
@@ -248,7 +247,7 @@ internal class WktDeserializerTest {
     // MultiPolygon Tests
     @Test
     fun testDeserializeMultiPolygon() {
-        val geom = deserializer.fromWkt(
+        val geom = WktDeserializer.fromWkt(
             "MULTIPOLYGON (((0.0 0.0, 10.0 0.0, 10.0 10.0, 0.0 10.0, 0.0 0.0)), " +
                     "((20.0 20.0, 30.0 20.0, 30.0 30.0, 20.0 30.0, 20.0 20.0)))"
         )
@@ -263,7 +262,7 @@ internal class WktDeserializerTest {
 
     @Test
     fun testDeserializeMultiPolygonSingle() {
-        val geom = deserializer.fromWkt(
+        val geom = WktDeserializer.fromWkt(
             "MULTIPOLYGON (((0.0 0.0, 10.0 0.0, 10.0 10.0, 0.0 0.0)))"
         )
         Assertions.assertInstanceOf<MultiPolygon?>(MultiPolygon::class.java, geom)
@@ -273,7 +272,7 @@ internal class WktDeserializerTest {
 
     @Test
     fun testDeserializeMultiPolygonWithHoles() {
-        val geom = deserializer.fromWkt(
+        val geom = WktDeserializer.fromWkt(
             "MULTIPOLYGON (((0.0 0.0, 10.0 0.0, 10.0 10.0, 0.0 10.0, 0.0 0.0), " +
                     "(2.0 2.0, 8.0 2.0, 8.0 8.0, 2.0 2.0)))"
         )
@@ -285,7 +284,7 @@ internal class WktDeserializerTest {
 
     @Test
     fun testDeserializeMultiPolygonEmpty() {
-        val geom = deserializer.fromWkt("MULTIPOLYGON EMPTY")
+        val geom = WktDeserializer.fromWkt("MULTIPOLYGON EMPTY")
         Assertions.assertInstanceOf<MultiPolygon?>(MultiPolygon::class.java, geom)
         val multiPolygon = geom as MultiPolygon
         Assertions.assertTrue(multiPolygon.coordinates.isEmpty())
@@ -293,7 +292,7 @@ internal class WktDeserializerTest {
 
     @Test
     fun testDeserializeMultiPolygonEwkt() {
-        val geom = deserializer.fromWkt("SRID=3857;MULTIPOLYGON (((0.0 0.0, 10.0 0.0, 10.0 10.0, 0.0 0.0)))")
+        val geom = WktDeserializer.fromWkt("SRID=3857;MULTIPOLYGON (((0.0 0.0, 10.0 0.0, 10.0 10.0, 0.0 0.0)))")
         Assertions.assertInstanceOf<MultiPolygon?>(MultiPolygon::class.java, geom)
         val multiPolygon = geom as MultiPolygon
         Assertions.assertEquals(CoordinateReferenceSystem.WEB_MERCATOR, multiPolygon.coordinateReferenceSystem)
@@ -302,7 +301,7 @@ internal class WktDeserializerTest {
     // GeometryCollection Tests
     @Test
     fun testDeserializeGeometryCollection() {
-        val collection = deserializer.fromWktAsCollection(
+        val collection = WktDeserializer.fromWktAsCollection(
             "GEOMETRYCOLLECTION (POINT (10.0 20.0), LINESTRING (30.0 40.0, 50.0 60.0))"
         )
         Assertions.assertEquals(2, collection.geometries.size)
@@ -312,7 +311,7 @@ internal class WktDeserializerTest {
 
     @Test
     fun testDeserializeGeometryCollectionMixed() {
-        val collection = deserializer.fromWktAsCollection(
+        val collection = WktDeserializer.fromWktAsCollection(
             "GEOMETRYCOLLECTION (POINT (10.0 20.0), LINESTRING (30.0 40.0, 50.0 60.0), " +
                     "POLYGON ((0.0 0.0, 5.0 0.0, 5.0 5.0, 0.0 5.0, 0.0 0.0)))"
         )
@@ -324,13 +323,13 @@ internal class WktDeserializerTest {
 
     @Test
     fun testDeserializeGeometryCollectionEmpty() {
-        val collection = deserializer.fromWktAsCollection("GEOMETRYCOLLECTION EMPTY")
+        val collection = WktDeserializer.fromWktAsCollection("GEOMETRYCOLLECTION EMPTY")
         Assertions.assertTrue(collection.geometries.isEmpty())
     }
 
     @Test
     fun testDeserializeGeometryCollectionWithMultiGeometries() {
-        val collection = deserializer.fromWktAsCollection(
+        val collection = WktDeserializer.fromWktAsCollection(
             "GEOMETRYCOLLECTION (MULTIPOINT ((1.0 2.0), (3.0 4.0)), " +
                     "MULTILINESTRING ((10.0 20.0, 30.0 40.0)))"
         )
@@ -341,7 +340,7 @@ internal class WktDeserializerTest {
 
     @Test
     fun testDeserializeGeometryCollectionEwkt() {
-        val collection = deserializer.fromWktAsCollection(
+        val collection = WktDeserializer.fromWktAsCollection(
             "SRID=3857;GEOMETRYCOLLECTION (POINT (10.0 20.0), LINESTRING (30.0 40.0, 50.0 60.0))"
         )
         Assertions.assertEquals(2, collection.geometries.size)
@@ -358,7 +357,7 @@ internal class WktDeserializerTest {
 
     @Test
     fun testDeserializeGeometryCollectionEwktWgs84() {
-        val collection = deserializer.fromWktAsCollection(
+        val collection = WktDeserializer.fromWktAsCollection(
             "SRID=4326;GEOMETRYCOLLECTION (POINT (10.0 20.0), POLYGON ((0.0 0.0, 5.0 0.0, 5.0 5.0, 0.0 5.0, 0.0 0.0)))"
         )
         Assertions.assertEquals(2, collection.geometries.size)
@@ -375,7 +374,7 @@ internal class WktDeserializerTest {
 
     @Test
     fun testDeserializeGeometryCollectionEwktWithMultiGeometries() {
-        val collection = deserializer.fromWktAsCollection(
+        val collection = WktDeserializer.fromWktAsCollection(
             "SRID=3857;GEOMETRYCOLLECTION (MULTIPOINT ((1.0 2.0), (3.0 4.0)), " +
                     "MULTILINESTRING ((10.0 20.0, 30.0 40.0)), " +
                     "MULTIPOLYGON (((0.0 0.0, 10.0 0.0, 10.0 10.0, 0.0 0.0))))"
@@ -403,7 +402,7 @@ internal class WktDeserializerTest {
 
     @Test
     fun testDeserializeGeometryCollectionWithoutSrid() {
-        val collection = deserializer.fromWktAsCollection(
+        val collection = WktDeserializer.fromWktAsCollection(
             "GEOMETRYCOLLECTION (POINT (10.0 20.0), LINESTRING (30.0 40.0, 50.0 60.0))"
         )
         Assertions.assertEquals(2, collection.geometries.size)
@@ -420,10 +419,9 @@ internal class WktDeserializerTest {
 
     @Test
     fun testRoundTripPoint() {
-        val serializer = WktSerializer()
         val original = Point(10.5, 20.3, 100.0)
-        val wkt = serializer.toWkt(original)
-        val deserialized = deserializer.fromWkt(wkt)
+        val wkt = WktSerializer.toWkt(original)
+        val deserialized = WktDeserializer.fromWkt(wkt)
         Assertions.assertInstanceOf<Point?>(Point::class.java, deserialized)
         val point = deserialized as Point
         Assertions.assertEquals(original.coordinates.longitude, point.coordinates.longitude)
@@ -433,7 +431,6 @@ internal class WktDeserializerTest {
 
     @Test
     fun testRoundTripLineString() {
-        val serializer = WktSerializer()
         val original = LineString(
             listOf(
                 Position(10.0, 20.0),
@@ -441,8 +438,8 @@ internal class WktDeserializerTest {
                 Position(50.0, 60.0)
             )
         )
-        val wkt = serializer.toWkt(original)
-        val deserialized = deserializer.fromWkt(wkt)
+        val wkt = WktSerializer.toWkt(original)
+        val deserialized = WktDeserializer.fromWkt(wkt)
         Assertions.assertInstanceOf<LineString?>(LineString::class.java, deserialized)
         val lineString = deserialized as LineString
         Assertions.assertEquals(3, lineString.coordinates.size)
@@ -450,7 +447,6 @@ internal class WktDeserializerTest {
 
     @Test
     fun testRoundTripPolygonWithEwkt() {
-        val serializer = WktSerializer()
         val original = Polygon(
             listOf(
                 listOf(
@@ -463,8 +459,8 @@ internal class WktDeserializerTest {
             ),
             CoordinateReferenceSystem.WEB_MERCATOR
         )
-        val ewkt = serializer.toEwkt(original)
-        val deserialized = deserializer.fromWkt(ewkt)
+        val ewkt = WktSerializer.toEwkt(original)
+        val deserialized = WktDeserializer.fromWkt(ewkt)
         Assertions.assertInstanceOf<Polygon?>(Polygon::class.java, deserialized)
         val polygon = deserialized as Polygon
         Assertions.assertEquals(CoordinateReferenceSystem.WEB_MERCATOR, polygon.coordinateReferenceSystem)
@@ -474,66 +470,65 @@ internal class WktDeserializerTest {
 
     @Test
     fun testRoundTripGeometryCollection() {
-        val serializer = WktSerializer()
         val original = GeometryCollection(
             listOf(
                 Point(10.0, 20.0),
                 LineString(listOf(Position(30.0, 40.0), Position(50.0, 60.0)))
             )
         )
-        val wkt = serializer.toWkt(original)
-        val deserialized = deserializer.fromWktAsCollection(wkt)
+        val wkt = WktSerializer.toWkt(original)
+        val deserialized = WktDeserializer.fromWktAsCollection(wkt)
         Assertions.assertEquals(2, deserialized.geometries.size)
     }
 
     // Error Handling Tests
     @Test
     fun testDeserializeEmptyWkt() {
-        Assertions.assertThrows<WktException?>(WktException::class.java) { deserializer.fromWkt("") }
+        Assertions.assertThrows<WktException?>(WktException::class.java) { WktDeserializer.fromWkt("") }
     }
 
     @Test
     fun testDeserializeBlankWkt() {
-        Assertions.assertThrows<WktException?>(WktException::class.java) { deserializer.fromWkt("   ") }
+        Assertions.assertThrows<WktException?>(WktException::class.java) { WktDeserializer.fromWkt("   ") }
     }
 
     @Test
     fun testDeserializeInvalidWkt() {
-        Assertions.assertThrows<WktException?>(WktException::class.java) { deserializer.fromWkt("INVALID") }
+        Assertions.assertThrows<WktException?>(WktException::class.java) { WktDeserializer.fromWkt("INVALID") }
     }
 
     @Test
     fun testDeserializeUnsupportedSrid() {
         Assertions.assertThrows<WktException?>(
             WktException::class.java
-        ) { deserializer.fromWkt("SRID=9999;POINT (10.0 20.0)") }
+        ) { WktDeserializer.fromWkt("SRID=9999;POINT (10.0 20.0)") }
     }
 
     @Test
     fun testDeserializeInvalidGeometryType() {
         Assertions.assertThrows<WktException?>(
             WktException::class.java
-        ) { deserializer.fromWkt("TRIANGLE (0 0, 1 0, 0 1, 0 0)") }
+        ) { WktDeserializer.fromWkt("TRIANGLE (0 0, 1 0, 0 1, 0 0)") }
     }
 
     @Test
     fun testDeserializeInvalidCoordinates() {
         Assertions.assertThrows<WktException?>(
             WktException::class.java
-        ) { deserializer.fromWkt("POINT (abc def)") }
+        ) { WktDeserializer.fromWkt("POINT (abc def)") }
     }
 
     @Test
     fun testDeserializeInsufficientCoordinates() {
         Assertions.assertThrows<WktException?>(
             WktException::class.java
-        ) { deserializer.fromWkt("POINT (10.0)") }
+        ) { WktDeserializer.fromWkt("POINT (10.0)") }
     }
 
     @Test
     fun testDeserializeWrongCollectionType() {
         Assertions.assertThrows<WktException?>(
             WktException::class.java
-        ) { deserializer.fromWktAsCollection("POINT (10.0 20.0)") }
+        ) { WktDeserializer.fromWktAsCollection("POINT (10.0 20.0)") }
     }
 }

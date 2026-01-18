@@ -19,15 +19,13 @@ import dev.goerner.geozen.model.simple_geometry.Polygon
  * EWKT extends WKT by adding support for SRID (Spatial Reference System Identifier).
  * 
  */
-class WktDeserializer {
+object WktDeserializer {
 
-    companion object {
-        private const val WGS_84_SRID = 4326
-        private const val WEB_MERCATOR_SRID = 3857
+    private const val WGS_84_SRID = 4326
+    private const val WEB_MERCATOR_SRID = 3857
 
-        private val SRID_PATTERN = Regex("^SRID=(\\d+);(.*)$", RegexOption.IGNORE_CASE)
-        private val GEOMETRY_TYPE_PATTERN = Regex("^(\\w+)\\s*(.*)$", RegexOption.IGNORE_CASE)
-    }
+    private val SRID_PATTERN = Regex("^SRID=(\\d+);(.*)$", RegexOption.IGNORE_CASE)
+    private val GEOMETRY_TYPE_PATTERN = Regex("^(\\w+)\\s*(.*)$", RegexOption.IGNORE_CASE)
 
     /**
      * Deserializes a WKT or EWKT string to a [Geometry] object.
