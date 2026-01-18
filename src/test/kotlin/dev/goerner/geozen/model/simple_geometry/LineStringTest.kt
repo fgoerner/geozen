@@ -2,33 +2,38 @@ package dev.goerner.geozen.model.simple_geometry
 
 import dev.goerner.geozen.model.CoordinateReferenceSystem
 import dev.goerner.geozen.model.Position
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Test
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
 
-class LineStringTest {
-    @Test
-    fun testCoordinatesConstructor() {
+class LineStringTest : FunSpec({
+
+    test("coordinates constructor") {
+        //given
         val coordinates = listOf(
             Position(1.0, 2.0, 3.0),
             Position(4.0, 5.0, 6.0)
         )
 
+        //when
         val lineString = LineString(coordinates)
 
-        Assertions.assertEquals(2, lineString.coordinates.size)
-        Assertions.assertEquals(CoordinateReferenceSystem.WGS_84, lineString.coordinateReferenceSystem)
+        //then
+        lineString.coordinates.size shouldBe 2
+        lineString.coordinateReferenceSystem shouldBe CoordinateReferenceSystem.WGS_84
     }
 
-    @Test
-    fun testReferenceSystemConstructor() {
+    test("reference system constructor") {
+        //given
         val coordinates = listOf(
             Position(1.0, 2.0, 3.0),
             Position(4.0, 5.0, 6.0)
         )
 
+        //when
         val lineString = LineString(coordinates, CoordinateReferenceSystem.WEB_MERCATOR)
 
-        Assertions.assertEquals(2, lineString.coordinates.size)
-        Assertions.assertEquals(CoordinateReferenceSystem.WEB_MERCATOR, lineString.coordinateReferenceSystem)
+        //then
+        lineString.coordinates.size shouldBe 2
+        lineString.coordinateReferenceSystem shouldBe CoordinateReferenceSystem.WEB_MERCATOR
     }
-}
+})

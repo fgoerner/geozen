@@ -2,12 +2,13 @@ package dev.goerner.geozen.model.multi_geometry
 
 import dev.goerner.geozen.model.CoordinateReferenceSystem
 import dev.goerner.geozen.model.Position
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Test
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
 
-class MultiPolygonTest {
-    @Test
-    fun testCoordinatesConstructor() {
+class MultiPolygonTest : FunSpec({
+
+    test("coordinates constructor") {
+        //given
         val coordinates = listOf(
             listOf(
                 listOf(
@@ -25,14 +26,16 @@ class MultiPolygonTest {
             )
         )
 
+        //when
         val multiPolygon = MultiPolygon(coordinates)
 
-        Assertions.assertEquals(1, multiPolygon.coordinates.size)
-        Assertions.assertEquals(CoordinateReferenceSystem.WGS_84, multiPolygon.coordinateReferenceSystem)
+        //then
+        multiPolygon.coordinates.size shouldBe 1
+        multiPolygon.coordinateReferenceSystem shouldBe CoordinateReferenceSystem.WGS_84
     }
 
-    @Test
-    fun testCoordinatesAndReferenceSystemConstructor() {
+    test("coordinates and reference system constructor") {
+        //given
         val coordinates = listOf(
             listOf(
                 listOf(
@@ -50,9 +53,11 @@ class MultiPolygonTest {
             )
         )
 
+        //when
         val multiPolygon = MultiPolygon(coordinates, CoordinateReferenceSystem.WEB_MERCATOR)
 
-        Assertions.assertEquals(1, multiPolygon.coordinates.size)
-        Assertions.assertEquals(CoordinateReferenceSystem.WEB_MERCATOR, multiPolygon.coordinateReferenceSystem)
+        //then
+        multiPolygon.coordinates.size shouldBe 1
+        multiPolygon.coordinateReferenceSystem shouldBe CoordinateReferenceSystem.WEB_MERCATOR
     }
-}
+})

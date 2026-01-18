@@ -4,33 +4,37 @@ import dev.goerner.geozen.calc.PreciseDistanceCalculator.karneyDistance
 import dev.goerner.geozen.model.Position
 import dev.goerner.geozen.model.simple_geometry.LineString
 import dev.goerner.geozen.model.simple_geometry.Point
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
 
-class PreciseDistanceCalculatorTest {
+class PreciseDistanceCalculatorTest : FunSpec({
 
-    @Test
-    fun `test karney distance`() {
+    test("karney distance") {
+        //given
         val p1 = Position(11.4694, 49.2965)
         val p2 = Position(11.0549, 49.4532)
 
+        //when
         val distance = karneyDistance(p1, p2)
 
-        assertEquals(34782.42347014982, distance)
+        //then
+        distance shouldBe 34782.42347014982
     }
 
-    @Test
-    fun `test Point to Point distance`() {
+    test("Point to Point distance") {
+        //given
         val p1 = Point(11.4694, 49.2965)
         val p2 = Point(11.0549, 49.4532)
 
+        //when
         val preciseDistance = PreciseDistanceCalculator.calculate(p1, p2)
 
-        assertEquals(34782.42347014982, preciseDistance)
+        //then
+        preciseDistance shouldBe 34782.42347014982
     }
 
-    @Test
-    fun `test Point to LineString distance`() {
+    test("Point to LineString distance") {
+        //given
         val p1 = Point(11.4694, 49.2965)
         val lineString = LineString(
             listOf(
@@ -40,8 +44,10 @@ class PreciseDistanceCalculatorTest {
             )
         )
 
+        //when
         val preciseDistance = PreciseDistanceCalculator.calculate(p1, lineString)
 
-        assertEquals(1874.0229499712636, preciseDistance)
+        //then
+        preciseDistance shouldBe 1874.0229499712636
     }
-}
+})

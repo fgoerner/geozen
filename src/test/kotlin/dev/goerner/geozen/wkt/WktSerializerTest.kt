@@ -9,50 +9,70 @@ import dev.goerner.geozen.model.multi_geometry.MultiPolygon
 import dev.goerner.geozen.model.simple_geometry.LineString
 import dev.goerner.geozen.model.simple_geometry.Point
 import dev.goerner.geozen.model.simple_geometry.Polygon
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Test
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
 
-internal class WktSerializerTest {
+class WktSerializerTest : FunSpec({
 
     // Point Tests
-    @Test
-    fun testSerializePoint() {
+    test("serialize point") {
+        //given
         val point = Point(10.5, 20.3)
+
+        //when
         val wkt = WktSerializer.toWkt(point)
-        Assertions.assertEquals("POINT (10.5 20.3)", wkt)
+
+        //then
+        wkt shouldBe "POINT (10.5 20.3)"
     }
 
-    @Test
-    fun testSerializePointWithAltitude() {
+    test("serialize point with altitude") {
+        //given
         val point = Point(10.5, 20.3, 100.0)
+
+        //when
         val wkt = WktSerializer.toWkt(point)
-        Assertions.assertEquals("POINT (10.5 20.3 100.0)", wkt)
+
+        //then
+        wkt shouldBe "POINT (10.5 20.3 100.0)"
     }
 
-    @Test
-    fun testSerializePointEwktWgs84() {
+    test("serialize point EWKT WGS84") {
+        //given
         val point = Point(10.5, 20.3)
+
+        //when
         val ewkt = WktSerializer.toEwkt(point)
-        Assertions.assertEquals("SRID=4326;POINT (10.5 20.3)", ewkt)
+
+        //then
+        ewkt shouldBe "SRID=4326;POINT (10.5 20.3)"
     }
 
-    @Test
-    fun testSerializePointEwktWebMercator() {
+    test("serialize point EWKT Web Mercator") {
+        //given
         val point = Point(Position(10.5, 20.3), CoordinateReferenceSystem.WEB_MERCATOR)
+
+        //when
         val ewkt = WktSerializer.toEwkt(point)
-        Assertions.assertEquals("SRID=3857;POINT (10.5 20.3)", ewkt)
+
+        //then
+        ewkt shouldBe "SRID=3857;POINT (10.5 20.3)"
     }
 
-    @Test
-    fun testSerializePointNegativeCoordinates() {
+    test("serialize point negative coordinates") {
+        //given
         val point = Point(-122.4194, 37.7749)
+
+        //when
         val wkt = WktSerializer.toWkt(point)
-        Assertions.assertEquals("POINT (-122.4194 37.7749)", wkt)
+
+        //then
+        wkt shouldBe "POINT (-122.4194 37.7749)"
     }
 
     // LineString Tests
-    @Test
-    fun testSerializeLineString() {
+    test("serialize LineString") {
+        //given
         val lineString = LineString(
             listOf(
                 Position(10.0, 20.0),
@@ -60,44 +80,60 @@ internal class WktSerializerTest {
                 Position(50.0, 60.0)
             )
         )
+
+        //when
         val wkt = WktSerializer.toWkt(lineString)
-        Assertions.assertEquals("LINESTRING (10.0 20.0, 30.0 40.0, 50.0 60.0)", wkt)
+
+        //then
+        wkt shouldBe "LINESTRING (10.0 20.0, 30.0 40.0, 50.0 60.0)"
     }
 
-    @Test
-    fun testSerializeLineStringEmpty() {
+    test("serialize LineString empty") {
+        //given
         val lineString = LineString(emptyList())
+
+        //when
         val wkt = WktSerializer.toWkt(lineString)
-        Assertions.assertEquals("LINESTRING EMPTY", wkt)
+
+        //then
+        wkt shouldBe "LINESTRING EMPTY"
     }
 
-    @Test
-    fun testSerializeLineStringWithAltitude() {
+    test("serialize LineString with altitude") {
+        //given
         val lineString = LineString(
             listOf(
                 Position(10.0, 20.0, 5.0),
                 Position(30.0, 40.0, 10.0)
             )
         )
+
+        //when
         val wkt = WktSerializer.toWkt(lineString)
-        Assertions.assertEquals("LINESTRING (10.0 20.0 5.0, 30.0 40.0 10.0)", wkt)
+
+        //then
+        wkt shouldBe "LINESTRING (10.0 20.0 5.0, 30.0 40.0 10.0)"
     }
 
-    @Test
-    fun testSerializeLineStringEwkt() {
+    test("serialize LineString EWKT") {
+        //given
         val lineString = LineString(
             listOf(
                 Position(10.0, 20.0),
                 Position(30.0, 40.0)
             ), CoordinateReferenceSystem.WEB_MERCATOR
         )
+
+        //when
         val ewkt = WktSerializer.toEwkt(lineString)
-        Assertions.assertEquals("SRID=3857;LINESTRING (10.0 20.0, 30.0 40.0)", ewkt)
+
+        //then
+        ewkt shouldBe "SRID=3857;LINESTRING (10.0 20.0, 30.0 40.0)"
     }
 
     // Polygon Tests
-    @Test
-    fun testSerializePolygon() {
+    test("serialize Polygon") {
+        //given
         val polygon = Polygon(
             listOf(
                 listOf(
@@ -109,12 +145,16 @@ internal class WktSerializerTest {
                 )
             )
         )
+
+        //when
         val wkt = WktSerializer.toWkt(polygon)
-        Assertions.assertEquals("POLYGON ((0.0 0.0, 10.0 0.0, 10.0 10.0, 0.0 10.0, 0.0 0.0))", wkt)
+
+        //then
+        wkt shouldBe "POLYGON ((0.0 0.0, 10.0 0.0, 10.0 10.0, 0.0 10.0, 0.0 0.0))"
     }
 
-    @Test
-    fun testSerializePolygonWithHole() {
+    test("serialize Polygon with hole") {
+        //given
         val polygon = Polygon(
             listOf(
                 listOf(
@@ -133,22 +173,28 @@ internal class WktSerializerTest {
                 )
             )
         )
+
+        //when
         val wkt = WktSerializer.toWkt(polygon)
-        Assertions.assertEquals(
-            "POLYGON ((0.0 0.0, 10.0 0.0, 10.0 10.0, 0.0 10.0, 0.0 0.0), " +
-                    "(2.0 2.0, 8.0 2.0, 8.0 8.0, 2.0 8.0, 2.0 2.0))", wkt
-        )
+
+        //then
+        wkt shouldBe "POLYGON ((0.0 0.0, 10.0 0.0, 10.0 10.0, 0.0 10.0, 0.0 0.0), " +
+                "(2.0 2.0, 8.0 2.0, 8.0 8.0, 2.0 8.0, 2.0 2.0))"
     }
 
-    @Test
-    fun testSerializePolygonEmpty() {
+    test("serialize Polygon empty") {
+        //given
         val polygon = Polygon(emptyList())
+
+        //when
         val wkt = WktSerializer.toWkt(polygon)
-        Assertions.assertEquals("POLYGON EMPTY", wkt)
+
+        //then
+        wkt shouldBe "POLYGON EMPTY"
     }
 
-    @Test
-    fun testSerializePolygonEwkt() {
+    test("serialize Polygon EWKT") {
+        //given
         val polygon = Polygon(
             listOf(
                 listOf(
@@ -159,110 +205,150 @@ internal class WktSerializerTest {
                 )
             ), CoordinateReferenceSystem.WGS_84
         )
+
+        //when
         val ewkt = WktSerializer.toEwkt(polygon)
-        Assertions.assertEquals("SRID=4326;POLYGON ((0.0 0.0, 10.0 0.0, 10.0 10.0, 0.0 0.0))", ewkt)
+
+        //then
+        ewkt shouldBe "SRID=4326;POLYGON ((0.0 0.0, 10.0 0.0, 10.0 10.0, 0.0 0.0))"
     }
 
     // MultiPoint Tests
-    @Test
-    fun testSerializeMultiPoint() {
+    test("serialize MultiPoint") {
+        //given
         val multiPoint = MultiPoint(
             listOf(
                 Position(10.0, 20.0),
                 Position(30.0, 40.0)
             )
         )
+
+        //when
         val wkt = WktSerializer.toWkt(multiPoint)
-        Assertions.assertEquals("MULTIPOINT ((10.0 20.0), (30.0 40.0))", wkt)
+
+        //then
+        wkt shouldBe "MULTIPOINT ((10.0 20.0), (30.0 40.0))"
     }
 
-    @Test
-    fun testSerializeMultiPointSingle() {
+    test("serialize MultiPoint single") {
+        //given
         val multiPoint = MultiPoint(
             listOf(
                 Position(10.0, 20.0)
             )
         )
+
+        //when
         val wkt = WktSerializer.toWkt(multiPoint)
-        Assertions.assertEquals("MULTIPOINT ((10.0 20.0))", wkt)
+
+        //then
+        wkt shouldBe "MULTIPOINT ((10.0 20.0))"
     }
 
-    @Test
-    fun testSerializeMultiPointEmpty() {
+    test("serialize MultiPoint empty") {
+        //given
         val multiPoint = MultiPoint(emptyList())
+
+        //when
         val wkt = WktSerializer.toWkt(multiPoint)
-        Assertions.assertEquals("MULTIPOINT EMPTY", wkt)
+
+        //then
+        wkt shouldBe "MULTIPOINT EMPTY"
     }
 
-    @Test
-    fun testSerializeMultiPointWithAltitude() {
+    test("serialize MultiPoint with altitude") {
+        //given
         val multiPoint = MultiPoint(
             listOf(
                 Position(10.0, 20.0, 5.0),
                 Position(30.0, 40.0, 15.0)
             )
         )
+
+        //when
         val wkt = WktSerializer.toWkt(multiPoint)
-        Assertions.assertEquals("MULTIPOINT ((10.0 20.0 5.0), (30.0 40.0 15.0))", wkt)
+
+        //then
+        wkt shouldBe "MULTIPOINT ((10.0 20.0 5.0), (30.0 40.0 15.0))"
     }
 
-    @Test
-    fun testSerializeMultiPointEwkt() {
+    test("serialize MultiPoint EWKT") {
+        //given
         val multiPoint = MultiPoint(
             listOf(
                 Position(10.0, 20.0),
                 Position(30.0, 40.0)
             ), CoordinateReferenceSystem.WEB_MERCATOR
         )
+
+        //when
         val ewkt = WktSerializer.toEwkt(multiPoint)
-        Assertions.assertEquals("SRID=3857;MULTIPOINT ((10.0 20.0), (30.0 40.0))", ewkt)
+
+        //then
+        ewkt shouldBe "SRID=3857;MULTIPOINT ((10.0 20.0), (30.0 40.0))"
     }
 
     // MultiLineString Tests
-    @Test
-    fun testSerializeMultiLineString() {
+    test("serialize MultiLineString") {
+        //given
         val multiLineString = MultiLineString(
             listOf(
                 listOf(Position(10.0, 20.0), Position(30.0, 40.0)),
                 listOf(Position(50.0, 60.0), Position(70.0, 80.0))
             )
         )
+
+        //when
         val wkt = WktSerializer.toWkt(multiLineString)
-        Assertions.assertEquals("MULTILINESTRING ((10.0 20.0, 30.0 40.0), (50.0 60.0, 70.0 80.0))", wkt)
+
+        //then
+        wkt shouldBe "MULTILINESTRING ((10.0 20.0, 30.0 40.0), (50.0 60.0, 70.0 80.0))"
     }
 
-    @Test
-    fun testSerializeMultiLineStringSingle() {
+    test("serialize MultiLineString single") {
+        //given
         val multiLineString = MultiLineString(
             listOf(
                 listOf(Position(10.0, 20.0), Position(30.0, 40.0), Position(50.0, 60.0))
             )
         )
+
+        //when
         val wkt = WktSerializer.toWkt(multiLineString)
-        Assertions.assertEquals("MULTILINESTRING ((10.0 20.0, 30.0 40.0, 50.0 60.0))", wkt)
+
+        //then
+        wkt shouldBe "MULTILINESTRING ((10.0 20.0, 30.0 40.0, 50.0 60.0))"
     }
 
-    @Test
-    fun testSerializeMultiLineStringEmpty() {
+    test("serialize MultiLineString empty") {
+        //given
         val multiLineString = MultiLineString(emptyList())
+
+        //when
         val wkt = WktSerializer.toWkt(multiLineString)
-        Assertions.assertEquals("MULTILINESTRING EMPTY", wkt)
+
+        //then
+        wkt shouldBe "MULTILINESTRING EMPTY"
     }
 
-    @Test
-    fun testSerializeMultiLineStringEwkt() {
+    test("serialize MultiLineString EWKT") {
+        //given
         val multiLineString = MultiLineString(
             listOf(
                 listOf(Position(10.0, 20.0), Position(30.0, 40.0))
             ), CoordinateReferenceSystem.WGS_84
         )
+
+        //when
         val ewkt = WktSerializer.toEwkt(multiLineString)
-        Assertions.assertEquals("SRID=4326;MULTILINESTRING ((10.0 20.0, 30.0 40.0))", ewkt)
+
+        //then
+        ewkt shouldBe "SRID=4326;MULTILINESTRING ((10.0 20.0, 30.0 40.0))"
     }
 
     // MultiPolygon Tests
-    @Test
-    fun testSerializeMultiPolygon() {
+    test("serialize MultiPolygon") {
+        //given
         val multiPolygon = MultiPolygon(
             listOf(
                 listOf(
@@ -285,15 +371,17 @@ internal class WktSerializerTest {
                 )
             )
         )
+
+        //when
         val wkt = WktSerializer.toWkt(multiPolygon)
-        Assertions.assertEquals(
-            "MULTIPOLYGON (((0.0 0.0, 10.0 0.0, 10.0 10.0, 0.0 10.0, 0.0 0.0)), " +
-                    "((20.0 20.0, 30.0 20.0, 30.0 30.0, 20.0 30.0, 20.0 20.0)))", wkt
-        )
+
+        //then
+        wkt shouldBe "MULTIPOLYGON (((0.0 0.0, 10.0 0.0, 10.0 10.0, 0.0 10.0, 0.0 0.0)), " +
+                "((20.0 20.0, 30.0 20.0, 30.0 30.0, 20.0 30.0, 20.0 20.0)))"
     }
 
-    @Test
-    fun testSerializeMultiPolygonSingle() {
+    test("serialize MultiPolygon single") {
+        //given
         val multiPolygon = MultiPolygon(
             listOf(
                 listOf(
@@ -306,12 +394,16 @@ internal class WktSerializerTest {
                 )
             )
         )
+
+        //when
         val wkt = WktSerializer.toWkt(multiPolygon)
-        Assertions.assertEquals("MULTIPOLYGON (((0.0 0.0, 10.0 0.0, 10.0 10.0, 0.0 0.0)))", wkt)
+
+        //then
+        wkt shouldBe "MULTIPOLYGON (((0.0 0.0, 10.0 0.0, 10.0 10.0, 0.0 0.0)))"
     }
 
-    @Test
-    fun testSerializeMultiPolygonWithHoles() {
+    test("serialize MultiPolygon with holes") {
+        //given
         val multiPolygon = MultiPolygon(
             listOf(
                 listOf(
@@ -326,27 +418,34 @@ internal class WktSerializerTest {
                         Position(2.0, 2.0),
                         Position(8.0, 2.0),
                         Position(8.0, 8.0),
+                        Position(2.0, 8.0),
                         Position(2.0, 2.0)
                     )
                 )
             )
         )
+
+        //when
         val wkt = WktSerializer.toWkt(multiPolygon)
-        Assertions.assertEquals(
-            "MULTIPOLYGON (((0.0 0.0, 10.0 0.0, 10.0 10.0, 0.0 10.0, 0.0 0.0), " +
-                    "(2.0 2.0, 8.0 2.0, 8.0 8.0, 2.0 2.0)))", wkt
-        )
+
+        //then
+        wkt shouldBe "MULTIPOLYGON (((0.0 0.0, 10.0 0.0, 10.0 10.0, 0.0 10.0, 0.0 0.0), " +
+                "(2.0 2.0, 8.0 2.0, 8.0 8.0, 2.0 8.0, 2.0 2.0)))"
     }
 
-    @Test
-    fun testSerializeMultiPolygonEmpty() {
+    test("serialize MultiPolygon empty") {
+        //given
         val multiPolygon = MultiPolygon(emptyList())
+
+        //when
         val wkt = WktSerializer.toWkt(multiPolygon)
-        Assertions.assertEquals("MULTIPOLYGON EMPTY", wkt)
+
+        //then
+        wkt shouldBe "MULTIPOLYGON EMPTY"
     }
 
-    @Test
-    fun testSerializeMultiPolygonEwkt() {
+    test("serialize MultiPolygon EWKT") {
+        //given
         val multiPolygon = MultiPolygon(
             listOf(
                 listOf(
@@ -359,25 +458,33 @@ internal class WktSerializerTest {
                 )
             ), CoordinateReferenceSystem.WEB_MERCATOR
         )
+
+        //when
         val ewkt = WktSerializer.toEwkt(multiPolygon)
-        Assertions.assertEquals("SRID=3857;MULTIPOLYGON (((0.0 0.0, 10.0 0.0, 10.0 10.0, 0.0 0.0)))", ewkt)
+
+        //then
+        ewkt shouldBe "SRID=3857;MULTIPOLYGON (((0.0 0.0, 10.0 0.0, 10.0 10.0, 0.0 0.0)))"
     }
 
     // GeometryCollection Tests
-    @Test
-    fun testSerializeGeometryCollection() {
+    test("serialize GeometryCollection") {
+        //given
         val collection = GeometryCollection(
             listOf(
                 Point(10.0, 20.0),
                 LineString(listOf(Position(30.0, 40.0), Position(50.0, 60.0)))
             )
         )
+
+        //when
         val wkt = WktSerializer.toWkt(collection)
-        Assertions.assertEquals("GEOMETRYCOLLECTION (POINT (10.0 20.0), LINESTRING (30.0 40.0, 50.0 60.0))", wkt)
+
+        //then
+        wkt shouldBe "GEOMETRYCOLLECTION (POINT (10.0 20.0), LINESTRING (30.0 40.0, 50.0 60.0))"
     }
 
-    @Test
-    fun testSerializeGeometryCollectionMixed() {
+    test("serialize GeometryCollection mixed") {
+        //given
         val collection = GeometryCollection(
             listOf(
                 Point(10.0, 20.0),
@@ -395,22 +502,28 @@ internal class WktSerializerTest {
                 )
             )
         )
+
+        //when
         val wkt = WktSerializer.toWkt(collection)
-        Assertions.assertEquals(
-            "GEOMETRYCOLLECTION (POINT (10.0 20.0), LINESTRING (30.0 40.0, 50.0 60.0), " +
-                    "POLYGON ((0.0 0.0, 5.0 0.0, 5.0 5.0, 0.0 5.0, 0.0 0.0)))", wkt
-        )
+
+        //then
+        wkt shouldBe "GEOMETRYCOLLECTION (POINT (10.0 20.0), LINESTRING (30.0 40.0, 50.0 60.0), " +
+                "POLYGON ((0.0 0.0, 5.0 0.0, 5.0 5.0, 0.0 5.0, 0.0 0.0)))"
     }
 
-    @Test
-    fun testSerializeGeometryCollectionEmpty() {
+    test("serialize GeometryCollection empty") {
+        //given
         val collection = GeometryCollection(emptyList())
+
+        //when
         val wkt = WktSerializer.toWkt(collection)
-        Assertions.assertEquals("GEOMETRYCOLLECTION EMPTY", wkt)
+
+        //then
+        wkt shouldBe "GEOMETRYCOLLECTION EMPTY"
     }
 
-    @Test
-    fun testSerializeGeometryCollectionEwkt() {
+    test("serialize GeometryCollection EWKT") {
+        //given
         val collection = GeometryCollection(
             listOf(
                 Point(10.0, 20.0, 0.0, CoordinateReferenceSystem.WEB_MERCATOR),
@@ -420,15 +533,16 @@ internal class WktSerializerTest {
                 )
             ), CoordinateReferenceSystem.WEB_MERCATOR
         )
+
+        //when
         val ewkt = WktSerializer.toEwkt(collection)
-        Assertions.assertEquals(
-            "SRID=3857;GEOMETRYCOLLECTION (POINT (10.0 20.0), LINESTRING (30.0 40.0, 50.0 60.0))",
-            ewkt
-        )
+
+        //then
+        ewkt shouldBe "SRID=3857;GEOMETRYCOLLECTION (POINT (10.0 20.0), LINESTRING (30.0 40.0, 50.0 60.0))"
     }
 
-    @Test
-    fun testSerializeGeometryCollectionWithMultiGeometries() {
+    test("serialize GeometryCollection with multi geometries") {
+        //given
         val collection = GeometryCollection(
             listOf(
                 MultiPoint(listOf(Position(1.0, 2.0), Position(3.0, 4.0))),
@@ -439,11 +553,12 @@ internal class WktSerializerTest {
                 )
             )
         )
-        val wkt = WktSerializer.toWkt(collection)
-        Assertions.assertEquals(
-            "GEOMETRYCOLLECTION (MULTIPOINT ((1.0 2.0), (3.0 4.0)), " +
-                    "MULTILINESTRING ((10.0 20.0, 30.0 40.0)))", wkt
-        )
-    }
-}
 
+        //when
+        val wkt = WktSerializer.toWkt(collection)
+
+        //then
+        wkt shouldBe "GEOMETRYCOLLECTION (MULTIPOINT ((1.0 2.0), (3.0 4.0)), " +
+                "MULTILINESTRING ((10.0 20.0, 30.0 40.0)))"
+    }
+})

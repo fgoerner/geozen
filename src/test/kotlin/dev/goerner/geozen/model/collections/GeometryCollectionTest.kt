@@ -4,12 +4,13 @@ import dev.goerner.geozen.model.Geometry
 import dev.goerner.geozen.model.Position
 import dev.goerner.geozen.model.simple_geometry.LineString
 import dev.goerner.geozen.model.simple_geometry.Point
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Test
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
 
-class GeometryCollectionTest {
-    @Test
-    fun testGeometriesConstructor() {
+class GeometryCollectionTest : FunSpec({
+
+    test("geometries constructor") {
+        //given
         val point: Geometry = Point(0.0, 0.0)
         val geometries = listOf(
             point,
@@ -21,8 +22,10 @@ class GeometryCollectionTest {
             )
         )
 
+        //when
         val geometryCollection = GeometryCollection(geometries)
 
-        Assertions.assertEquals(2, geometryCollection.geometries.size)
+        //then
+        geometryCollection.geometries.size shouldBe 2
     }
-}
+})

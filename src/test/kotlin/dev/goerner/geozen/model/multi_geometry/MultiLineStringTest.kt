@@ -2,12 +2,13 @@ package dev.goerner.geozen.model.multi_geometry
 
 import dev.goerner.geozen.model.CoordinateReferenceSystem
 import dev.goerner.geozen.model.Position
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Test
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
 
-class MultiLineStringTest {
-    @Test
-    fun testCoordinatesConstructor() {
+class MultiLineStringTest : FunSpec({
+
+    test("coordinates constructor") {
+        //given
         val coordinates = listOf(
             listOf(
                 Position(1.0, 2.0, 3.0),
@@ -15,14 +16,16 @@ class MultiLineStringTest {
             )
         )
 
+        //when
         val multiLineString = MultiLineString(coordinates)
 
-        Assertions.assertEquals(1, multiLineString.coordinates.size)
-        Assertions.assertEquals(CoordinateReferenceSystem.WGS_84, multiLineString.coordinateReferenceSystem)
+        //then
+        multiLineString.coordinates.size shouldBe 1
+        multiLineString.coordinateReferenceSystem shouldBe CoordinateReferenceSystem.WGS_84
     }
 
-    @Test
-    fun testCoordinatesAndReferenceSystemConstructor() {
+    test("coordinates and reference system constructor") {
+        //given
         val coordinates = listOf(
             listOf(
                 Position(1.0, 2.0, 3.0),
@@ -30,9 +33,11 @@ class MultiLineStringTest {
             )
         )
 
+        //when
         val multiLineString = MultiLineString(coordinates, CoordinateReferenceSystem.WEB_MERCATOR)
 
-        Assertions.assertEquals(1, multiLineString.coordinates.size)
-        Assertions.assertEquals(CoordinateReferenceSystem.WEB_MERCATOR, multiLineString.coordinateReferenceSystem)
+        //then
+        multiLineString.coordinates.size shouldBe 1
+        multiLineString.coordinateReferenceSystem shouldBe CoordinateReferenceSystem.WEB_MERCATOR
     }
-}
+})

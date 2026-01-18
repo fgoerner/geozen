@@ -1,45 +1,66 @@
 package dev.goerner.geozen.model
 
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Test
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
 
-class PositionTest {
-    @Test
-    fun testLongitudeAndLatitudeConstructor() {
+class PositionTest : FunSpec({
+
+    test("longitude and latitude constructor") {
+        //given
         val position = Position(1.0, 2.0)
 
-        Assertions.assertEquals(1.0, position.longitude)
-        Assertions.assertEquals(2.0, position.latitude)
-        Assertions.assertEquals(0.0, position.altitude)
+        //when
+        // constructor is the action
+
+        //then
+        position.longitude shouldBe 1.0
+        position.latitude shouldBe 2.0
+        position.altitude shouldBe 0.0
     }
 
-    @Test
-    fun testLongitudeAndLatitudeAndAltitudeConstructor() {
+    test("longitude latitude and altitude constructor") {
+        //given
         val position = Position(1.0, 2.0, 3.0)
 
-        Assertions.assertEquals(1.0, position.longitude)
-        Assertions.assertEquals(2.0, position.latitude)
-        Assertions.assertEquals(3.0, position.altitude)
+        //when
+        // constructor is the action
+
+        //then
+        position.longitude shouldBe 1.0
+        position.latitude shouldBe 2.0
+        position.altitude shouldBe 3.0
     }
 
-    @Test
-    fun testGetLongitude() {
+    test("get longitude") {
+        //given
         val position = Position(1.0, 2.0, 3.0)
 
-        Assertions.assertEquals(1.0, position.longitude)
+        //when
+        // access property
+
+        //then
+        position.longitude shouldBe 1.0
     }
 
-    @Test
-    fun testGetLatitude() {
+    test("get latitude") {
+        //given
         val position = Position(1.0, 2.0, 3.0)
 
-        Assertions.assertEquals(2.0, position.latitude)
+        //when
+        // access property
+
+        //then
+        position.latitude shouldBe 2.0
     }
 
-    @Test
-    fun testGetAltitude() {
+    test("get altitude") {
+        //given
         val position = Position(1.0, 2.0, 3.0)
 
-        Assertions.assertEquals(3.0, position.altitude)
+        //when
+        // access property
+
+        //then
+        position.altitude shouldBe 3.0
     }
-}
+})

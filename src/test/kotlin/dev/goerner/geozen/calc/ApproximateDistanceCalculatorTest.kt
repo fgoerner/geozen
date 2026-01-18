@@ -4,33 +4,37 @@ import dev.goerner.geozen.calc.ApproximateDistanceCalculator.haversineDistance
 import dev.goerner.geozen.model.Position
 import dev.goerner.geozen.model.simple_geometry.LineString
 import dev.goerner.geozen.model.simple_geometry.Point
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
 
-class ApproximateDistanceCalculatorTest {
+class ApproximateDistanceCalculatorTest : FunSpec({
 
-    @Test
-    fun `test haversine distance`() {
+    test("haversine distance") {
+        //given
         val p1 = Position(11.4694, 49.2965)
         val p2 = Position(11.0549, 49.4532)
 
+        //when
         val haversineDistance = haversineDistance(p1, p2)
 
-        assertEquals(34701.39385602524, haversineDistance)
+        //then
+        haversineDistance shouldBe 34701.39385602524
     }
 
-    @Test
-    fun `test Point to Point distance`() {
+    test("Point to Point distance") {
+        //given
         val p1 = Point(11.4694, 49.2965)
         val p2 = Point(11.0549, 49.4532)
 
+        //when
         val approximateDistance = ApproximateDistanceCalculator.calculate(p1, p2)
 
-        assertEquals(34701.39385602524, approximateDistance)
+        //then
+        approximateDistance shouldBe 34701.39385602524
     }
 
-    @Test
-    fun `test Point to LineString distance`() {
+    test("Point to LineString distance") {
+        //given
         val p1 = Point(11.4694, 49.2965)
         val lineString = LineString(
             listOf(
@@ -40,8 +44,10 @@ class ApproximateDistanceCalculatorTest {
             )
         )
 
+        //when
         val approximateDistance = ApproximateDistanceCalculator.calculate(p1, lineString)
 
-        assertEquals(1832.5414860629317, approximateDistance)
+        //then
+        approximateDistance shouldBe 1832.5414860629317
     }
-}
+})

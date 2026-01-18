@@ -2,18 +2,21 @@ package dev.goerner.geozen.model.collections
 
 import dev.goerner.geozen.model.Feature
 import dev.goerner.geozen.model.simple_geometry.Point
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Test
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
 
-class FeatureCollectionTest {
-    @Test
-    fun testFeaturesConstructor() {
+class FeatureCollectionTest : FunSpec({
+
+    test("features constructor") {
+        //given
         val features = listOf(
             Feature(null, Point(0.0, 0.0))
         )
 
+        //when
         val featureCollection = FeatureCollection(features)
 
-        Assertions.assertEquals(1, featureCollection.features.size)
+        //then
+        featureCollection.features.size shouldBe 1
     }
-}
+})
