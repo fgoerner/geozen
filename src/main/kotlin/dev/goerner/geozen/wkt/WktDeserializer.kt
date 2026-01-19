@@ -53,7 +53,7 @@ object WktDeserializer {
         val match = GEOMETRY_TYPE_PATTERN.matchEntire(trimmed) ?: throw WktException("Invalid WKT format")
 
         val type = match.groupValues[1].uppercase()
-        val coordinates = match.groupValues[2].trim()
+        val coordinates = match.groupValues[2].trim().uppercase()
 
         if (type != "GEOMETRYCOLLECTION") {
             throw WktException("Expected GEOMETRYCOLLECTION but got $type")
@@ -79,7 +79,7 @@ object WktDeserializer {
         val match = GEOMETRY_TYPE_PATTERN.matchEntire(wkt) ?: throw WktException("Invalid WKT format")
 
         val type = match.groupValues[1].uppercase()
-        val coordinates = match.groupValues[2].trim()
+        val coordinates = match.groupValues[2].trim().uppercase()
 
         return when (type) {
             "POINT" -> parsePoint(coordinates, crs)
