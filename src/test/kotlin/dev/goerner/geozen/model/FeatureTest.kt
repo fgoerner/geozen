@@ -16,7 +16,7 @@ class FeatureTest : FunSpec({
         //then
         feature.id shouldBe null
         feature.geometry shouldBe geometry
-        feature.properties shouldBe emptyMap<String, String>()
+        feature.properties shouldBe emptyMap()
     }
 
     test("id and geometry constructor") {
@@ -29,7 +29,7 @@ class FeatureTest : FunSpec({
         //then
         feature.id shouldBe "123"
         feature.geometry shouldBe geometry
-        feature.properties shouldBe emptyMap<String, String>()
+        feature.properties shouldBe emptyMap()
     }
 
     test("geometry and properties constructor") {
