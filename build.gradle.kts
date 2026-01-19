@@ -18,9 +18,8 @@ repositories {
 }
 
 dependencies {
-    testImplementation(platform("org.junit:junit-bom:5.14.0"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("io.kotest:kotest-assertions-core:6.0.7")
+    testImplementation("io.kotest:kotest-runner-junit5:6.0.7")
     implementation(platform("tools.jackson:jackson-bom:3.0.0"))
     implementation("tools.jackson.core:jackson-databind")
     implementation("net.sf.geographiclib:GeographicLib-Java:2.1")
