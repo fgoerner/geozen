@@ -14,10 +14,10 @@ data class MultiLineString(
 ) : Geometry(coordinateReferenceSystem) {
 
     override fun fastDistanceTo(other: Geometry): Double {
-        TODO("Fast distance calculation not implemented yet")
+        throw UnsupportedOperationException("Fast distance calculation not implemented yet")
     }
 
     override fun exactDistanceTo(other: Geometry): Double {
-        TODO("Exact distance calculation not implemented yet")
+        throw UnsupportedOperationException("Exact distance calculation not implemented yet")
     }
 }
