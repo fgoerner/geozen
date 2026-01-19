@@ -94,8 +94,8 @@ class WktDeserializerTest : FunSpec({
         val point = geom.shouldBeInstanceOf<Point>()
 
         //then
-        point.coordinates.longitude shouldBe Double.NaN
-        point.coordinates.latitude shouldBe Double.NaN
+        point.coordinates.longitude.isNaN() shouldBe true
+        point.coordinates.latitude.isNaN() shouldBe true
     }
 
     test("deserialize point negative coordinates") {
