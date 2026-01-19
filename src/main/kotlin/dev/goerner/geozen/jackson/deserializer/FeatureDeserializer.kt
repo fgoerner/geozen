@@ -28,12 +28,20 @@ class FeatureDeserializer : ValueDeserializer<Feature>() {
 
         val propertiesNode = rootNode["properties"]
         val properties = if (propertiesNode != null && propertiesNode.isObject) {
-            propertiesNode.properties().associate { it.key to it.value.asString() }
+            propertiesNode.properties().associate { it.key to nodeToValue(it.value) }
         } else {
             emptyMap()
         }
 
         return Feature(id, geometry, properties)
+    }
+
+    private fun nodeToValue(node: JsonNode): Any? = when {
+        node.isNull -> null
+        node.isBoolean -> node.asBoolean()
+        node.isNumber -> node.numberValue()
+        node.isString -> node.asString()
+        else -> node.toString() // fallback for objects/arrays
     }
 }
 
