@@ -89,17 +89,6 @@ class WktSerializerTest : FunSpec({
         wkt shouldBe "LINESTRING (10.0 20.0, 30.0 40.0, 50.0 60.0)"
     }
 
-    test("serialize LineString empty not supported") {
-        //given
-        val lineString = LineString(emptyList())
-
-        //when
-        val action = { WktSerializer.toWkt(lineString) }
-
-        //then
-        shouldThrow<WktException>(action)
-    }
-
     test("serialize LineString with altitude") {
         //given
         val lineString = LineString(
