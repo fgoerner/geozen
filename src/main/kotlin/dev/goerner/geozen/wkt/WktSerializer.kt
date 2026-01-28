@@ -85,13 +85,17 @@ object WktSerializer {
 
     private fun serializeLineString(lineString: LineString): String {
         val coords = lineString.coordinates
-        if (coords.isEmpty()) return "LINESTRING EMPTY"
+        if (coords.isEmpty()) {
+            throw WktException("Cannot serialize empty LineString. GeoJSON does not allow empty linestrings.")
+        }
         return "LINESTRING (${coords.joinToString(", ") { formatPosition(it) }})"
     }
 
     private fun serializePolygon(polygon: Polygon): String {
         val coords = polygon.coordinates
-        if (coords.isEmpty()) return "POLYGON EMPTY"
+        if (coords.isEmpty()) {
+            throw WktException("Cannot serialize empty Polygon. GeoJSON does not allow empty polygons.")
+        }
         return "POLYGON (${coords.joinToString(", ") { ring ->
             "(${ring.joinToString(", ") { formatPosition(it) }})"
         }})"
@@ -99,13 +103,17 @@ object WktSerializer {
 
     private fun serializeMultiPoint(multiPoint: MultiPoint): String {
         val coords = multiPoint.coordinates
-        if (coords.isEmpty()) return "MULTIPOINT EMPTY"
+        if (coords.isEmpty()) {
+            throw WktException("Cannot serialize empty MultiPoint. GeoJSON does not allow empty multipoints.")
+        }
         return "MULTIPOINT (${coords.joinToString(", ") { "(${formatPosition(it)})" }})"
     }
 
     private fun serializeMultiLineString(multiLineString: MultiLineString): String {
         val coords = multiLineString.coordinates
-        if (coords.isEmpty()) return "MULTILINESTRING EMPTY"
+        if (coords.isEmpty()) {
+            throw WktException("Cannot serialize empty MultiLineString. GeoJSON does not allow empty multilinestrings.")
+        }
         return "MULTILINESTRING (${coords.joinToString(", ") { line ->
             "(${line.joinToString(", ") { formatPosition(it) }})"
         }})"
@@ -113,7 +121,9 @@ object WktSerializer {
 
     private fun serializeMultiPolygon(multiPolygon: MultiPolygon): String {
         val coords = multiPolygon.coordinates
-        if (coords.isEmpty()) return "MULTIPOLYGON EMPTY"
+        if (coords.isEmpty()) {
+            throw WktException("Cannot serialize empty MultiPolygon. GeoJSON does not allow empty multipolygons.")
+        }
         return "MULTIPOLYGON (${coords.joinToString(", ") { polygon ->
             "(${polygon.joinToString(", ") { ring ->
                 "(${ring.joinToString(", ") { formatPosition(it) }})"
@@ -122,7 +132,9 @@ object WktSerializer {
     }
 
     private fun serializeGeometryCollection(collection: GeometryCollection): String {
-        if (collection.geometries.isEmpty()) return "GEOMETRYCOLLECTION EMPTY"
+        if (collection.geometries.isEmpty()) {
+            throw WktException("Cannot serialize empty GeometryCollection. GeoJSON does not allow empty geometry collections.")
+        }
         return "GEOMETRYCOLLECTION (${collection.geometries.joinToString(", ") { serialize(it, false) }})"
     }
 

@@ -9,6 +9,7 @@ import dev.goerner.geozen.model.multi_geometry.MultiPolygon
 import dev.goerner.geozen.model.simple_geometry.LineString
 import dev.goerner.geozen.model.simple_geometry.Point
 import dev.goerner.geozen.model.simple_geometry.Polygon
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 
@@ -86,17 +87,6 @@ class WktSerializerTest : FunSpec({
 
         //then
         wkt shouldBe "LINESTRING (10.0 20.0, 30.0 40.0, 50.0 60.0)"
-    }
-
-    test("serialize LineString empty") {
-        //given
-        val lineString = LineString(emptyList())
-
-        //when
-        val wkt = WktSerializer.toWkt(lineString)
-
-        //then
-        wkt shouldBe "LINESTRING EMPTY"
     }
 
     test("serialize LineString with altitude") {
@@ -182,17 +172,6 @@ class WktSerializerTest : FunSpec({
                 "(2.0 2.0, 8.0 2.0, 8.0 8.0, 2.0 8.0, 2.0 2.0))"
     }
 
-    test("serialize Polygon empty") {
-        //given
-        val polygon = Polygon(emptyList())
-
-        //when
-        val wkt = WktSerializer.toWkt(polygon)
-
-        //then
-        wkt shouldBe "POLYGON EMPTY"
-    }
-
     test("serialize Polygon EWKT") {
         //given
         val polygon = Polygon(
@@ -245,15 +224,15 @@ class WktSerializerTest : FunSpec({
         wkt shouldBe "MULTIPOINT ((10.0 20.0))"
     }
 
-    test("serialize MultiPoint empty") {
+    test("serialize MultiPoint empty not supported") {
         //given
         val multiPoint = MultiPoint(emptyList())
 
         //when
-        val wkt = WktSerializer.toWkt(multiPoint)
+        val action = { WktSerializer.toWkt(multiPoint) }
 
         //then
-        wkt shouldBe "MULTIPOINT EMPTY"
+        shouldThrow<WktException>(action)
     }
 
     test("serialize MultiPoint with altitude") {
@@ -320,15 +299,15 @@ class WktSerializerTest : FunSpec({
         wkt shouldBe "MULTILINESTRING ((10.0 20.0, 30.0 40.0, 50.0 60.0))"
     }
 
-    test("serialize MultiLineString empty") {
+    test("serialize MultiLineString empty not supported") {
         //given
         val multiLineString = MultiLineString(emptyList())
 
         //when
-        val wkt = WktSerializer.toWkt(multiLineString)
+        val action = { WktSerializer.toWkt(multiLineString) }
 
         //then
-        wkt shouldBe "MULTILINESTRING EMPTY"
+        shouldThrow<WktException>(action)
     }
 
     test("serialize MultiLineString EWKT") {
@@ -433,15 +412,15 @@ class WktSerializerTest : FunSpec({
                 "(2.0 2.0, 8.0 2.0, 8.0 8.0, 2.0 8.0, 2.0 2.0)))"
     }
 
-    test("serialize MultiPolygon empty") {
+    test("serialize MultiPolygon empty not supported") {
         //given
         val multiPolygon = MultiPolygon(emptyList())
 
         //when
-        val wkt = WktSerializer.toWkt(multiPolygon)
+        val action = { WktSerializer.toWkt(multiPolygon) }
 
         //then
-        wkt shouldBe "MULTIPOLYGON EMPTY"
+        shouldThrow<WktException>(action)
     }
 
     test("serialize MultiPolygon EWKT") {
@@ -511,15 +490,15 @@ class WktSerializerTest : FunSpec({
                 "POLYGON ((0.0 0.0, 5.0 0.0, 5.0 5.0, 0.0 5.0, 0.0 0.0)))"
     }
 
-    test("serialize GeometryCollection empty") {
+    test("serialize GeometryCollection empty not supported") {
         //given
         val collection = GeometryCollection(emptyList())
 
         //when
-        val wkt = WktSerializer.toWkt(collection)
+        val action = { WktSerializer.toWkt(collection) }
 
         //then
-        wkt shouldBe "GEOMETRYCOLLECTION EMPTY"
+        shouldThrow<WktException>(action)
     }
 
     test("serialize GeometryCollection EWKT") {

@@ -14,11 +14,37 @@ import dev.goerner.geozen.model.Position
  * 
  * The first ring is the exterior ring, defining the outer boundary of the polygon. Any subsequent rings are interior
  * rings, defining holes within the polygon.
+ *
+ * @param coordinates The list of linear rings. At least one ring (exterior ring) must be provided.
+ *                    Each ring must contain at least 4 positions and be closed (first position equals last position).
+ * @param coordinateReferenceSystem The coordinate reference system, defaults to WGS_84
+ * @throws IllegalArgumentException if coordinates is empty, if any ring has fewer than 4 positions,
+ *                                  or if any ring is not closed (first position != last position)
  */
 data class Polygon(
     val coordinates: List<List<Position>>,
     override val coordinateReferenceSystem: CoordinateReferenceSystem = CoordinateReferenceSystem.WGS_84
 ) : Geometry(coordinateReferenceSystem) {
+
+    init {
+        require(coordinates.isNotEmpty()) {
+            "Polygon must contain at least 1 ring (exterior ring), but contained 0"
+        }
+
+        coordinates.forEachIndexed { index, ring ->
+            require(ring.size >= 4) {
+                val ringType = if (index == 0) "exterior ring" else "interior ring at index $index"
+                "Each ring in Polygon must contain at least 4 positions, " +
+                        "but $ringType contained ${ring.size}"
+            }
+
+            require(ring.first() == ring.last()) {
+                val ringType = if (index == 0) "exterior ring" else "interior ring at index $index"
+                "Each ring in Polygon must be closed (first position must equal last position), " +
+                        "but $ringType is not closed"
+            }
+        }
+    }
 
     override fun fastDistanceTo(other: Geometry): Double {
         return when (other) {
