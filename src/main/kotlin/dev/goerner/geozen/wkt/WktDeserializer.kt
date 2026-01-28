@@ -97,7 +97,7 @@ object WktDeserializer {
     private fun parsePoint(coords: String, crs: CoordinateReferenceSystem): Point {
         var coords = coords
         if (coords == "EMPTY") {
-            return Point(Position(Double.NaN, Double.NaN), crs)
+            throw WktException("POINT EMPTY is not supported. GeoJSON does not allow empty points.")
         }
 
         coords = stripParentheses(coords)
@@ -108,7 +108,7 @@ object WktDeserializer {
     private fun parseLineString(coords: String, crs: CoordinateReferenceSystem): LineString {
         var coords = coords
         if (coords == "EMPTY") {
-            return LineString(emptyList(), crs)
+            throw WktException("LINESTRING EMPTY is not supported. GeoJSON does not allow empty linestrings.")
         }
 
         coords = stripParentheses(coords)
@@ -119,7 +119,7 @@ object WktDeserializer {
     private fun parsePolygon(coords: String, crs: CoordinateReferenceSystem): Polygon {
         var coords = coords
         if (coords == "EMPTY") {
-            return Polygon(emptyList(), crs)
+            throw WktException("POLYGON EMPTY is not supported. GeoJSON does not allow empty polygons.")
         }
 
         coords = stripParentheses(coords)
@@ -130,7 +130,7 @@ object WktDeserializer {
     private fun parseMultiPoint(coords: String, crs: CoordinateReferenceSystem): MultiPoint {
         var coords = coords
         if (coords == "EMPTY") {
-            return MultiPoint(emptyList(), crs)
+            throw WktException("MULTIPOINT EMPTY is not supported. GeoJSON does not allow empty multipoints.")
         }
 
         coords = stripParentheses(coords)
@@ -141,7 +141,7 @@ object WktDeserializer {
     private fun parseMultiLineString(coords: String, crs: CoordinateReferenceSystem): MultiLineString {
         var coords = coords
         if (coords == "EMPTY") {
-            return MultiLineString(emptyList(), crs)
+            throw WktException("MULTILINESTRING EMPTY is not supported. GeoJSON does not allow empty multilinestrings.")
         }
 
         coords = stripParentheses(coords)
@@ -152,7 +152,7 @@ object WktDeserializer {
     private fun parseMultiPolygon(coords: String, crs: CoordinateReferenceSystem): MultiPolygon {
         var coords = coords
         if (coords == "EMPTY") {
-            return MultiPolygon(emptyList(), crs)
+            throw WktException("MULTIPOLYGON EMPTY is not supported. GeoJSON does not allow empty multipolygons.")
         }
 
         coords = stripParentheses(coords)
@@ -163,7 +163,7 @@ object WktDeserializer {
     private fun parseGeometryCollection(coords: String, crs: CoordinateReferenceSystem): GeometryCollection {
         var coords = coords
         if (coords == "EMPTY") {
-            return GeometryCollection(emptyList(), crs)
+            throw WktException("GEOMETRYCOLLECTION EMPTY is not supported. GeoJSON does not allow empty geometry collections.")
         }
 
         coords = stripParentheses(coords)

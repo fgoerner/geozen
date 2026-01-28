@@ -1,5 +1,6 @@
 package dev.goerner.geozen.model
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 
@@ -62,5 +63,100 @@ class PositionTest : FunSpec({
 
         //then
         position.altitude shouldBe 3.0
+    }
+
+    test("longitude out of range - too high") {
+        //given
+        // when & then
+        shouldThrow<IllegalArgumentException> {
+            Position(181.0, 0.0)
+        }
+    }
+
+    test("longitude out of range - too low") {
+        //given
+        // when & then
+        shouldThrow<IllegalArgumentException> {
+            Position(-181.0, 0.0)
+        }
+    }
+
+    test("latitude out of range - too high") {
+        //given
+        // when & then
+        shouldThrow<IllegalArgumentException> {
+            Position(0.0, 91.0)
+        }
+    }
+
+    test("latitude out of range - too low") {
+        //given
+        // when & then
+        shouldThrow<IllegalArgumentException> {
+            Position(0.0, -91.0)
+        }
+    }
+
+    test("longitude infinite") {
+        //given
+        // when & then
+        shouldThrow<IllegalArgumentException> {
+            Position(Double.POSITIVE_INFINITY, 0.0)
+        }
+    }
+
+    test("latitude infinite") {
+        //given
+        // when & then
+        shouldThrow<IllegalArgumentException> {
+            Position(0.0, Double.NEGATIVE_INFINITY)
+        }
+    }
+
+    test("altitude infinite") {
+        //given
+        // when & then
+        shouldThrow<IllegalArgumentException> {
+            Position(0.0, 0.0, Double.POSITIVE_INFINITY)
+        }
+    }
+
+    test("longitude NaN not allowed") {
+        //given
+        // when & then
+        shouldThrow<IllegalArgumentException> {
+            Position(Double.NaN, 0.0)
+        }
+    }
+
+    test("latitude NaN not allowed") {
+        //given
+        // when & then
+        shouldThrow<IllegalArgumentException> {
+            Position(0.0, Double.NaN)
+        }
+    }
+
+    test("altitude NaN not allowed") {
+        //given
+        // when & then
+        shouldThrow<IllegalArgumentException> {
+            Position(0.0, 0.0, Double.NaN)
+        }
+    }
+
+    test("valid boundary values") {
+        //given
+        val position1 = Position(180.0, 90.0)
+        val position2 = Position(-180.0, -90.0)
+
+        //when
+        // constructor is the action
+
+        //then
+        position1.longitude shouldBe 180.0
+        position1.latitude shouldBe 90.0
+        position2.longitude shouldBe -180.0
+        position2.latitude shouldBe -90.0
     }
 })
