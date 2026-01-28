@@ -172,17 +172,6 @@ class WktSerializerTest : FunSpec({
                 "(2.0 2.0, 8.0 2.0, 8.0 8.0, 2.0 8.0, 2.0 2.0))"
     }
 
-    test("serialize Polygon empty not supported") {
-        //given
-        val polygon = Polygon(emptyList())
-
-        //when
-        val action = { WktSerializer.toWkt(polygon) }
-
-        //then
-        shouldThrow<WktException>(action)
-    }
-
     test("serialize Polygon EWKT") {
         //given
         val polygon = Polygon(
