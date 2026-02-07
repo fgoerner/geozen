@@ -113,6 +113,68 @@ object ApproximateDistanceCalculator {
     }
 
     /**
+     * Calculates an approximate distance between two LineString geometries.
+     *
+     *
+     * This method will find the minimum distance between any two segments across both
+     * LineStrings using the Haversine formula and equirectangular projection approximation.
+     * This is faster but less accurate than the precise method, especially over large distances
+     * or near poles.
+     *
+     * @param lineString1 the first line string
+     * @param lineString2 the second line string
+     * @return the approximate minimum distance in meters
+     */
+    fun calculate(lineString1: LineString, lineString2: LineString): Double {
+        val positions1 = lineString1.coordinates
+        val positions2 = lineString2.coordinates
+
+        // Check for segment-segment intersections
+        for (i in 0 until positions1.size - 1) {
+            val seg1Start = positions1[i]
+            val seg1End = positions1[i + 1]
+
+            for (j in 0 until positions2.size - 1) {
+                val seg2Start = positions2[j]
+                val seg2End = positions2[j + 1]
+
+                if (doSegmentsIntersect(seg1Start, seg1End, seg2Start, seg2End)) {
+                    return 0.0
+                }
+            }
+        }
+
+        // No intersections found, calculate minimum distance from all points in lineString1 to lineString2
+        val minFromLine1 = positions1.minOf { position ->
+            calculateMinDistanceToPositions(Point(position), positions2)
+        }
+
+        // Find minimum distance from all points in lineString2 to lineString1
+        val minFromLine2 = positions2.minOf { position ->
+            calculateMinDistanceToPositions(Point(position), positions1)
+        }
+
+        return minOf(minFromLine1, minFromLine2)
+    }
+
+    /**
+     * Calculates an approximate distance between a LineString and a Polygon.
+     *
+     *
+     * This method will check if any part of the LineString intersects or is contained within
+     * the Polygon (accounting for holes). If not, it calculates the minimum distance between
+     * the LineString and the Polygon's rings using the Haversine formula and equirectangular
+     * projection approximation.
+     *
+     * @param lineString the line string
+     * @param polygon    the polygon
+     * @return the approximate minimum distance in meters
+     */
+    fun calculate(lineString: LineString, polygon: Polygon): Double {
+        TODO()
+    }
+
+    /**
      * Checks if a point is inside a ring using the ray casting algorithm.
      *
      * @param p    the point
@@ -204,5 +266,88 @@ object ApproximateDistanceCalculator {
         val lenSq = dx * dx + dy * dy
 
         return if (lenSq != 0.0) dot / lenSq else -1.0
+    }
+
+    /**
+     * Checks if two line segments intersect using the cross product method.
+     *
+     * This method uses a planar approximation (treating lat/lon as x/y coordinates),
+     * which is reasonable for small distances. For segments that are far apart or
+     * very long, this approximation may introduce small errors, but for intersection
+     * detection it's generally sufficient.
+     *
+     * The algorithm checks if the segments straddle each other by computing the
+     * orientation (cross product) of triplets of points.
+     *
+     * @param seg1Start start position of the first segment
+     * @param seg1End   end position of the first segment
+     * @param seg2Start start position of the second segment
+     * @param seg2End   end position of the second segment
+     * @return true if the segments intersect, false otherwise
+     */
+    private fun doSegmentsIntersect(
+        seg1Start: Position,
+        seg1End: Position,
+        seg2Start: Position,
+        seg2End: Position
+    ): Boolean {
+        // Check if segments share an endpoint
+        if (seg1Start == seg2Start || seg1Start == seg2End || seg1End == seg2Start || seg1End == seg2End) {
+            return true
+        }
+
+        // Calculate orientations
+        val o1 = orientation(seg1Start, seg1End, seg2Start)
+        val o2 = orientation(seg1Start, seg1End, seg2End)
+        val o3 = orientation(seg2Start, seg2End, seg1Start)
+        val o4 = orientation(seg2Start, seg2End, seg1End)
+
+        // General case: segments intersect if they have different orientations
+        if (o1 != o2 && o3 != o4) {
+            return true
+        }
+
+        // Special cases: check if point lies on segment (when orientation is 0)
+        if (o1 == 0 && onSegment(seg1Start, seg2Start, seg1End)) return true
+        if (o2 == 0 && onSegment(seg1Start, seg2End, seg1End)) return true
+        if (o3 == 0 && onSegment(seg2Start, seg1Start, seg2End)) return true
+        if (o4 == 0 && onSegment(seg2Start, seg1End, seg2End)) return true
+
+        return false
+    }
+
+    /**
+     * Calculates the orientation of an ordered triplet of points.
+     *
+     * @param p first point
+     * @param q second point
+     * @param r third point
+     * @return 0 if collinear, 1 if clockwise, 2 if counterclockwise
+     */
+    private fun orientation(p: Position, q: Position, r: Position): Int {
+        val val1 = (q.latitude - p.latitude) * (r.longitude - q.longitude)
+        val val2 = (q.longitude - p.longitude) * (r.latitude - q.latitude)
+        val diff = val1 - val2
+
+        return when {
+            diff.equals(0.0) -> 0  // Collinear
+            diff > 0 -> 1          // Clockwise
+            else -> 2               // Counterclockwise
+        }
+    }
+
+    /**
+     * Checks if point q lies on segment pr (given that p, q, r are collinear).
+     *
+     * @param p start of segment
+     * @param q point to check
+     * @param r end of segment
+     * @return true if q lies on segment pr, false otherwise
+     */
+    private fun onSegment(p: Position, q: Position, r: Position): Boolean {
+        return q.longitude <= maxOf(p.longitude, r.longitude) &&
+                q.longitude >= minOf(p.longitude, r.longitude) &&
+                q.latitude <= maxOf(p.latitude, r.latitude) &&
+                q.latitude >= minOf(p.latitude, r.latitude)
     }
 }

@@ -108,6 +108,40 @@ object PreciseDistanceCalculator {
     }
 
     /**
+     * Calculates a precise distance between two LineString geometries.
+     *
+     *
+     * This method will find the minimum distance between any two segments across both
+     * LineStrings using Karney's algorithm from the GeographicLib library. This provides
+     * highly accurate geodesic distance calculations suitable for all distances and locations
+     * on Earth.
+     *
+     * @param lineString1 the first line string
+     * @param lineString2 the second line string
+     * @return the precise minimum distance in meters
+     */
+    fun calculate(lineString1: LineString, lineString2: LineString): Double {
+        TODO()
+    }
+
+    /**
+     * Calculates a precise distance between a LineString and a Polygon.
+     *
+     *
+     * This method will check if any part of the LineString intersects or is contained within
+     * the Polygon (accounting for holes). If not, it calculates the minimum distance between
+     * the LineString and the Polygon's rings using Karney's algorithm from the GeographicLib
+     * library.
+     *
+     * @param lineString the line string
+     * @param polygon    the polygon
+     * @return the precise minimum distance in meters
+     */
+    fun calculate(lineString: LineString, polygon: Polygon): Double {
+        TODO()
+    }
+
+    /**
      * Checks if a point is inside a ring using the ray casting algorithm.
      *
      * @param p    the point

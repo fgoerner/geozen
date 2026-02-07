@@ -105,6 +105,27 @@ val ewkt = wktSerializer.serializeWithSrid(point)
 
 GeoZen provides multiple ways to calculate distances between geometries:
 
+#### Supported Distance Calculations
+
+The following matrix shows which geometry type combinations support distance calculations:
+
+| From ↓ / To →          | Point | LineString | Polygon | MultiPoint | MultiLineString | MultiPolygon | GeometryCollection |
+|------------------------|-------|------------|---------|------------|-----------------|--------------|--------------------|
+| **Point**              | ✅     | ✅          | ✅       | ❌          | ❌               | ❌            | ❌                  |
+| **LineString**         | ✅     | 🟡         | ❌       | ❌          | ❌               | ❌            | ❌                  |
+| **Polygon**            | ✅     | ❌          | ❌       | ❌          | ❌               | ❌            | ❌                  |
+| **MultiPoint**         | ❌     | ❌          | ❌       | ❌          | ❌               | ❌            | ❌                  |
+| **MultiLineString**    | ❌     | ❌          | ❌       | ❌          | ❌               | ❌            | ❌                  |
+| **MultiPolygon**       | ❌     | ❌          | ❌       | ❌          | ❌               | ❌            | ❌                  |
+| **GeometryCollection** | ❌     | ❌          | ❌       | ❌          | ❌               | ❌            | ❌                  |
+
+**Legend:**
+- ✅ Supported for both precise (Karney's algorithm) and approximate (Haversine formula) distance calculations
+- 🟡 Only approximate (Haversine formula) calculation supported - precise calculation not yet implemented
+- ❌ Not yet supported
+
+**Note:** Distance calculations are commutative - if `A.distanceTo(B)` is supported, then `B.distanceTo(A)` is also supported and will return the same result.
+
 #### Using Distance Calculators
 
 ```kotlin

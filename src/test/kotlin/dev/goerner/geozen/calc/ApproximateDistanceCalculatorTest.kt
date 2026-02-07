@@ -115,4 +115,124 @@ class ApproximateDistanceCalculatorTest : FunSpec({
         //then
         approximateDistance shouldBe 2173.096197532901
     }
+
+    test("LineString to LineString distance - non-intersecting") {
+        //given
+        val lineString1 = LineString(
+            listOf(
+                Position(11.4432, 49.3429),
+                Position(11.4463, 49.1877),
+                Position(11.5161, 49.1239)
+            )
+        )
+        val lineString2 = LineString(
+            listOf(
+                Position(11.6, 49.3),
+                Position(11.7, 49.35),
+                Position(11.8, 49.3)
+            )
+        )
+
+        //when
+        val approximateDistance = ApproximateDistanceCalculator.calculate(lineString1, lineString2)
+
+        //then
+        approximateDistance shouldBe 11306.646230126744
+    }
+
+    test("LineString to LineString distance - close parallel lines") {
+        //given
+        val lineString1 = LineString(
+            listOf(
+                Position(11.5, 49.3),
+                Position(11.6, 49.3)
+            )
+        )
+        val lineString2 = LineString(
+            listOf(
+                Position(11.5, 49.31),
+                Position(11.6, 49.31)
+            )
+        )
+
+        //when
+        val approximateDistance = ApproximateDistanceCalculator.calculate(lineString1, lineString2)
+
+        //then
+        approximateDistance shouldBe 1111.9508004064583
+    }
+
+    test("LineString to LineString distance - intersecting lines with common point") {
+        //given
+        val lineString1 = LineString(
+            listOf(
+                Position(11.5, 49.3),
+                Position(11.55, 49.35),  // Common point
+                Position(11.6, 49.4)
+            )
+        )
+        val lineString2 = LineString(
+            listOf(
+                Position(11.5, 49.4),
+                Position(11.55, 49.35),  // Common point
+                Position(11.6, 49.3)
+            )
+        )
+
+        //when
+        val approximateDistance = ApproximateDistanceCalculator.calculate(lineString1, lineString2)
+
+        //then
+        approximateDistance shouldBe 0.0
+    }
+
+    test("LineString to LineString distance - intersecting segments without common point") {
+        //given
+        // Two line segments that cross each other (X pattern)
+        val lineString1 = LineString(
+            listOf(
+                Position(11.5, 49.3),   // Bottom-left
+                Position(11.6, 49.4)    // Top-right
+            )
+        )
+        val lineString2 = LineString(
+            listOf(
+                Position(11.5, 49.4),   // Top-left
+                Position(11.6, 49.3)    // Bottom-right
+            )
+        )
+
+        //when
+        val approximateDistance = ApproximateDistanceCalculator.calculate(lineString1, lineString2)
+
+        //then
+        // These segments cross in the middle, so distance should be 0.0
+        approximateDistance shouldBe 0.0
+    }
+
+    test("LineString to LineString distance - closest points in middle of segments") {
+        //given
+        // Two nearly parallel segments where closest points are in the middle, not at endpoints
+        val lineString1 = LineString(
+            listOf(
+                Position(11.5, 49.3),
+                Position(11.6, 49.3)
+            )
+        )
+        val lineString2 = LineString(
+            listOf(
+                Position(11.51, 49.31),
+                Position(11.59, 49.31)
+            )
+        )
+
+        //when
+        val approximateDistance = ApproximateDistanceCalculator.calculate(lineString1, lineString2)
+
+        //then
+        // Distance should be approximately 1112 meters (about 0.01 degrees latitude difference)
+        // This verifies that we're finding the minimum distance between segment interiors,
+        // not just checking endpoint-to-segment distances
+        approximateDistance shouldBe 1111.9508004064583
+    }
 })

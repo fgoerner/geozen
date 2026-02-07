@@ -28,6 +28,7 @@ data class LineString(
     override fun fastDistanceTo(other: Geometry): Double {
         return when (other) {
             is Point -> ApproximateDistanceCalculator.calculate(other, this)
+            is LineString -> ApproximateDistanceCalculator.calculate(other, this)
             else -> throw UnsupportedOperationException("Fast distance calculation is not supported for geometry type: ${other::class.simpleName}")
         }
     }
