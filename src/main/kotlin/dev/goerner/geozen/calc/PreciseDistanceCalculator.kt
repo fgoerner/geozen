@@ -1,5 +1,6 @@
 package dev.goerner.geozen.calc
 
+import dev.goerner.geozen.calc.PreciseDistanceCalculator.karneyDistance
 import dev.goerner.geozen.model.Position
 import dev.goerner.geozen.model.simple_geometry.LineString
 import dev.goerner.geozen.model.simple_geometry.Point
@@ -110,18 +111,63 @@ object PreciseDistanceCalculator {
     /**
      * Calculates a precise distance between two LineString geometries.
      *
+     * This method finds the minimum geodesic distance between two LineStrings using a two-phase approach:
      *
-     * This method will find the minimum distance between any two segments across both
-     * LineStrings using Karney's algorithm from the GeographicLib library. This provides
-     * highly accurate geodesic distance calculations suitable for all distances and locations
-     * on Earth.
+     * **Phase 1: Intersection Detection**
+     * - Checks all segment pairs for intersections using a planar approximation
+     * - Returns 0.0 immediately if any intersection is found
+     * - The planar approximation is acceptable because segments close enough to intersect
+     *   make the spheroid surface nearly planar at that scale
+     *
+     * **Phase 2: Distance Calculation** (if no intersections)
+     * - Calculates the minimum distance from all points in LineString1 to LineString2
+     * - Calculates the minimum distance from all points in LineString2 to LineString1
+     * - Returns the overall minimum distance
+     * - Uses Karney's algorithm for all distance calculations, providing high geodesic accuracy
+     *
+     * **Performance:**
+     * - Time Complexity: O(n × m) where n and m are the number of segments
+     * - Suitable for typical GIS use cases with LineStrings containing < 100 segments
+     *
+     * **Note on Antimeridian:**
+     * - This implementation does not handle segments crossing the ±180° longitude line
+     * - For such cases, consider normalizing coordinates or subdividing segments
      *
      * @param lineString1 the first line string
      * @param lineString2 the second line string
      * @return the precise minimum distance in meters
      */
     fun calculate(lineString1: LineString, lineString2: LineString): Double {
-        TODO()
+        val positions1 = lineString1.coordinates
+        val positions2 = lineString2.coordinates
+
+        // Phase 1: Check for segment-segment intersections
+        for (i in 0 until positions1.size - 1) {
+            val seg1Start = positions1[i]
+            val seg1End = positions1[i + 1]
+
+            for (j in 0 until positions2.size - 1) {
+                val seg2Start = positions2[j]
+                val seg2End = positions2[j + 1]
+
+                if (GeometricUtils.doSegmentsIntersect(seg1Start, seg1End, seg2Start, seg2End)) {
+                    return 0.0
+                }
+            }
+        }
+
+        // Phase 2: No intersections found - calculate minimum distances
+        // Calculate minimum distance from all points in lineString1 to lineString2
+        val minFromLine1 = positions1.minOf { position ->
+            calculateMinDistanceToPositions(Point(position), positions2)
+        }
+
+        // Calculate minimum distance from all points in lineString2 to lineString1
+        val minFromLine2 = positions2.minOf { position ->
+            calculateMinDistanceToPositions(Point(position), positions1)
+        }
+
+        return minOf(minFromLine1, minFromLine2)
     }
 
     /**

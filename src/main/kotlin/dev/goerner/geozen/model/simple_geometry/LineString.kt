@@ -36,6 +36,7 @@ data class LineString(
     override fun exactDistanceTo(other: Geometry): Double {
         return when (other) {
             is Point -> PreciseDistanceCalculator.calculate(other, this)
+            is LineString -> PreciseDistanceCalculator.calculate(other, this)
             else -> throw UnsupportedOperationException("Exact distance calculation is not supported for geometry type: ${other::class.simpleName}")
         }
     }

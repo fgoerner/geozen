@@ -112,7 +112,7 @@ The following matrix shows which geometry type combinations support distance cal
 | From ↓ / To →          | Point | LineString | Polygon | MultiPoint | MultiLineString | MultiPolygon | GeometryCollection |
 |------------------------|-------|------------|---------|------------|-----------------|--------------|--------------------|
 | **Point**              | ✅     | ✅          | ✅       | ❌          | ❌               | ❌            | ❌                  |
-| **LineString**         | ✅     | 🟡         | ❌       | ❌          | ❌               | ❌            | ❌                  |
+| **LineString**         | ✅     | ✅          | ❌       | ❌          | ❌               | ❌            | ❌                  |
 | **Polygon**            | ✅     | ❌          | ❌       | ❌          | ❌               | ❌            | ❌                  |
 | **MultiPoint**         | ❌     | ❌          | ❌       | ❌          | ❌               | ❌            | ❌                  |
 | **MultiLineString**    | ❌     | ❌          | ❌       | ❌          | ❌               | ❌            | ❌                  |
@@ -121,7 +121,6 @@ The following matrix shows which geometry type combinations support distance cal
 
 **Legend:**
 - ✅ Supported for both precise (Karney's algorithm) and approximate (Haversine formula) distance calculations
-- 🟡 Only approximate (Haversine formula) calculation supported - precise calculation not yet implemented
 - ❌ Not yet supported
 
 **Note:** Distance calculations are commutative - if `A.distanceTo(B)` is supported, then `B.distanceTo(A)` is also supported and will return the same result.
