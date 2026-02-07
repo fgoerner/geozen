@@ -1,5 +1,6 @@
 package dev.goerner.geozen.calc
 
+import dev.goerner.geozen.calc.ApproximateDistanceCalculator.haversineDistance
 import dev.goerner.geozen.model.Position
 import dev.goerner.geozen.model.simple_geometry.LineString
 import dev.goerner.geozen.model.simple_geometry.Point
@@ -24,7 +25,7 @@ object ApproximateDistanceCalculator {
      * @param p2 the second geographical position, with latitude and longitude in degrees
      * @return the computed distance between `p1` and `p2` in meters
      */
-    fun haversineDistance(p1: Position, p2: Position): Double {
+    private fun haversineDistance(p1: Position, p2: Position): Double {
         val lat1 = Math.toRadians(p1.latitude)
         val lat2 = Math.toRadians(p2.latitude)
 
@@ -87,7 +88,6 @@ object ApproximateDistanceCalculator {
      */
     fun calculate(p: Point, polygon: Polygon): Double {
         val rings = polygon.coordinates
-        require(rings.isNotEmpty()) { "Polygon must contain at least one ring." }
 
         val exteriorRing = rings[0]
         val interiorRings = rings.drop(1)
@@ -120,8 +120,6 @@ object ApproximateDistanceCalculator {
      * @return true if the point is inside the ring, false otherwise
      */
     private fun isPointInsideRing(p: Point, ring: List<Position>): Boolean {
-        if (ring.size < 3) return false
-
         var intersections = 0
         val px = p.longitude
         val py = p.latitude
@@ -156,7 +154,6 @@ object ApproximateDistanceCalculator {
      * @return the minimum distance in meters
      */
     private fun calculateMinDistanceToPositions(p: Point, positions: List<Position>): Double {
-        require(positions.isNotEmpty()) { "Position list must contain at least one position." }
         if (positions.size == 1) {
             return haversineDistance(p.coordinates, positions[0])
         }

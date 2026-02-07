@@ -23,7 +23,7 @@ object PreciseDistanceCalculator {
      * @param p2 the second geographical position with latitude and longitude coordinates
      * @return the geodesic distance in meters between `p1` and `p2`
      */
-    fun karneyDistance(p1: Position, p2: Position): Double {
+    private fun karneyDistance(p1: Position, p2: Position): Double {
         val geodesicData = Geodesic.WGS84.Inverse(
             p1.latitude,
             p1.longitude,
@@ -65,11 +65,6 @@ object PreciseDistanceCalculator {
      */
     fun calculate(p: Point, lineString: LineString): Double {
         val positions = lineString.coordinates
-
-        require(positions.isNotEmpty()) { "LineString must contain at least one position." }
-        if (positions.size == 1) {
-            return karneyDistance(p.coordinates, positions[0])
-        }
 
         return positions.zipWithNext { p1, p2 ->
             val gAP = Geodesic.WGS84.Inverse(
@@ -139,7 +134,6 @@ object PreciseDistanceCalculator {
      */
     fun calculate(p: Point, polygon: Polygon): Double {
         val rings = polygon.coordinates
-        require(rings.isNotEmpty()) { "Polygon must contain at least one ring." }
 
         val exteriorRing = rings[0]
         val interiorRings = rings.drop(1)
@@ -172,8 +166,6 @@ object PreciseDistanceCalculator {
      * @return true if the point is inside the ring, false otherwise
      */
     private fun isPointInsideRing(p: Point, ring: List<Position>): Boolean {
-        if (ring.size < 3) return false
-
         var intersections = 0
         val px = p.longitude
         val py = p.latitude
@@ -208,11 +200,6 @@ object PreciseDistanceCalculator {
      * @return the minimum distance in meters
      */
     private fun calculateMinDistanceToPositions(p: Point, positions: List<Position>): Double {
-        require(positions.isNotEmpty()) { "Position list must contain at least one position." }
-        if (positions.size == 1) {
-            return karneyDistance(p.coordinates, positions[0])
-        }
-
         val distances = positions.zipWithNext { p1, p2 ->
             val gAP = Geodesic.WGS84.Inverse(
                 p1.latitude,
