@@ -1,5 +1,6 @@
 package dev.goerner.geozen.model
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 
@@ -62,5 +63,53 @@ class PositionTest : FunSpec({
 
         //then
         position.altitude shouldBe 3.0
+    }
+
+    test("longitude infinite") {
+        //given
+        // when & then
+        shouldThrow<IllegalArgumentException> {
+            Position(Double.POSITIVE_INFINITY, 0.0)
+        }
+    }
+
+    test("latitude infinite") {
+        //given
+        // when & then
+        shouldThrow<IllegalArgumentException> {
+            Position(0.0, Double.NEGATIVE_INFINITY)
+        }
+    }
+
+    test("altitude infinite") {
+        //given
+        // when & then
+        shouldThrow<IllegalArgumentException> {
+            Position(0.0, 0.0, Double.POSITIVE_INFINITY)
+        }
+    }
+
+    test("longitude NaN not allowed") {
+        //given
+        // when & then
+        shouldThrow<IllegalArgumentException> {
+            Position(Double.NaN, 0.0)
+        }
+    }
+
+    test("latitude NaN not allowed") {
+        //given
+        // when & then
+        shouldThrow<IllegalArgumentException> {
+            Position(0.0, Double.NaN)
+        }
+    }
+
+    test("altitude NaN not allowed") {
+        //given
+        // when & then
+        shouldThrow<IllegalArgumentException> {
+            Position(0.0, 0.0, Double.NaN)
+        }
     }
 })

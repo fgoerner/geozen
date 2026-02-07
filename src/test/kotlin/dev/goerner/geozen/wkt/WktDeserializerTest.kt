@@ -11,7 +11,6 @@ import dev.goerner.geozen.model.simple_geometry.Point
 import dev.goerner.geozen.model.simple_geometry.Polygon
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 
@@ -85,17 +84,15 @@ class WktDeserializerTest : FunSpec({
         point.coordinateReferenceSystem shouldBe CoordinateReferenceSystem.WEB_MERCATOR
     }
 
-    test("deserialize point empty") {
+    test("deserialize point empty not supported") {
         //given
         val wkt = "POINT EMPTY"
 
         //when
-        val geom = WktDeserializer.fromWkt(wkt)
-        val point = geom.shouldBeInstanceOf<Point>()
+        val action = { WktDeserializer.fromWkt(wkt) }
 
         //then
-        point.coordinates.longitude.isNaN() shouldBe true
-        point.coordinates.latitude.isNaN() shouldBe true
+        shouldThrow<WktException>(action)
     }
 
     test("deserialize point negative coordinates") {
@@ -128,16 +125,15 @@ class WktDeserializerTest : FunSpec({
         lineString.coordinates[2].latitude shouldBe 60.0
     }
 
-    test("deserialize LineString empty") {
+    test("deserialize LineString empty not supported") {
         //given
         val wkt = "LINESTRING EMPTY"
 
         //when
-        val geom = WktDeserializer.fromWkt(wkt)
-        val lineString = geom.shouldBeInstanceOf<LineString>()
+        val action = { WktDeserializer.fromWkt(wkt) }
 
         //then
-        lineString.coordinates.shouldBeEmpty()
+        shouldThrow<WktException>(action)
     }
 
     test("deserialize LineString with altitude") {
@@ -197,16 +193,15 @@ class WktDeserializerTest : FunSpec({
         polygon.coordinates[1].size shouldBe 5
     }
 
-    test("deserialize Polygon empty") {
+    test("deserialize Polygon empty not supported") {
         //given
         val wkt = "POLYGON EMPTY"
 
         //when
-        val geom = WktDeserializer.fromWkt(wkt)
-        val polygon = geom.shouldBeInstanceOf<Polygon>()
+        val action = { WktDeserializer.fromWkt(wkt) }
 
         //then
-        polygon.coordinates.shouldBeEmpty()
+        shouldThrow<WktException>(action)
     }
 
     test("deserialize Polygon EWKT") {
@@ -250,16 +245,15 @@ class WktDeserializerTest : FunSpec({
         multiPoint.coordinates.size shouldBe 1
     }
 
-    test("deserialize MultiPoint empty") {
+    test("deserialize MultiPoint empty not supported") {
         //given
         val wkt = "MULTIPOINT EMPTY"
 
         //when
-        val geom = WktDeserializer.fromWkt(wkt)
-        val multiPoint = geom.shouldBeInstanceOf<MultiPoint>()
+        val action = { WktDeserializer.fromWkt(wkt) }
 
         //then
-        multiPoint.coordinates.shouldBeEmpty()
+        shouldThrow<WktException>(action)
     }
 
     test("deserialize MultiPoint with altitude") {
@@ -317,16 +311,15 @@ class WktDeserializerTest : FunSpec({
         multiLineString.coordinates[0].size shouldBe 3
     }
 
-    test("deserialize MultiLineString empty") {
+    test("deserialize MultiLineString empty not supported") {
         //given
         val wkt = "MULTILINESTRING EMPTY"
 
         //when
-        val geom = WktDeserializer.fromWkt(wkt)
-        val multiLineString = geom.shouldBeInstanceOf<MultiLineString>()
+        val action = { WktDeserializer.fromWkt(wkt) }
 
         //then
-        multiLineString.coordinates.shouldBeEmpty()
+        shouldThrow<WktException>(action)
     }
 
     test("deserialize MultiLineString EWKT") {
@@ -385,16 +378,15 @@ class WktDeserializerTest : FunSpec({
         multiPolygon.coordinates[0].size shouldBe 2
     }
 
-    test("deserialize MultiPolygon empty") {
+    test("deserialize MultiPolygon empty not supported") {
         //given
         val wkt = "MULTIPOLYGON EMPTY"
 
         //when
-        val geom = WktDeserializer.fromWkt(wkt)
-        val multiPolygon = geom.shouldBeInstanceOf<MultiPolygon>()
+        val action = { WktDeserializer.fromWkt(wkt) }
 
         //then
-        multiPolygon.coordinates.shouldBeEmpty()
+        shouldThrow<WktException>(action)
     }
 
     test("deserialize MultiPolygon EWKT") {
@@ -438,15 +430,15 @@ class WktDeserializerTest : FunSpec({
         collection.geometries[2].shouldBeInstanceOf<Polygon>()
     }
 
-    test("deserialize GeometryCollection empty") {
+    test("deserialize GeometryCollection empty not supported") {
         //given
         val wkt = "GEOMETRYCOLLECTION EMPTY"
 
         //when
-        val collection = WktDeserializer.fromWktAsCollection(wkt)
+        val action = { WktDeserializer.fromWktAsCollection(wkt) }
 
         //then
-        collection.geometries.shouldBeEmpty()
+        shouldThrow<WktException>(action)
     }
 
     test("deserialize GeometryCollection with multi geometries") {
