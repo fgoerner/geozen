@@ -23,7 +23,7 @@ object PreciseDistanceCalculator {
      * @param p2 the second geographical position with latitude and longitude coordinates
      * @return the geodesic distance in meters between `p1` and `p2`
      */
-    fun karneyDistance(p1: Position, p2: Position): Double {
+    private fun karneyDistance(p1: Position, p2: Position): Double {
         val geodesicData = Geodesic.WGS84.Inverse(
             p1.latitude,
             p1.longitude,
@@ -38,7 +38,7 @@ object PreciseDistanceCalculator {
      * Calculates a precise geodesic distance between two [Point] instances.
      * 
      * 
-     * This method delegates to [karneyDistance] by using the
+     * This method delegates to karneyDistance by using the
      * underlying [Position] coordinates of the provided points. It is intended for
      * scenarios where high accuracy in distance calculation is required.
      * 
@@ -57,71 +57,15 @@ object PreciseDistanceCalculator {
      * This method iterates through the segments and uses the GeographicLib Karney algorithm
      * to determine distances. It handles the geodesic nature of the segments by checking
      * azimuths to determine if the closest point lies within the segment or at an endpoint.
-     * If within the segment, it calculates the cross-track distance on the ellipsoid.
-     * 
+     * If within the segment, it projects the point onto the segment and calculates the
+     * precise distance to the projected point.
+     *
      * @param p          the point
      * @param lineString the line string
      * @return the precise distance in meters
      */
     fun calculate(p: Point, lineString: LineString): Double {
-        val positions = lineString.coordinates
-
-        require(positions.isNotEmpty()) { "LineString must contain at least one position." }
-        if (positions.size == 1) {
-            return karneyDistance(p.coordinates, positions[0])
-        }
-
-        return positions.zipWithNext { p1, p2 ->
-            val gAP = Geodesic.WGS84.Inverse(
-                p1.latitude,
-                p1.longitude,
-                p.latitude,
-                p.longitude,
-                GeodesicMask.DISTANCE or GeodesicMask.AZIMUTH or GeodesicMask.REDUCEDLENGTH
-            )
-            val gAB = Geodesic.WGS84.Inverse(
-                p1.latitude,
-                p1.longitude,
-                p2.latitude,
-                p2.longitude,
-                GeodesicMask.AZIMUTH
-            )
-
-            var azDiffA = abs(gAP.azi1 - gAB.azi1)
-            if (azDiffA > 180) azDiffA = 360 - azDiffA
-
-            if (azDiffA > 90) {
-                // Closest is p1
-                gAP.s12
-            } else {
-                val gBP = Geodesic.WGS84.Inverse(
-                    p2.latitude,
-                    p2.longitude,
-                    p.latitude,
-                    p.longitude,
-                    GeodesicMask.DISTANCE or GeodesicMask.AZIMUTH
-                )
-                val gBA = Geodesic.WGS84.Inverse(
-                    p2.latitude,
-                    p2.longitude,
-                    p1.latitude,
-                    p1.longitude,
-                    GeodesicMask.AZIMUTH
-                )
-
-                var azDiffB = abs(gBP.azi1 - gBA.azi1)
-                if (azDiffB > 180) azDiffB = 360 - azDiffB
-
-                if (azDiffB > 90) {
-                    // Closest is p2
-                    gBP.s12
-                } else {
-                    // Closest is on the segment. Use reduced length method for ellipsoidal cross-track distance.
-                    // The reduced length m12 relates azimuth perturbations to perpendicular displacement.
-                    abs(Math.toRadians(azDiffA) * gAP.m12)
-                }
-            }
-        }.min()
+        return calculateMinDistanceToPositions(p, lineString.coordinates)
     }
 
     /**
@@ -139,7 +83,6 @@ object PreciseDistanceCalculator {
      */
     fun calculate(p: Point, polygon: Polygon): Double {
         val rings = polygon.coordinates
-        require(rings.isNotEmpty()) { "Polygon must contain at least one ring." }
 
         val exteriorRing = rings[0]
         val interiorRings = rings.drop(1)
@@ -165,6 +108,85 @@ object PreciseDistanceCalculator {
     }
 
     /**
+     * Calculates a precise distance between two LineString geometries.
+     *
+     * This method finds the minimum geodesic distance between two LineStrings using a two-phase approach:
+     *
+     * **Phase 1: Intersection Detection**
+     * - Checks all segment pairs for intersections using a planar approximation
+     * - Returns 0.0 immediately if any intersection is found
+     * - The planar approximation is acceptable because segments close enough to intersect
+     *   make the spheroid surface nearly planar at that scale
+     *
+     * **Phase 2: Distance Calculation** (if no intersections)
+     * - Calculates the minimum distance from all points in LineString1 to LineString2
+     * - Calculates the minimum distance from all points in LineString2 to LineString1
+     * - Returns the overall minimum distance
+     * - Uses Karney's algorithm for all distance calculations, providing high geodesic accuracy
+     *
+     * **Performance:**
+     * - Time Complexity: O(n × m) where n and m are the number of segments
+     * - Suitable for typical GIS use cases with LineStrings containing < 100 segments
+     *
+     * **Note on Antimeridian:**
+     * - This implementation does not handle segments crossing the ±180° longitude line
+     * - For such cases, consider normalizing coordinates or subdividing segments
+     *
+     * @param lineString1 the first line string
+     * @param lineString2 the second line string
+     * @return the precise minimum distance in meters
+     */
+    fun calculate(lineString1: LineString, lineString2: LineString): Double {
+        val positions1 = lineString1.coordinates
+        val positions2 = lineString2.coordinates
+
+        // Phase 1: Check for segment-segment intersections
+        for (i in 0 until positions1.size - 1) {
+            val seg1Start = positions1[i]
+            val seg1End = positions1[i + 1]
+
+            for (j in 0 until positions2.size - 1) {
+                val seg2Start = positions2[j]
+                val seg2End = positions2[j + 1]
+
+                if (GeometricUtils.doSegmentsIntersect(seg1Start, seg1End, seg2Start, seg2End)) {
+                    return 0.0
+                }
+            }
+        }
+
+        // Phase 2: No intersections found - calculate minimum distances
+        // Calculate minimum distance from all points in lineString1 to lineString2
+        val minFromLine1 = positions1.minOf { position ->
+            calculateMinDistanceToPositions(Point(position), positions2)
+        }
+
+        // Calculate minimum distance from all points in lineString2 to lineString1
+        val minFromLine2 = positions2.minOf { position ->
+            calculateMinDistanceToPositions(Point(position), positions1)
+        }
+
+        return minOf(minFromLine1, minFromLine2)
+    }
+
+    /**
+     * Calculates a precise distance between a LineString and a Polygon.
+     *
+     *
+     * This method will check if any part of the LineString intersects or is contained within
+     * the Polygon (accounting for holes). If not, it calculates the minimum distance between
+     * the LineString and the Polygon's rings using Karney's algorithm from the GeographicLib
+     * library.
+     *
+     * @param lineString the line string
+     * @param polygon    the polygon
+     * @return the precise minimum distance in meters
+     */
+    fun calculate(lineString: LineString, polygon: Polygon): Double {
+        TODO()
+    }
+
+    /**
      * Checks if a point is inside a ring using the ray casting algorithm.
      *
      * @param p    the point
@@ -172,8 +194,6 @@ object PreciseDistanceCalculator {
      * @return true if the point is inside the ring, false otherwise
      */
     private fun isPointInsideRing(p: Point, ring: List<Position>): Boolean {
-        if (ring.size < 3) return false
-
         var intersections = 0
         val px = p.longitude
         val py = p.latitude
@@ -208,11 +228,6 @@ object PreciseDistanceCalculator {
      * @return the minimum distance in meters
      */
     private fun calculateMinDistanceToPositions(p: Point, positions: List<Position>): Double {
-        require(positions.isNotEmpty()) { "Position list must contain at least one position." }
-        if (positions.size == 1) {
-            return karneyDistance(p.coordinates, positions[0])
-        }
-
         val distances = positions.zipWithNext { p1, p2 ->
             val gAP = Geodesic.WGS84.Inverse(
                 p1.latitude,

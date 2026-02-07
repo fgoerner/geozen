@@ -24,7 +24,7 @@ object ApproximateDistanceCalculator {
      * @param p2 the second geographical position, with latitude and longitude in degrees
      * @return the computed distance between `p1` and `p2` in meters
      */
-    fun haversineDistance(p1: Position, p2: Position): Double {
+    private fun haversineDistance(p1: Position, p2: Position): Double {
         val lat1 = Math.toRadians(p1.latitude)
         val lat2 = Math.toRadians(p2.latitude)
 
@@ -43,7 +43,7 @@ object ApproximateDistanceCalculator {
      * Calculates an approximate geodesic distance between two [Point] instances.
      * 
      * 
-     * This method delegates to [haversineDistance] by using the
+     * This method delegates to haversineDistance by using the
      * underlying [Position] coordinates of the provided points. It is intended for
      * scenarios where a fast, reasonably accurate distance calculation is sufficient.
      * 
@@ -87,7 +87,6 @@ object ApproximateDistanceCalculator {
      */
     fun calculate(p: Point, polygon: Polygon): Double {
         val rings = polygon.coordinates
-        require(rings.isNotEmpty()) { "Polygon must contain at least one ring." }
 
         val exteriorRing = rings[0]
         val interiorRings = rings.drop(1)
@@ -113,6 +112,68 @@ object ApproximateDistanceCalculator {
     }
 
     /**
+     * Calculates an approximate distance between two LineString geometries.
+     *
+     *
+     * This method will find the minimum distance between any two segments across both
+     * LineStrings using the Haversine formula and equirectangular projection approximation.
+     * This is faster but less accurate than the precise method, especially over large distances
+     * or near poles.
+     *
+     * @param lineString1 the first line string
+     * @param lineString2 the second line string
+     * @return the approximate minimum distance in meters
+     */
+    fun calculate(lineString1: LineString, lineString2: LineString): Double {
+        val positions1 = lineString1.coordinates
+        val positions2 = lineString2.coordinates
+
+        // Check for segment-segment intersections
+        for (i in 0 until positions1.size - 1) {
+            val seg1Start = positions1[i]
+            val seg1End = positions1[i + 1]
+
+            for (j in 0 until positions2.size - 1) {
+                val seg2Start = positions2[j]
+                val seg2End = positions2[j + 1]
+
+                if (GeometricUtils.doSegmentsIntersect(seg1Start, seg1End, seg2Start, seg2End)) {
+                    return 0.0
+                }
+            }
+        }
+
+        // No intersections found, calculate minimum distance from all points in lineString1 to lineString2
+        val minFromLine1 = positions1.minOf { position ->
+            calculateMinDistanceToPositions(Point(position), positions2)
+        }
+
+        // Find minimum distance from all points in lineString2 to lineString1
+        val minFromLine2 = positions2.minOf { position ->
+            calculateMinDistanceToPositions(Point(position), positions1)
+        }
+
+        return minOf(minFromLine1, minFromLine2)
+    }
+
+    /**
+     * Calculates an approximate distance between a LineString and a Polygon.
+     *
+     *
+     * This method will check if any part of the LineString intersects or is contained within
+     * the Polygon (accounting for holes). If not, it calculates the minimum distance between
+     * the LineString and the Polygon's rings using the Haversine formula and equirectangular
+     * projection approximation.
+     *
+     * @param lineString the line string
+     * @param polygon    the polygon
+     * @return the approximate minimum distance in meters
+     */
+    fun calculate(lineString: LineString, polygon: Polygon): Double {
+        TODO()
+    }
+
+    /**
      * Checks if a point is inside a ring using the ray casting algorithm.
      *
      * @param p    the point
@@ -120,8 +181,6 @@ object ApproximateDistanceCalculator {
      * @return true if the point is inside the ring, false otherwise
      */
     private fun isPointInsideRing(p: Point, ring: List<Position>): Boolean {
-        if (ring.size < 3) return false
-
         var intersections = 0
         val px = p.longitude
         val py = p.latitude
@@ -156,7 +215,6 @@ object ApproximateDistanceCalculator {
      * @return the minimum distance in meters
      */
     private fun calculateMinDistanceToPositions(p: Point, positions: List<Position>): Double {
-        require(positions.isNotEmpty()) { "Position list must contain at least one position." }
         if (positions.size == 1) {
             return haversineDistance(p.coordinates, positions[0])
         }
