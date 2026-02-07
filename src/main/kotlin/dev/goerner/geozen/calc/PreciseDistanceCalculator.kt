@@ -57,66 +57,15 @@ object PreciseDistanceCalculator {
      * This method iterates through the segments and uses the GeographicLib Karney algorithm
      * to determine distances. It handles the geodesic nature of the segments by checking
      * azimuths to determine if the closest point lies within the segment or at an endpoint.
-     * If within the segment, it calculates the cross-track distance on the ellipsoid.
-     * 
+     * If within the segment, it projects the point onto the segment and calculates the
+     * precise distance to the projected point.
+     *
      * @param p          the point
      * @param lineString the line string
      * @return the precise distance in meters
      */
     fun calculate(p: Point, lineString: LineString): Double {
-        val positions = lineString.coordinates
-
-        return positions.zipWithNext { p1, p2 ->
-            val gAP = Geodesic.WGS84.Inverse(
-                p1.latitude,
-                p1.longitude,
-                p.latitude,
-                p.longitude,
-                GeodesicMask.DISTANCE or GeodesicMask.AZIMUTH or GeodesicMask.REDUCEDLENGTH
-            )
-            val gAB = Geodesic.WGS84.Inverse(
-                p1.latitude,
-                p1.longitude,
-                p2.latitude,
-                p2.longitude,
-                GeodesicMask.AZIMUTH
-            )
-
-            var azDiffA = abs(gAP.azi1 - gAB.azi1)
-            if (azDiffA > 180) azDiffA = 360 - azDiffA
-
-            if (azDiffA > 90) {
-                // Closest is p1
-                gAP.s12
-            } else {
-                val gBP = Geodesic.WGS84.Inverse(
-                    p2.latitude,
-                    p2.longitude,
-                    p.latitude,
-                    p.longitude,
-                    GeodesicMask.DISTANCE or GeodesicMask.AZIMUTH
-                )
-                val gBA = Geodesic.WGS84.Inverse(
-                    p2.latitude,
-                    p2.longitude,
-                    p1.latitude,
-                    p1.longitude,
-                    GeodesicMask.AZIMUTH
-                )
-
-                var azDiffB = abs(gBP.azi1 - gBA.azi1)
-                if (azDiffB > 180) azDiffB = 360 - azDiffB
-
-                if (azDiffB > 90) {
-                    // Closest is p2
-                    gBP.s12
-                } else {
-                    // Closest is on the segment. Use reduced length method for ellipsoidal cross-track distance.
-                    // The reduced length m12 relates azimuth perturbations to perpendicular displacement.
-                    abs(Math.toRadians(azDiffA) * gAP.m12)
-                }
-            }
-        }.min()
+        return calculateMinDistanceToPositions(p, lineString.coordinates)
     }
 
     /**

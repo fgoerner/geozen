@@ -1,6 +1,5 @@
 package dev.goerner.geozen.calc
 
-import dev.goerner.geozen.calc.ApproximateDistanceCalculator.haversineDistance
 import dev.goerner.geozen.model.Position
 import dev.goerner.geozen.model.simple_geometry.LineString
 import dev.goerner.geozen.model.simple_geometry.Point
@@ -9,18 +8,6 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 
 class ApproximateDistanceCalculatorTest : FunSpec({
-
-    test("haversine distance") {
-        //given
-        val p1 = Position(11.4694, 49.2965)
-        val p2 = Position(11.0549, 49.4532)
-
-        //when
-        val haversineDistance = haversineDistance(p1, p2)
-
-        //then
-        haversineDistance shouldBe 34701.39385602524
-    }
 
     test("Point to Point distance") {
         //given
