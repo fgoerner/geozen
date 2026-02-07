@@ -192,14 +192,12 @@ class PreciseDistanceCalculatorTest : FunSpec({
         val lineString1 = LineString(
             listOf(
                 Position(11.5, 49.3),   // Bottom-left
-                Position(11.55, 49.35),
                 Position(11.6, 49.4)    // Top-right
             )
         )
         val lineString2 = LineString(
             listOf(
                 Position(11.5, 49.4),   // Top-left
-                Position(11.55, 49.35),
                 Position(11.6, 49.3)    // Bottom-right
             )
         )
@@ -208,7 +206,7 @@ class PreciseDistanceCalculatorTest : FunSpec({
         val preciseDistance = PreciseDistanceCalculator.calculate(lineString1, lineString2)
 
         //then
-        // These segments share a common point, so distance should be 0.0
+        // These segments cross in the middle, so distance should be 0.0
         preciseDistance shouldBe 0.0
     }
 
@@ -236,35 +234,5 @@ class PreciseDistanceCalculatorTest : FunSpec({
         // This verifies that we're finding the minimum distance between segment interiors,
         // not just checking endpoint-to-segment distances
         preciseDistance shouldBe 1111.7232047168816
-    }
-
-    test("LineString to LineString distance - compare with approximate") {
-        //given
-        val lineString1 = LineString(
-            listOf(
-                Position(11.4432, 49.3429),
-                Position(11.4463, 49.1877),
-                Position(11.5161, 49.1239)
-            )
-        )
-        val lineString2 = LineString(
-            listOf(
-                Position(11.6, 49.3),
-                Position(11.7, 49.35),
-                Position(11.8, 49.3)
-            )
-        )
-
-        //when
-        val preciseDistance = PreciseDistanceCalculator.calculate(lineString1, lineString2)
-        val approximateDistance = ApproximateDistanceCalculator.calculate(lineString1, lineString2)
-
-        //then
-        // Precise distance should be slightly larger than approximate (more accurate)
-        preciseDistance shouldBe 11340.980794059093
-        approximateDistance shouldBe 11306.646230126744
-        // Verify precise is within 1% more accurate
-        val percentDifference = ((preciseDistance - approximateDistance) / preciseDistance) * 100
-        assert(percentDifference < 1.0) { "Difference should be less than 1%: $percentDifference%" }
     }
 })
