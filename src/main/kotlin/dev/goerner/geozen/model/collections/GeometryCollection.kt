@@ -11,6 +11,16 @@ data class GeometryCollection(
     override val coordinateReferenceSystem: CoordinateReferenceSystem = CoordinateReferenceSystem.WGS_84
 ) : Geometry(coordinateReferenceSystem) {
 
+    init {
+        geometries.forEachIndexed { index, geometry ->
+            require(geometry.coordinateReferenceSystem == coordinateReferenceSystem) {
+                "The coordinate reference system of each geometry (${geometry.coordinateReferenceSystem}) " +
+                        "must match the coordinate reference system of the geometry collection ($coordinateReferenceSystem), " +
+                        "but geometry at index $index had a different coordinate reference system"
+            }
+        }
+    }
+
     override fun fastDistanceTo(other: Geometry): Double {
         throw UnsupportedOperationException("Fast distance calculation not implemented yet")
     }
