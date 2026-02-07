@@ -65,38 +65,6 @@ class PositionTest : FunSpec({
         position.altitude shouldBe 3.0
     }
 
-    test("longitude out of range - too high") {
-        //given
-        // when & then
-        shouldThrow<IllegalArgumentException> {
-            Position(181.0, 0.0)
-        }
-    }
-
-    test("longitude out of range - too low") {
-        //given
-        // when & then
-        shouldThrow<IllegalArgumentException> {
-            Position(-181.0, 0.0)
-        }
-    }
-
-    test("latitude out of range - too high") {
-        //given
-        // when & then
-        shouldThrow<IllegalArgumentException> {
-            Position(0.0, 91.0)
-        }
-    }
-
-    test("latitude out of range - too low") {
-        //given
-        // when & then
-        shouldThrow<IllegalArgumentException> {
-            Position(0.0, -91.0)
-        }
-    }
-
     test("longitude infinite") {
         //given
         // when & then
@@ -143,20 +111,5 @@ class PositionTest : FunSpec({
         shouldThrow<IllegalArgumentException> {
             Position(0.0, 0.0, Double.NaN)
         }
-    }
-
-    test("valid boundary values") {
-        //given
-        val position1 = Position(180.0, 90.0)
-        val position2 = Position(-180.0, -90.0)
-
-        //when
-        // constructor is the action
-
-        //then
-        position1.longitude shouldBe 180.0
-        position1.latitude shouldBe 90.0
-        position2.longitude shouldBe -180.0
-        position2.latitude shouldBe -90.0
     }
 })

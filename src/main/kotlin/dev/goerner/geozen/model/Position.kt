@@ -13,7 +13,5 @@ data class Position(val longitude: Double, val latitude: Double, val altitude: D
         require(longitude.isFinite()) { "Longitude must be a finite number, but was $longitude" }
         require(latitude.isFinite()) { "Latitude must be a finite number, but was $latitude" }
         require(altitude.isFinite()) { "Altitude must be a finite number, but was $altitude" }
-        require(longitude in -180.0..180.0) { "Longitude must be in range [-180, 180], but was $longitude" }
-        require(latitude in -90.0..90.0) { "Latitude must be in range [-90, 90], but was $latitude" }
     }
 }
