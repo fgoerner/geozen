@@ -378,7 +378,7 @@ class WktDeserializerTest : FunSpec({
         multiPolygon.coordinates[0].size shouldBe 2
     }
 
-    test("deserialize MultiPolygon empty") {
+    test("deserialize MultiPolygon empty not supported") {
         //given
         val wkt = "MULTIPOLYGON EMPTY"
 
