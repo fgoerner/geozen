@@ -164,8 +164,9 @@ internal object GeometricUtils {
         val val2 = (q.longitude - p.longitude) * (r.latitude - q.latitude)
         val diff = val1 - val2
 
+        val epsilon = 1e-10
         return when {
-            diff.equals(0.0) -> 0  // Collinear
+            diff in -epsilon..epsilon -> 0  // Collinear
             diff > 0 -> 1          // Clockwise
             else -> 2               // Counterclockwise
         }
