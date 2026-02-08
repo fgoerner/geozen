@@ -1,6 +1,9 @@
 package dev.goerner.geozen.calc
 
 import dev.goerner.geozen.model.Position
+import dev.goerner.geozen.model.multi_geometry.MultiLineString
+import dev.goerner.geozen.model.multi_geometry.MultiPoint
+import dev.goerner.geozen.model.multi_geometry.MultiPolygon
 import dev.goerner.geozen.model.simple_geometry.LineString
 import dev.goerner.geozen.model.simple_geometry.Point
 import dev.goerner.geozen.model.simple_geometry.Polygon
@@ -103,10 +106,70 @@ object ApproximateDistanceCalculator {
             is PointToPolygonDistanceHelper.ContainmentResult.InsideHole -> {
                 calculateMinDistanceToPositions(p, containmentResult.holeRing)
             }
+
             is PointToPolygonDistanceHelper.ContainmentResult.OutsidePolygon -> {
                 calculateMinDistanceToPositions(p, exteriorRing)
             }
         }
+    }
+
+    /**
+     * Calculates an approximate distance between a Point and a MultiPoint.
+     *
+     *
+     * This method iterates through all points in the MultiPoint and calculates the Haversine
+     * distance to each, returning the minimum distance found. This is faster but less accurate
+     * than the precise method, especially over large distances or near poles.
+     *
+     * @param point      the point
+     * @param multiPoint the multi-point geometry
+     * @return the approximate minimum distance in meters
+     */
+    fun calculate(point: Point, multiPoint: MultiPoint): Double {
+        require(multiPoint.coordinates.isNotEmpty()) {
+            "MultiPoint must contain at least one point to calculate distance, but contained 0"
+        }
+        return multiPoint.coordinates.minOf { haversineDistance(point.coordinates, it) }
+    }
+
+    /**
+     * Calculates an approximate distance between a Point and a MultiLineString.
+     *
+     *
+     * This method iterates through all LineStrings in the MultiLineString, calculates the
+     * distance from the point to each LineString using the same approach as point-to-linestring
+     * distance calculation, and returns the minimum distance found. This is faster but less
+     * accurate than the precise method, especially over large distances or near poles.
+     *
+     * @param point           the point
+     * @param multiLineString the multi-line string geometry
+     * @return the approximate minimum distance in meters
+     */
+    fun calculate(point: Point, multiLineString: MultiLineString): Double {
+        require(multiLineString.coordinates.isNotEmpty()) {
+            "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
+        }
+        return multiLineString.coordinates.minOf { calculate(point, LineString(it)) }
+    }
+
+    /**
+     * Calculates an approximate distance between a Point and a MultiPolygon.
+     *
+     *
+     * This method iterates through all Polygons in the MultiPolygon, calculates the distance
+     * from the point to each Polygon using the same approach as point-to-polygon distance
+     * calculation, and returns the minimum distance found. This is faster but less accurate
+     * than the precise method, especially over large distances or near poles.
+     *
+     * @param point        the point
+     * @param multiPolygon the multi-polygon geometry
+     * @return the approximate minimum distance in meters
+     */
+    fun calculate(point: Point, multiPolygon: MultiPolygon): Double {
+        require(multiPolygon.coordinates.isNotEmpty()) {
+            "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
+        }
+        return multiPolygon.coordinates.minOf { calculate(point, Polygon(it)) }
     }
 
     /**
@@ -175,6 +238,7 @@ object ApproximateDistanceCalculator {
                     ::calculateMinDistanceToPositions
                 )
             }
+
             is LineStringToPolygonDistanceHelper.AnalysisResult.NoIntersectionOrContainment -> {
                 // Phase 3: Calculate minimum distances using approximate algorithm
                 LineStringToPolygonDistanceHelper.calculateDistanceForGeneralCase(
@@ -244,6 +308,7 @@ object ApproximateDistanceCalculator {
                     ::calculateMinDistanceToPositions
                 )
             }
+
             is PolygonToPolygonDistanceHelper.AnalysisResult.Polygon2InHoleOfPolygon1 -> {
                 PolygonToPolygonDistanceHelper.calculateDistanceForHoleCase(
                     rings2,
@@ -251,6 +316,7 @@ object ApproximateDistanceCalculator {
                     ::calculateMinDistanceToPositions
                 )
             }
+
             is PolygonToPolygonDistanceHelper.AnalysisResult.NoIntersectionOrContainment -> {
                 // Phase 3: Calculate minimum distances using approximate algorithm
                 PolygonToPolygonDistanceHelper.calculateDistanceForGeneralCase(

@@ -1,6 +1,9 @@
 package dev.goerner.geozen.calc
 
 import dev.goerner.geozen.model.Position
+import dev.goerner.geozen.model.multi_geometry.MultiLineString
+import dev.goerner.geozen.model.multi_geometry.MultiPoint
+import dev.goerner.geozen.model.multi_geometry.MultiPolygon
 import dev.goerner.geozen.model.simple_geometry.LineString
 import dev.goerner.geozen.model.simple_geometry.Point
 import dev.goerner.geozen.model.simple_geometry.Polygon
@@ -103,6 +106,57 @@ object PreciseDistanceCalculator {
                 calculateMinDistanceToPositions(p, exteriorRing)
             }
         }
+    }
+
+    /**
+     * Calculates a precise distance between a Point and a MultiPoint.
+     *
+     * This method iterates through all points in the MultiPoint, calculates the distance to each using
+     * the precise Karney algorithm, and returns the minimum distance found.
+     *
+     * @param point the point
+     * @param multiPoint the multi-point geometry
+     * @return the minimum distance in meters from the point to any point in the multi-point
+     */
+    fun calculate(point: Point, multiPoint: MultiPoint): Double {
+        require(multiPoint.coordinates.isNotEmpty()) {
+            "MultiPoint must contain at least one point to calculate distance, but contained 0"
+        }
+        return multiPoint.coordinates.minOf { karneyDistance(point.coordinates, it) }
+    }
+
+    /**
+     * Calculates a precise distance between a Point and a MultiLineString.
+     *
+     * This method iterates through all LineStrings in the MultiLineString, calculates the distance to each using
+     * the precise point-to-linestring distance calculation, and returns the minimum distance found.
+     *
+     * @param point the point
+     * @param multiLineString the multi-line string geometry
+     * @return the minimum distance in meters from the point to any line string in the multi-line string
+     */
+    fun calculate(point: Point, multiLineString: MultiLineString): Double {
+        require(multiLineString.coordinates.isNotEmpty()) {
+            "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
+        }
+        return multiLineString.coordinates.minOf { calculate(point, LineString(it)) }
+    }
+
+    /**
+     * Calculates a precise distance between a Point and a MultiPolygon.
+     *
+     * This method iterates through all Polygons in the MultiPolygon, calculates the distance to each using
+     * the precise point-to-polygon distance calculation, and returns the minimum distance found.
+     *
+     * @param point the point
+     * @param multiPolygon the multi-polygon geometry
+     * @return the minimum distance in meters from the point to any polygon in the multi-polygon
+     */
+    fun calculate(point: Point, multiPolygon: MultiPolygon): Double {
+        require(multiPolygon.coordinates.isNotEmpty()) {
+            "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
+        }
+        return multiPolygon.coordinates.minOf { calculate(point, Polygon(it)) }
     }
 
     /**
