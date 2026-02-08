@@ -531,4 +531,44 @@ class PreciseDistanceCalculatorTest : FunSpec({
         // Polygon vertex lies on LineString segment (collinear and within bounds)
         preciseDistance shouldBe 0.0
     }
+
+    test("LineString to Polygon distance - LineString in non-convex hole with protruding vertex") {
+        //given
+        // LineString running horizontally through a hole
+        val lineString = LineString(
+            listOf(
+                Position(11.53, 49.35),
+                Position(11.57, 49.35)
+            )
+        )
+        val polygon = Polygon(
+            listOf(
+                // Exterior ring
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.6, 49.3),
+                    Position(11.6, 49.4),
+                    Position(11.5, 49.4),
+                    Position(11.5, 49.3)
+                ),
+                // Non-convex hole with a vertex protruding toward the LineString
+                listOf(
+                    Position(11.52, 49.32),
+                    Position(11.58, 49.32),
+                    Position(11.58, 49.38),
+                    Position(11.55, 49.352),  // This vertex protrudes very close to the LineString
+                    Position(11.52, 49.38),
+                    Position(11.52, 49.32)
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(lineString, polygon)
+
+        //then
+        // The minimum distance should be from the protruding hole vertex to the LineString segment
+        // This tests that we calculate distances in both directions (hole vertex → LineString)
+        preciseDistance shouldBe 222.24064087559196
+    }
 })

@@ -247,9 +247,17 @@ object PreciseDistanceCalculator {
 
         // If any vertex is in a hole, calculate distance to that hole's boundary
         if (anyVertexInHole && holeContainingVertex != null) {
-            return lineStringPositions.minOf { position ->
+            // Calculate distance from LineString vertices to hole boundary
+            val minFromLineStringToHole = lineStringPositions.minOf { position ->
                 calculateMinDistanceToPositions(Point(position), holeContainingVertex)
             }
+
+            // Calculate distance from hole boundary vertices to LineString
+            val minFromHoleToLineString = holeContainingVertex.minOf { position ->
+                calculateMinDistanceToPositions(Point(position), lineStringPositions)
+            }
+
+            return minOf(minFromLineStringToHole, minFromHoleToLineString)
         }
 
         // Phase 3: No intersection or containment - calculate minimum distances
