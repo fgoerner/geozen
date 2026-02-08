@@ -235,4 +235,300 @@ class PreciseDistanceCalculatorTest : FunSpec({
         // not just checking endpoint-to-segment distances
         preciseDistance shouldBe 1111.7232047168816
     }
+
+    test("LineString to Polygon distance - LineString outside polygon") {
+        //given
+        val lineString = LineString(
+            listOf(
+                Position(11.4, 49.3),
+                Position(11.45, 49.35)
+            )
+        )
+        val polygon = Polygon(
+            listOf(
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.6, 49.3),
+                    Position(11.6, 49.4),
+                    Position(11.5, 49.4),
+                    Position(11.5, 49.3)
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(lineString, polygon)
+
+        //then
+        // LineString is completely outside the polygon
+        preciseDistance shouldBe 3632.8854322075017
+    }
+
+    test("LineString to Polygon distance - LineString intersects exterior ring") {
+        //given
+        val lineString = LineString(
+            listOf(
+                Position(11.45, 49.35),
+                Position(11.55, 49.35)  // Crosses into polygon
+            )
+        )
+        val polygon = Polygon(
+            listOf(
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.6, 49.3),
+                    Position(11.6, 49.4),
+                    Position(11.5, 49.4),
+                    Position(11.5, 49.3)
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(lineString, polygon)
+
+        //then
+        // LineString intersects the polygon boundary
+        preciseDistance shouldBe 0.0
+    }
+
+    test("LineString to Polygon distance - LineString fully contained in polygon") {
+        //given
+        val lineString = LineString(
+            listOf(
+                Position(11.52, 49.32),
+                Position(11.58, 49.38)
+            )
+        )
+        val polygon = Polygon(
+            listOf(
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.6, 49.3),
+                    Position(11.6, 49.4),
+                    Position(11.5, 49.4),
+                    Position(11.5, 49.3)
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(lineString, polygon)
+
+        //then
+        // All vertices are inside the polygon
+        preciseDistance shouldBe 0.0
+    }
+
+    test("LineString to Polygon distance - LineString intersects hole") {
+        //given
+        val lineString = LineString(
+            listOf(
+                Position(11.53, 49.33),
+                Position(11.57, 49.37)  // Crosses hole boundary
+            )
+        )
+        val polygon = Polygon(
+            listOf(
+                // Exterior ring
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.6, 49.3),
+                    Position(11.6, 49.4),
+                    Position(11.5, 49.4),
+                    Position(11.5, 49.3)
+                ),
+                // Interior ring (hole)
+                listOf(
+                    Position(11.54, 49.34),
+                    Position(11.56, 49.34),
+                    Position(11.56, 49.36),
+                    Position(11.54, 49.36),
+                    Position(11.54, 49.34)
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(lineString, polygon)
+
+        //then
+        // LineString intersects the hole boundary
+        preciseDistance shouldBe 0.0
+    }
+
+    test("LineString to Polygon distance - LineString vertex in hole") {
+        //given
+        val lineString = LineString(
+            listOf(
+                Position(11.55, 49.35),  // Inside the hole
+                Position(11.58, 49.38)
+            )
+        )
+        val polygon = Polygon(
+            listOf(
+                // Exterior ring
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.6, 49.3),
+                    Position(11.6, 49.4),
+                    Position(11.5, 49.4),
+                    Position(11.5, 49.3)
+                ),
+                // Interior ring (hole)
+                listOf(
+                    Position(11.52, 49.32),
+                    Position(11.58, 49.32),
+                    Position(11.58, 49.38),
+                    Position(11.52, 49.38),
+                    Position(11.52, 49.32)
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(lineString, polygon)
+
+        //then
+        // First vertex is inside the hole, so calculate distance to hole boundary
+        preciseDistance shouldBe 0.0
+    }
+
+    test("LineString to Polygon distance - LineString touches polygon vertex") {
+        //given
+        val lineString = LineString(
+            listOf(
+                Position(11.45, 49.35),
+                Position(11.5, 49.4)  // Touches polygon vertex
+            )
+        )
+        val polygon = Polygon(
+            listOf(
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.6, 49.3),
+                    Position(11.6, 49.4),
+                    Position(11.5, 49.4),
+                    Position(11.5, 49.3)
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(lineString, polygon)
+
+        //then
+        // LineString touches polygon at a vertex (shared endpoint)
+        preciseDistance shouldBe 0.0
+    }
+
+    test("LineString to Polygon distance - Complex polygon with multiple holes") {
+        //given
+        val lineString = LineString(
+            listOf(
+                Position(11.51, 49.31),
+                Position(11.59, 49.39)
+            )
+        )
+        val polygon = Polygon(
+            listOf(
+                // Exterior ring
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.6, 49.3),
+                    Position(11.6, 49.4),
+                    Position(11.5, 49.4),
+                    Position(11.5, 49.3)
+                ),
+                // First hole
+                listOf(
+                    Position(11.52, 49.32),
+                    Position(11.54, 49.32),
+                    Position(11.54, 49.34),
+                    Position(11.52, 49.34),
+                    Position(11.52, 49.32)
+                ),
+                // Second hole
+                listOf(
+                    Position(11.56, 49.36),
+                    Position(11.58, 49.36),
+                    Position(11.58, 49.38),
+                    Position(11.56, 49.38),
+                    Position(11.56, 49.36)
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(lineString, polygon)
+
+        //then
+        // LineString passes between two holes, all vertices inside polygon but not in holes
+        preciseDistance shouldBe 0.0
+    }
+
+    test("LineString to Polygon distance - LineString completely contained in hole without touching") {
+        //given
+        val lineString = LineString(
+            listOf(
+                Position(11.53, 49.33),
+                Position(11.55, 49.35)
+            )
+        )
+        val polygon = Polygon(
+            listOf(
+                // Exterior ring
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.6, 49.3),
+                    Position(11.6, 49.4),
+                    Position(11.5, 49.4),
+                    Position(11.5, 49.3)
+                ),
+                // Interior ring (hole) - LineString is completely inside this hole
+                listOf(
+                    Position(11.52, 49.32),
+                    Position(11.58, 49.32),
+                    Position(11.58, 49.38),
+                    Position(11.52, 49.38),
+                    Position(11.52, 49.32)
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(lineString, polygon)
+
+        //then
+        // LineString is completely inside the hole, so distance is to the hole boundary
+        preciseDistance shouldBe 726.8716356088281
+    }
+
+    test("LineString to Polygon distance - LineString segment touches polygon vertex") {
+        //given
+        val lineString = LineString(
+            listOf(
+                Position(11.45, 49.3),
+                Position(11.65, 49.3)  // Segment passes through polygon vertex at (11.5, 49.3)
+            )
+        )
+        val polygon = Polygon(
+            listOf(
+                listOf(
+                    Position(11.5, 49.3),   // This vertex lies on the LineString segment
+                    Position(11.6, 49.3),
+                    Position(11.6, 49.4),
+                    Position(11.5, 49.4),
+                    Position(11.5, 49.3)
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(lineString, polygon)
+
+        //then
+        // Polygon vertex lies on LineString segment (collinear and within bounds)
+        preciseDistance shouldBe 0.0
+    }
 })

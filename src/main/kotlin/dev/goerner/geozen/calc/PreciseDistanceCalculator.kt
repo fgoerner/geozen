@@ -183,7 +183,93 @@ object PreciseDistanceCalculator {
      * @return the precise minimum distance in meters
      */
     fun calculate(lineString: LineString, polygon: Polygon): Double {
-        TODO()
+        val lineStringPositions = lineString.coordinates
+        val rings = polygon.coordinates
+        val exteriorRing = rings[0]
+        val interiorRings = rings.drop(1)
+
+        // Phase 1: Check for segment intersections between LineString and any polygon ring
+        for (i in 0 until lineStringPositions.size - 1) {
+            val lsSegStart = lineStringPositions[i]
+            val lsSegEnd = lineStringPositions[i + 1]
+
+            // Check intersection with exterior ring
+            for (j in 0 until exteriorRing.size - 1) {
+                val ringSegStart = exteriorRing[j]
+                val ringSegEnd = exteriorRing[j + 1]
+
+                if (GeometricUtils.doSegmentsIntersect(lsSegStart, lsSegEnd, ringSegStart, ringSegEnd)) {
+                    return 0.0
+                }
+            }
+
+            // Check intersection with interior rings (holes)
+            for (hole in interiorRings) {
+                for (j in 0 until hole.size - 1) {
+                    val holeSegStart = hole[j]
+                    val holeSegEnd = hole[j + 1]
+
+                    if (GeometricUtils.doSegmentsIntersect(lsSegStart, lsSegEnd, holeSegStart, holeSegEnd)) {
+                        return 0.0
+                    }
+                }
+            }
+        }
+
+        // Phase 2: Check containment - analyze LineString vertices
+        var allVerticesInsidePolygon = true
+        var anyVertexInHole = false
+        var holeContainingVertex: List<Position>? = null
+
+        for (position in lineStringPositions) {
+            val point = Point(position)
+            val insideExterior = isPointInsideRing(point, exteriorRing)
+
+            if (!insideExterior) {
+                allVerticesInsidePolygon = false
+                break
+            }
+
+            // Check if this vertex is in any hole
+            val hole = interiorRings.firstOrNull { h -> isPointInsideRing(point, h) }
+            if (hole != null) {
+                anyVertexInHole = true
+                holeContainingVertex = hole
+                allVerticesInsidePolygon = false
+                break
+            }
+        }
+
+        // If all vertices are inside the polygon (and not in any hole), distance is 0
+        if (allVerticesInsidePolygon) {
+            return 0.0
+        }
+
+        // If any vertex is in a hole, calculate distance to that hole's boundary
+        if (anyVertexInHole && holeContainingVertex != null) {
+            return lineStringPositions.minOf { position ->
+                calculateMinDistanceToPositions(Point(position), holeContainingVertex)
+            }
+        }
+
+        // Phase 3: No intersection or containment - calculate minimum distances
+        // Calculate minimum distance from all LineString vertices to all polygon rings
+        val minFromLineStringToPolygon = lineStringPositions.minOf { position ->
+            val point = Point(position)
+            val distToExterior = calculateMinDistanceToPositions(point, exteriorRing)
+            val distToHoles = interiorRings.map { hole ->
+                calculateMinDistanceToPositions(point, hole)
+            }
+            minOf(distToExterior, distToHoles.minOrNull() ?: Double.MAX_VALUE)
+        }
+
+        // Calculate minimum distance from all polygon ring vertices to LineString
+        val allRingVertices = rings.flatten()
+        val minFromPolygonToLineString = allRingVertices.minOf { position ->
+            calculateMinDistanceToPositions(Point(position), lineStringPositions)
+        }
+
+        return minOf(minFromLineStringToPolygon, minFromPolygonToLineString)
     }
 
     /**
