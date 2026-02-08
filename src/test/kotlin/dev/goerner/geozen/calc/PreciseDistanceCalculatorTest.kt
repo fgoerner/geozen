@@ -571,4 +571,306 @@ class PreciseDistanceCalculatorTest : FunSpec({
         // This tests that we calculate distances in both directions (hole vertex → LineString)
         preciseDistance shouldBe 222.24064087559196
     }
+
+    test("Polygon to Polygon distance - disjoint polygons") {
+        //given
+        val polygon1 = Polygon(
+            listOf(
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.6, 49.3),
+                    Position(11.6, 49.4),
+                    Position(11.5, 49.4),
+                    Position(11.5, 49.3)
+                )
+            )
+        )
+        val polygon2 = Polygon(
+            listOf(
+                listOf(
+                    Position(11.7, 49.3),
+                    Position(11.8, 49.3),
+                    Position(11.8, 49.4),
+                    Position(11.7, 49.4),
+                    Position(11.7, 49.3)
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(polygon1, polygon2)
+
+        //then
+        // Distance between the closest vertices (11.6, 49.3) and (11.7, 49.3)
+        preciseDistance shouldBe 7258.404502774052
+    }
+
+    test("Polygon to Polygon distance - touching at vertex") {
+        //given
+        val polygon1 = Polygon(
+            listOf(
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.6, 49.3),
+                    Position(11.6, 49.4),
+                    Position(11.5, 49.4),
+                    Position(11.5, 49.3)
+                )
+            )
+        )
+        val polygon2 = Polygon(
+            listOf(
+                listOf(
+                    Position(11.6, 49.3),
+                    Position(11.7, 49.3),
+                    Position(11.7, 49.4),
+                    Position(11.6, 49.4),
+                    Position(11.6, 49.3)
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(polygon1, polygon2)
+
+        //then
+        // Polygons share a vertex - boundaries intersect
+        preciseDistance shouldBe 0.0
+    }
+
+    test("Polygon to Polygon distance - edge intersection") {
+        //given
+        val polygon1 = Polygon(
+            listOf(
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.6, 49.3),
+                    Position(11.6, 49.4),
+                    Position(11.5, 49.4),
+                    Position(11.5, 49.3)
+                )
+            )
+        )
+        val polygon2 = Polygon(
+            listOf(
+                listOf(
+                    Position(11.55, 49.35),
+                    Position(11.65, 49.35),
+                    Position(11.65, 49.45),
+                    Position(11.55, 49.45),
+                    Position(11.55, 49.35)
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(polygon1, polygon2)
+
+        //then
+        // Polygons have overlapping boundaries
+        preciseDistance shouldBe 0.0
+    }
+
+    test("Polygon to Polygon distance - one polygon fully contained in another") {
+        //given
+        val polygon1 = Polygon(
+            listOf(
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.7, 49.3),
+                    Position(11.7, 49.5),
+                    Position(11.5, 49.5),
+                    Position(11.5, 49.3)
+                )
+            )
+        )
+        val polygon2 = Polygon(
+            listOf(
+                listOf(
+                    Position(11.55, 49.35),
+                    Position(11.65, 49.35),
+                    Position(11.65, 49.45),
+                    Position(11.55, 49.45),
+                    Position(11.55, 49.35)
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(polygon1, polygon2)
+
+        //then
+        // polygon2 is fully contained within polygon1
+        preciseDistance shouldBe 0.0
+    }
+
+    test("Polygon to Polygon distance - polygon inside hole of another polygon") {
+        //given
+        val polygon1 = Polygon(
+            listOf(
+                // Exterior ring
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.7, 49.3),
+                    Position(11.7, 49.5),
+                    Position(11.5, 49.5),
+                    Position(11.5, 49.3)
+                ),
+                // Interior ring (hole)
+                listOf(
+                    Position(11.52, 49.32),
+                    Position(11.68, 49.32),
+                    Position(11.68, 49.48),
+                    Position(11.52, 49.48),
+                    Position(11.52, 49.32)
+                )
+            )
+        )
+        val polygon2 = Polygon(
+            listOf(
+                listOf(
+                    Position(11.55, 49.35),
+                    Position(11.65, 49.35),
+                    Position(11.65, 49.45),
+                    Position(11.55, 49.45),
+                    Position(11.55, 49.35)
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(polygon1, polygon2)
+
+        //then
+        // polygon2 is inside the hole of polygon1 - calculate distance to hole boundary
+        // Closest distance is from polygon2's edge at (11.55, 49.35) to hole boundary at (11.52, 49.35)
+        preciseDistance shouldBe 2175.3098715848414
+    }
+
+    test("Polygon to Polygon distance - both polygons have holes") {
+        //given
+        val polygon1 = Polygon(
+            listOf(
+                // Exterior ring
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.6, 49.3),
+                    Position(11.6, 49.4),
+                    Position(11.5, 49.4),
+                    Position(11.5, 49.3)
+                ),
+                // Hole
+                listOf(
+                    Position(11.52, 49.32),
+                    Position(11.58, 49.32),
+                    Position(11.58, 49.38),
+                    Position(11.52, 49.38),
+                    Position(11.52, 49.32)
+                )
+            )
+        )
+        val polygon2 = Polygon(
+            listOf(
+                // Exterior ring
+                listOf(
+                    Position(11.7, 49.3),
+                    Position(11.8, 49.3),
+                    Position(11.8, 49.4),
+                    Position(11.7, 49.4),
+                    Position(11.7, 49.3)
+                ),
+                // Hole
+                listOf(
+                    Position(11.72, 49.32),
+                    Position(11.78, 49.32),
+                    Position(11.78, 49.38),
+                    Position(11.72, 49.38),
+                    Position(11.72, 49.32)
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(polygon1, polygon2)
+
+        //then
+        // Distance between closest vertices of exterior rings
+        preciseDistance shouldBe 7258.404502774052
+    }
+
+    test("Polygon to Polygon distance - complex nested scenario") {
+        //given
+        val polygon1 = Polygon(
+            listOf(
+                // Large exterior ring
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.8, 49.3),
+                    Position(11.8, 49.5),
+                    Position(11.5, 49.5),
+                    Position(11.5, 49.3)
+                )
+            )
+        )
+        val polygon2 = Polygon(
+            listOf(
+                // Exterior ring with hole
+                listOf(
+                    Position(11.52, 49.32),
+                    Position(11.78, 49.32),
+                    Position(11.78, 49.48),
+                    Position(11.52, 49.48),
+                    Position(11.52, 49.32)
+                ),
+                // Hole in polygon2
+                listOf(
+                    Position(11.54, 49.34),
+                    Position(11.76, 49.34),
+                    Position(11.76, 49.46),
+                    Position(11.54, 49.46),
+                    Position(11.54, 49.34)
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(polygon1, polygon2)
+
+        //then
+        // polygon2 is fully contained within polygon1
+        preciseDistance shouldBe 0.0
+    }
+
+    test("Polygon to Polygon distance - small gap between polygons") {
+        //given
+        val polygon1 = Polygon(
+            listOf(
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.6, 49.3),
+                    Position(11.6, 49.4),
+                    Position(11.5, 49.4),
+                    Position(11.5, 49.3)
+                )
+            )
+        )
+        val polygon2 = Polygon(
+            listOf(
+                listOf(
+                    Position(11.601, 49.3),
+                    Position(11.7, 49.3),
+                    Position(11.7, 49.4),
+                    Position(11.601, 49.4),
+                    Position(11.601, 49.3)
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(polygon1, polygon2)
+
+        //then
+        // Small gap of ~0.001 degrees longitude
+        preciseDistance shouldBe 72.58405033833097
+    }
 })
