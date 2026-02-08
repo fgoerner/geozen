@@ -188,5 +188,41 @@ internal object GeometricUtils {
                 q.latitude <= maxOf(p.latitude, r.latitude) &&
                 q.latitude >= minOf(p.latitude, r.latitude)
     }
+
+    /**
+     * Checks if a point is inside a ring using the ray casting algorithm.
+     *
+     * This algorithm works by casting a ray from the point horizontally to the right
+     * and counting how many times it crosses the ring boundary. If the number of
+     * crossings is odd, the point is inside; if even, it's outside.
+     *
+     * Uses a planar approximation (treating lat/lon as x/y coordinates), which is
+     * acceptable for this topology test.
+     *
+     * @param px the point's longitude
+     * @param py the point's latitude
+     * @param ring the ring (linear ring of positions)
+     * @return true if the point is inside the ring, false otherwise
+     */
+    fun isPointInsideRing(px: Double, py: Double, ring: List<Position>): Boolean {
+        var intersections = 0
+
+        for (i in ring.indices) {
+            val p1 = ring[i]
+            val p2 = ring[(i + 1) % ring.size]
+
+            val x1 = p1.longitude
+            val y1 = p1.latitude
+            val x2 = p2.longitude
+            val y2 = p2.latitude
+
+            // Check if the ray crosses this edge
+            if (((y1 > py) != (y2 > py)) && (px < (x2 - x1) * (py - y1) / (y2 - y1) + x1)) {
+                intersections++
+            }
+        }
+
+        return intersections % 2 == 1
+    }
 }
 

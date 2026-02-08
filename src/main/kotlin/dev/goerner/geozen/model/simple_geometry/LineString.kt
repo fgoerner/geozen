@@ -29,6 +29,7 @@ data class LineString(
         return when (other) {
             is Point -> ApproximateDistanceCalculator.calculate(other, this)
             is LineString -> ApproximateDistanceCalculator.calculate(other, this)
+            is Polygon -> ApproximateDistanceCalculator.calculate(this, other)
             else -> throw UnsupportedOperationException("Fast distance calculation is not supported for geometry type: ${other::class.simpleName}")
         }
     }
@@ -37,6 +38,7 @@ data class LineString(
         return when (other) {
             is Point -> PreciseDistanceCalculator.calculate(other, this)
             is LineString -> PreciseDistanceCalculator.calculate(other, this)
+            is Polygon -> PreciseDistanceCalculator.calculate(this, other)
             else -> throw UnsupportedOperationException("Exact distance calculation is not supported for geometry type: ${other::class.simpleName}")
         }
     }

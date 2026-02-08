@@ -87,28 +87,26 @@ object ApproximateDistanceCalculator {
      */
     fun calculate(p: Point, polygon: Polygon): Double {
         val rings = polygon.coordinates
-
         val exteriorRing = rings[0]
         val interiorRings = rings.drop(1)
 
-        // Check if point is inside the exterior ring
-        val insideExterior = isPointInsideRing(p, exteriorRing)
+        // Use shared helper for containment analysis
+        val containmentResult = PointToPolygonDistanceHelper.analyzePointPolygonContainment(
+            p.longitude,
+            p.latitude,
+            exteriorRing,
+            interiorRings
+        )
 
-        if (insideExterior) {
-            // Check if point is inside any hole
-            val holeContainingPoint = interiorRings.firstOrNull { hole -> isPointInsideRing(p, hole) }
-
-            return if (holeContainingPoint != null) {
-                // Point is inside a hole - only calculate distance to that hole's boundary
-                calculateMinDistanceToPositions(p, holeContainingPoint)
-            } else {
-                // Point is inside polygon and not in any hole
-                0.0
+        return when (containmentResult) {
+            is PointToPolygonDistanceHelper.ContainmentResult.InsidePolygon -> 0.0
+            is PointToPolygonDistanceHelper.ContainmentResult.InsideHole -> {
+                calculateMinDistanceToPositions(p, containmentResult.holeRing)
+            }
+            is PointToPolygonDistanceHelper.ContainmentResult.OutsidePolygon -> {
+                calculateMinDistanceToPositions(p, exteriorRing)
             }
         }
-
-        // Point is outside the polygon - calculate minimum distance to exterior ring
-        return calculateMinDistanceToPositions(p, exteriorRing)
     }
 
     /**
@@ -128,32 +126,17 @@ object ApproximateDistanceCalculator {
         val positions1 = lineString1.coordinates
         val positions2 = lineString2.coordinates
 
-        // Check for segment-segment intersections
-        for (i in 0 until positions1.size - 1) {
-            val seg1Start = positions1[i]
-            val seg1End = positions1[i + 1]
-
-            for (j in 0 until positions2.size - 1) {
-                val seg2Start = positions2[j]
-                val seg2End = positions2[j + 1]
-
-                if (GeometricUtils.doSegmentsIntersect(seg1Start, seg1End, seg2Start, seg2End)) {
-                    return 0.0
-                }
-            }
+        // Check for segment intersections using shared helper
+        if (LineStringToLineStringDistanceHelper.doLineStringsIntersect(positions1, positions2)) {
+            return 0.0
         }
 
-        // No intersections found, calculate minimum distance from all points in lineString1 to lineString2
-        val minFromLine1 = positions1.minOf { position ->
-            calculateMinDistanceToPositions(Point(position), positions2)
-        }
-
-        // Find minimum distance from all points in lineString2 to lineString1
-        val minFromLine2 = positions2.minOf { position ->
-            calculateMinDistanceToPositions(Point(position), positions1)
-        }
-
-        return minOf(minFromLine1, minFromLine2)
+        // No intersections found - calculate bidirectional distance
+        return LineStringToLineStringDistanceHelper.calculateBidirectionalDistance(
+            positions1,
+            positions2,
+            ::calculateMinDistanceToPositions
+        )
     }
 
     /**
@@ -170,37 +153,39 @@ object ApproximateDistanceCalculator {
      * @return the approximate minimum distance in meters
      */
     fun calculate(lineString: LineString, polygon: Polygon): Double {
-        TODO()
-    }
+        val lineStringPositions = lineString.coordinates
+        val rings = polygon.coordinates
+        val exteriorRing = rings[0]
+        val interiorRings = rings.drop(1)
 
-    /**
-     * Checks if a point is inside a ring using the ray casting algorithm.
-     *
-     * @param p    the point
-     * @param ring the ring (linear ring of positions)
-     * @return true if the point is inside the ring, false otherwise
-     */
-    private fun isPointInsideRing(p: Point, ring: List<Position>): Boolean {
-        var intersections = 0
-        val px = p.longitude
-        val py = p.latitude
+        // Phase 1 & 2: Use shared helper for intersection detection and containment analysis
+        val analysisResult = LineStringToPolygonDistanceHelper.analyzeLineStringPolygonRelationship(
+            lineStringPositions,
+            exteriorRing,
+            interiorRings
+        )
 
-        for (i in ring.indices) {
-            val p1 = ring[i]
-            val p2 = ring[(i + 1) % ring.size]
-
-            val x1 = p1.longitude
-            val y1 = p1.latitude
-            val x2 = p2.longitude
-            val y2 = p2.latitude
-
-            // Check if the ray crosses this edge
-            if (((y1 > py) != (y2 > py)) && (px < (x2 - x1) * (py - y1) / (y2 - y1) + x1)) {
-                intersections++
+        return when (analysisResult) {
+            is LineStringToPolygonDistanceHelper.AnalysisResult.Intersection -> 0.0
+            is LineStringToPolygonDistanceHelper.AnalysisResult.FullyContained -> 0.0
+            is LineStringToPolygonDistanceHelper.AnalysisResult.InHole -> {
+                LineStringToPolygonDistanceHelper.calculateDistanceForHoleCase(
+                    lineStringPositions,
+                    analysisResult.holeContainingVertex,
+                    ::calculateMinDistanceToPositions
+                )
+            }
+            is LineStringToPolygonDistanceHelper.AnalysisResult.NoIntersectionOrContainment -> {
+                // Phase 3: Calculate minimum distances using approximate algorithm
+                LineStringToPolygonDistanceHelper.calculateDistanceForGeneralCase(
+                    lineStringPositions,
+                    rings,
+                    exteriorRing,
+                    interiorRings,
+                    ::calculateMinDistanceToPositions
+                )
             }
         }
-
-        return intersections % 2 == 1
     }
 
     /**
