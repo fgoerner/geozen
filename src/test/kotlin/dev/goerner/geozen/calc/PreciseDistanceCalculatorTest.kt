@@ -1,6 +1,9 @@
 package dev.goerner.geozen.calc
 
 import dev.goerner.geozen.model.Position
+import dev.goerner.geozen.model.multi_geometry.MultiLineString
+import dev.goerner.geozen.model.multi_geometry.MultiPoint
+import dev.goerner.geozen.model.multi_geometry.MultiPolygon
 import dev.goerner.geozen.model.simple_geometry.LineString
 import dev.goerner.geozen.model.simple_geometry.Point
 import dev.goerner.geozen.model.simple_geometry.Polygon
@@ -872,5 +875,471 @@ class PreciseDistanceCalculatorTest : FunSpec({
         //then
         // Small gap of ~0.001 degrees longitude
         preciseDistance shouldBe 72.58405033833097
+    }
+
+    test("Point to MultiPoint distance - point coincides with one of the multi-point positions") {
+        //given
+        val point = Point(11.5, 49.3)
+        val multiPoint = MultiPoint(
+            listOf(
+                Position(11.4, 49.2),
+                Position(11.5, 49.3),  // Same as point
+                Position(11.6, 49.4)
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(point, multiPoint)
+
+        //then
+        preciseDistance shouldBe 0.0
+    }
+
+    test("Point to MultiPoint distance - point far from all multi-point positions") {
+        //given
+        val point = Point(11.7, 49.5)
+        val multiPoint = MultiPoint(
+            listOf(
+                Position(11.4, 49.2),
+                Position(11.45, 49.25),
+                Position(11.5, 49.3)
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(point, multiPoint)
+
+        //then
+        // Distance to closest point (11.5, 49.3)
+        preciseDistance shouldBe 26561.432159292937
+    }
+
+    test("Point to MultiPoint distance - point closest to middle position") {
+        //given
+        val point = Point(11.55, 49.35)
+        val multiPoint = MultiPoint(
+            listOf(
+                Position(11.4, 49.2),
+                Position(11.56, 49.36),  // Closest
+                Position(11.7, 49.5)
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(point, multiPoint)
+
+        //then
+        preciseDistance shouldBe 1328.4279308883688
+    }
+
+    test("Point to MultiPoint distance - single point in multi-point") {
+        //given
+        val point = Point(11.5, 49.3)
+        val multiPoint = MultiPoint(
+            listOf(
+                Position(11.6, 49.4)
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(point, multiPoint)
+
+        //then
+        preciseDistance shouldBe 13284.671121936399
+    }
+
+    test("Point to MultiPoint distance - many points in multi-point") {
+        //given
+        val point = Point(11.5, 49.3)
+        val multiPoint = MultiPoint(
+            listOf(
+                Position(11.6, 49.4),
+                Position(11.7, 49.5),
+                Position(11.8, 49.6),
+                Position(11.51, 49.31),  // Closest
+                Position(11.9, 49.7)
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(point, multiPoint)
+
+        //then
+        preciseDistance shouldBe 1328.8225628740156
+    }
+
+    test("Point to MultiLineString distance - point intersects one of the linestrings") {
+        //given
+        val point = Point(11.5, 49.3)
+        val multiLineString = MultiLineString(
+            listOf(
+                listOf(
+                    Position(11.4, 49.2),
+                    Position(11.45, 49.25)
+                ),
+                listOf(
+                    Position(11.5, 49.3),  // Same as point
+                    Position(11.6, 49.4)
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(point, multiLineString)
+
+        //then
+        preciseDistance shouldBe 0.0
+    }
+
+    test("Point to MultiLineString distance - point close to one linestring, far from others") {
+        //given
+        val point = Point(11.55, 49.35)
+        val multiLineString = MultiLineString(
+            listOf(
+                listOf(
+                    Position(11.4, 49.2),
+                    Position(11.45, 49.25)
+                ),
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.6, 49.4)  // Closest linestring
+                ),
+                listOf(
+                    Position(11.7, 49.5),
+                    Position(11.8, 49.6)
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(point, multiLineString)
+
+        //then
+        // Distance to closest linestring segment
+        preciseDistance shouldBe 3.7533050083968593
+    }
+
+    test("Point to MultiLineString distance - point equidistant from multiple linestrings") {
+        //given
+        val point = Point(11.5, 49.35)
+        val multiLineString = MultiLineString(
+            listOf(
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.6, 49.3)
+                ),
+                listOf(
+                    Position(11.5, 49.4),
+                    Position(11.6, 49.4)
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(point, multiLineString)
+
+        //then
+        // Point is equidistant from both linestrings (0.05 degrees)
+        preciseDistance shouldBe 5560.800277548468
+    }
+
+    test("Point to MultiLineString distance - single linestring in multi-linestring") {
+        //given
+        val point = Point(11.55, 49.35)
+        val multiLineString = MultiLineString(
+            listOf(
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.6, 49.4)
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(point, multiLineString)
+
+        //then
+        preciseDistance shouldBe 3.7533050083968593
+    }
+
+    test("Point to MultiLineString distance - complex multi-linestring") {
+        //given
+        val point = Point(11.65, 49.35)
+        val multiLineString = MultiLineString(
+            listOf(
+                listOf(
+                    Position(11.4, 49.2),
+                    Position(11.45, 49.25),
+                    Position(11.5, 49.3)
+                ),
+                listOf(
+                    Position(11.5, 49.4),
+                    Position(11.55, 49.35),  // Closest segment starts here
+                    Position(11.6, 49.3)
+                ),
+                listOf(
+                    Position(11.7, 49.5),
+                    Position(11.8, 49.6),
+                    Position(11.9, 49.7)
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(point, multiLineString)
+
+        //then
+        preciseDistance shouldBe 6083.137300708031
+    }
+
+    test("Point to MultiPolygon distance - point inside one of the polygons") {
+        //given
+        val point = Point(11.55, 49.35)
+        val multiPolygon = MultiPolygon(
+            listOf(
+                listOf(
+                    listOf(
+                        Position(11.5, 49.3),
+                        Position(11.6, 49.3),
+                        Position(11.6, 49.4),
+                        Position(11.5, 49.4),
+                        Position(11.5, 49.3)
+                    )
+                ),
+                listOf(
+                    listOf(
+                        Position(11.7, 49.5),
+                        Position(11.8, 49.5),
+                        Position(11.8, 49.6),
+                        Position(11.7, 49.6),
+                        Position(11.7, 49.5)
+                    )
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(point, multiPolygon)
+
+        //then
+        preciseDistance shouldBe 0.0
+    }
+
+    test("Point to MultiPolygon distance - point outside all polygons") {
+        //given
+        val point = Point(11.45, 49.25)
+        val multiPolygon = MultiPolygon(
+            listOf(
+                listOf(
+                    listOf(
+                        Position(11.5, 49.3),
+                        Position(11.6, 49.3),
+                        Position(11.6, 49.4),
+                        Position(11.5, 49.4),
+                        Position(11.5, 49.3)
+                    )
+                ),
+                listOf(
+                    listOf(
+                        Position(11.7, 49.5),
+                        Position(11.8, 49.5),
+                        Position(11.8, 49.6),
+                        Position(11.7, 49.6),
+                        Position(11.7, 49.5)
+                    )
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(point, multiPolygon)
+
+        //then
+        // Distance to closest polygon (first one)
+        preciseDistance shouldBe 6645.296326887788
+    }
+
+    test("Point to MultiPolygon distance - point inside hole of one polygon") {
+        //given
+        val point = Point(11.55, 49.35)
+        val multiPolygon = MultiPolygon(
+            listOf(
+                listOf(
+                    // Exterior ring
+                    listOf(
+                        Position(11.5, 49.3),
+                        Position(11.6, 49.3),
+                        Position(11.6, 49.4),
+                        Position(11.5, 49.4),
+                        Position(11.5, 49.3)
+                    ),
+                    // Interior ring (hole)
+                    listOf(
+                        Position(11.52, 49.32),
+                        Position(11.58, 49.32),
+                        Position(11.58, 49.38),
+                        Position(11.52, 49.38),
+                        Position(11.52, 49.32)
+                    )
+                ),
+                listOf(
+                    listOf(
+                        Position(11.7, 49.5),
+                        Position(11.8, 49.5),
+                        Position(11.8, 49.6),
+                        Position(11.7, 49.6),
+                        Position(11.7, 49.5)
+                    )
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(point, multiPolygon)
+
+        //then
+        // Distance to hole boundary of first polygon
+        preciseDistance shouldBe 2179.73136124694
+    }
+
+    test("Point to MultiPolygon distance - single polygon in multi-polygon") {
+        //given
+        val point = Point(11.45, 49.25)
+        val multiPolygon = MultiPolygon(
+            listOf(
+                listOf(
+                    listOf(
+                        Position(11.5, 49.3),
+                        Position(11.6, 49.3),
+                        Position(11.6, 49.4),
+                        Position(11.5, 49.4),
+                        Position(11.5, 49.3)
+                    )
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(point, multiPolygon)
+
+        //then
+        preciseDistance shouldBe 6645.296326887788
+    }
+
+    test("Point to MultiPolygon distance - point on boundary of one polygon") {
+        //given
+        val point = Point(11.5, 49.3)
+        val multiPolygon = MultiPolygon(
+            listOf(
+                listOf(
+                    listOf(
+                        Position(11.5, 49.3),  // Point on this vertex
+                        Position(11.6, 49.3),
+                        Position(11.6, 49.4),
+                        Position(11.5, 49.4),
+                        Position(11.5, 49.3)
+                    )
+                ),
+                listOf(
+                    listOf(
+                        Position(11.7, 49.5),
+                        Position(11.8, 49.5),
+                        Position(11.8, 49.6),
+                        Position(11.7, 49.6),
+                        Position(11.7, 49.5)
+                    )
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(point, multiPolygon)
+
+        //then
+        preciseDistance shouldBe 0.0
+    }
+
+    test("Point to MultiPolygon distance - multiple polygons with holes") {
+        //given
+        val point = Point(11.65, 49.45)
+        val multiPolygon = MultiPolygon(
+            listOf(
+                listOf(
+                    // First polygon with hole
+                    listOf(
+                        Position(11.5, 49.3),
+                        Position(11.6, 49.3),
+                        Position(11.6, 49.4),
+                        Position(11.5, 49.4),
+                        Position(11.5, 49.3)
+                    ),
+                    listOf(
+                        Position(11.52, 49.32),
+                        Position(11.58, 49.32),
+                        Position(11.58, 49.38),
+                        Position(11.52, 49.38),
+                        Position(11.52, 49.32)
+                    )
+                ),
+                listOf(
+                    // Second polygon with hole
+                    listOf(
+                        Position(11.7, 49.5),
+                        Position(11.8, 49.5),
+                        Position(11.8, 49.6),
+                        Position(11.7, 49.6),
+                        Position(11.7, 49.5)
+                    ),
+                    listOf(
+                        Position(11.72, 49.52),
+                        Position(11.78, 49.52),
+                        Position(11.78, 49.58),
+                        Position(11.72, 49.58),
+                        Position(11.72, 49.52)
+                    )
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(point, multiPolygon)
+
+        //then
+        // Distance to closest polygon (second one)
+        preciseDistance shouldBe 6637.403408090623
+    }
+
+    test("Point to MultiPolygon distance - point between two polygons") {
+        //given
+        val point = Point(11.65, 49.45)
+        val multiPolygon = MultiPolygon(
+            listOf(
+                listOf(
+                    listOf(
+                        Position(11.5, 49.3),
+                        Position(11.6, 49.3),
+                        Position(11.6, 49.4),
+                        Position(11.5, 49.4),
+                        Position(11.5, 49.3)
+                    )
+                ),
+                listOf(
+                    listOf(
+                        Position(11.7, 49.5),
+                        Position(11.8, 49.5),
+                        Position(11.8, 49.6),
+                        Position(11.7, 49.6),
+                        Position(11.7, 49.5)
+                    )
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(point, multiPolygon)
+
+        //then
+        // Distance to the closer polygon boundary
+        preciseDistance shouldBe 6637.403408090623
     }
 })
