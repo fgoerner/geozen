@@ -189,6 +189,80 @@ object ApproximateDistanceCalculator {
     }
 
     /**
+     * Calculates an approximate distance between two Polygon geometries.
+     *
+     * This method finds the minimum distance between two Polygons using a three-phase approach:
+     *
+     * **Phase 1: Intersection Detection**
+     * - Checks all ring pairs for intersections using a planar approximation
+     * - Returns 0.0 immediately if any intersection is found
+     *
+     * **Phase 2: Containment Analysis**
+     * - Checks if polygon1 is fully contained within polygon2 (not in a hole) → distance is 0.0
+     * - Checks if polygon2 is fully contained within polygon1 (not in a hole) → distance is 0.0
+     * - Checks if either polygon has vertices inside a hole of the other → calculate distance to hole boundary
+     *
+     * **Phase 3: Distance Calculation** (if no intersections or containment)
+     * - Calculates bidirectional distances between all rings of both polygons
+     * - Uses Haversine formula and equirectangular projection approximation
+     *
+     * **Performance:**
+     * - Time Complexity: O(n × m) where n and m are the total number of vertices across all rings
+     * - Faster but less accurate than the precise method, especially over large distances or near poles
+     *
+     * @param polygon1 the first polygon
+     * @param polygon2 the second polygon
+     * @return the approximate minimum distance in meters
+     */
+    fun calculate(polygon1: Polygon, polygon2: Polygon): Double {
+        val rings1 = polygon1.coordinates
+        val exteriorRing1 = rings1[0]
+        val interiorRings1 = rings1.drop(1)
+
+        val rings2 = polygon2.coordinates
+        val exteriorRing2 = rings2[0]
+        val interiorRings2 = rings2.drop(1)
+
+        // Phase 1 & 2: Use shared helper for intersection detection and containment analysis
+        val analysisResult = PolygonToPolygonDistanceHelper.analyzePolygonPolygonRelationship(
+            rings1,
+            rings2,
+            exteriorRing1,
+            interiorRings1,
+            exteriorRing2,
+            interiorRings2
+        )
+
+        return when (analysisResult) {
+            is PolygonToPolygonDistanceHelper.AnalysisResult.Intersection -> 0.0
+            is PolygonToPolygonDistanceHelper.AnalysisResult.Polygon1ContainedInPolygon2 -> 0.0
+            is PolygonToPolygonDistanceHelper.AnalysisResult.Polygon2ContainedInPolygon1 -> 0.0
+            is PolygonToPolygonDistanceHelper.AnalysisResult.Polygon1InHoleOfPolygon2 -> {
+                PolygonToPolygonDistanceHelper.calculateDistanceForHoleCase(
+                    rings1,
+                    analysisResult.holeRing,
+                    ::calculateMinDistanceToPositions
+                )
+            }
+            is PolygonToPolygonDistanceHelper.AnalysisResult.Polygon2InHoleOfPolygon1 -> {
+                PolygonToPolygonDistanceHelper.calculateDistanceForHoleCase(
+                    rings2,
+                    analysisResult.holeRing,
+                    ::calculateMinDistanceToPositions
+                )
+            }
+            is PolygonToPolygonDistanceHelper.AnalysisResult.NoIntersectionOrContainment -> {
+                // Phase 3: Calculate minimum distances using approximate algorithm
+                PolygonToPolygonDistanceHelper.calculateDistanceForGeneralCase(
+                    rings1,
+                    rings2,
+                    ::calculateMinDistanceToPositions
+                )
+            }
+        }
+    }
+
+    /**
      * Calculates the minimum distance from a point to a sequence of positions.
      *
      * This method iterates through consecutive pairs of positions, treating them as line segments,
