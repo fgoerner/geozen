@@ -7,6 +7,7 @@ import dev.goerner.geozen.model.multi_geometry.MultiPolygon
 import dev.goerner.geozen.model.simple_geometry.LineString
 import dev.goerner.geozen.model.simple_geometry.Point
 import dev.goerner.geozen.model.simple_geometry.Polygon
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 
@@ -1341,5 +1342,41 @@ class PreciseDistanceCalculatorTest : FunSpec({
         //then
         // Distance to the closer polygon boundary
         preciseDistance shouldBe 6637.403408090623
+    }
+
+    test("Point to MultiPoint distance - empty MultiPoint throws exception") {
+        //given
+        val point = Point(11.5, 49.3)
+        val emptyMultiPoint = MultiPoint(emptyList())
+
+        //when & then
+        val exception = shouldThrow<IllegalArgumentException> {
+            PreciseDistanceCalculator.calculate(point, emptyMultiPoint)
+        }
+        exception.message shouldBe "MultiPoint must contain at least one point to calculate distance, but contained 0"
+    }
+
+    test("Point to MultiLineString distance - empty MultiLineString throws exception") {
+        //given
+        val point = Point(11.5, 49.3)
+        val emptyMultiLineString = MultiLineString(emptyList())
+
+        //when & then
+        val exception = shouldThrow<IllegalArgumentException> {
+            PreciseDistanceCalculator.calculate(point, emptyMultiLineString)
+        }
+        exception.message shouldBe "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
+    }
+
+    test("Point to MultiPolygon distance - empty MultiPolygon throws exception") {
+        //given
+        val point = Point(11.5, 49.3)
+        val emptyMultiPolygon = MultiPolygon(emptyList())
+
+        //when & then
+        val exception = shouldThrow<IllegalArgumentException> {
+            PreciseDistanceCalculator.calculate(point, emptyMultiPolygon)
+        }
+        exception.message shouldBe "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
     }
 })

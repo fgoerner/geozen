@@ -126,6 +126,9 @@ object ApproximateDistanceCalculator {
      * @return the approximate minimum distance in meters
      */
     fun calculate(point: Point, multiPoint: MultiPoint): Double {
+        require(multiPoint.coordinates.isNotEmpty()) {
+            "MultiPoint must contain at least one point to calculate distance, but contained 0"
+        }
         return multiPoint.coordinates.minOf { haversineDistance(point.coordinates, it) }
     }
 
@@ -143,6 +146,9 @@ object ApproximateDistanceCalculator {
      * @return the approximate minimum distance in meters
      */
     fun calculate(point: Point, multiLineString: MultiLineString): Double {
+        require(multiLineString.coordinates.isNotEmpty()) {
+            "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
+        }
         return multiLineString.coordinates.minOf { calculate(point, LineString(it)) }
     }
 
@@ -160,6 +166,9 @@ object ApproximateDistanceCalculator {
      * @return the approximate minimum distance in meters
      */
     fun calculate(point: Point, multiPolygon: MultiPolygon): Double {
+        require(multiPolygon.coordinates.isNotEmpty()) {
+            "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
+        }
         return multiPolygon.coordinates.minOf { calculate(point, Polygon(it)) }
     }
 
