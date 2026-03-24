@@ -1441,4 +1441,105 @@ class ApproximateDistanceCalculatorTest : FunSpec({
         }
         exception.message shouldBe "MultiPoint must contain at least one point to calculate distance, but contained 0"
     }
+
+    test("LineString to MultiLineString distance - returns minimum distance to closest LineString") {
+        //given
+        val lineString = LineString(
+            listOf(
+                Position(11.4432, 49.3429),
+                Position(11.4463, 49.1877),
+                Position(11.5161, 49.1239)
+            )
+        )
+        val multiLineString = MultiLineString(
+            listOf(
+                listOf(   // far LineString
+                    Position(11.9, 49.5),
+                    Position(12.0, 49.5)
+                ),
+                listOf(   // close LineString – same as in "LineString to LineString distance - non-intersecting"
+                    Position(11.6, 49.3),
+                    Position(11.7, 49.35),
+                    Position(11.8, 49.3)
+                )
+            )
+        )
+
+        //when
+        val approximateDistance = ApproximateDistanceCalculator.calculate(lineString, multiLineString)
+
+        //then
+        // Distance to the closer LineString, same result as the LineString-to-LineString test
+        approximateDistance shouldBe 11306.646230126744
+    }
+
+    test("LineString to MultiLineString distance - LineString intersects one of the member LineStrings") {
+        //given
+        // X-pattern cross: lineString goes bottom-left to top-right
+        val lineString = LineString(
+            listOf(
+                Position(11.5, 49.3),
+                Position(11.6, 49.4)
+            )
+        )
+        val multiLineString = MultiLineString(
+            listOf(
+                listOf(   // far, no intersection
+                    Position(11.9, 49.5),
+                    Position(12.0, 49.5)
+                ),
+                listOf(   // crosses the lineString (top-left to bottom-right)
+                    Position(11.5, 49.4),
+                    Position(11.6, 49.3)
+                )
+            )
+        )
+
+        //when
+        val approximateDistance = ApproximateDistanceCalculator.calculate(lineString, multiLineString)
+
+        //then
+        approximateDistance shouldBe 0.0
+    }
+
+    test("LineString to MultiLineString distance - single LineString in MultiLineString") {
+        //given
+        val lineString = LineString(
+            listOf(
+                Position(11.5, 49.3),
+                Position(11.6, 49.3)
+            )
+        )
+        val multiLineString = MultiLineString(
+            listOf(
+                listOf(   // parallel line 0.01° north – same as "close parallel lines" test
+                    Position(11.5, 49.31),
+                    Position(11.6, 49.31)
+                )
+            )
+        )
+
+        //when
+        val approximateDistance = ApproximateDistanceCalculator.calculate(lineString, multiLineString)
+
+        //then
+        approximateDistance shouldBe 1111.9508004064583
+    }
+
+    test("LineString to MultiLineString distance - empty MultiLineString throws exception") {
+        //given
+        val lineString = LineString(
+            listOf(
+                Position(11.4432, 49.3429),
+                Position(11.4463, 49.1877)
+            )
+        )
+        val emptyMultiLineString = MultiLineString(emptyList())
+
+        //when & then
+        val exception = shouldThrow<IllegalArgumentException> {
+            ApproximateDistanceCalculator.calculate(lineString, emptyMultiLineString)
+        }
+        exception.message shouldBe "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
+    }
 })
