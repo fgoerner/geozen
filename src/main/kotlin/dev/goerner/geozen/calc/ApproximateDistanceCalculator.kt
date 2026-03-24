@@ -352,8 +352,24 @@ object ApproximateDistanceCalculator {
         return multiLineString.coordinates.minOf { calculate(LineString(it), polygon) }
     }
     
+    /**
+     * Calculates an approximate distance between a Polygon and a MultiPolygon.
+     *
+     * This method iterates through all Polygons in the MultiPolygon, calculates the
+     * distance from the Polygon to each member Polygon using the same approach as
+     * polygon-to-polygon distance calculation, and returns the minimum distance found.
+     * This is faster but less accurate than the precise method, especially over large
+     * distances or near poles.
+     *
+     * @param polygon      the polygon
+     * @param multiPolygon the multi-polygon geometry
+     * @return the approximate minimum distance in meters
+     */
     fun calculate(polygon: Polygon, multiPolygon: MultiPolygon): Double {
-        TODO()
+        require(multiPolygon.coordinates.isNotEmpty()) {
+            "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
+        }
+        return multiPolygon.coordinates.minOf { calculate(polygon, Polygon(it)) }
     }
     
     fun calculate(multiPoint1: MultiPoint, multiPoint2: MultiPoint): Double {

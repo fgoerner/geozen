@@ -1986,4 +1986,234 @@ class ApproximateDistanceCalculatorTest : FunSpec({
         }
         exception.message shouldBe "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
     }
+
+    test("Polygon to MultiPolygon distance - polygon outside all polygons, closest member wins") {
+        //given
+        val polygon = Polygon(
+            listOf(
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.6, 49.3),
+                    Position(11.6, 49.4),
+                    Position(11.5, 49.4),
+                    Position(11.5, 49.3)
+                )
+            )
+        )
+        val multiPolygon = MultiPolygon(
+            listOf(
+                listOf(  // closer polygon
+                    listOf(
+                        Position(11.7, 49.3),
+                        Position(11.8, 49.3),
+                        Position(11.8, 49.4),
+                        Position(11.7, 49.4),
+                        Position(11.7, 49.3)
+                    )
+                ),
+                listOf(  // far polygon
+                    listOf(
+                        Position(12.0, 50.0),
+                        Position(12.1, 50.0),
+                        Position(12.1, 50.1),
+                        Position(12.0, 50.1),
+                        Position(12.0, 50.0)
+                    )
+                )
+            )
+        )
+
+        //when
+        val approximateDistance = ApproximateDistanceCalculator.calculate(polygon, multiPolygon)
+
+        //then
+        // Minimum distance is to the closer polygon - same as Polygon-to-Polygon disjoint result
+        approximateDistance shouldBe 7236.288600808812
+    }
+
+    test("Polygon to MultiPolygon distance - polygon intersects one polygon in MultiPolygon") {
+        //given
+        val polygon = Polygon(
+            listOf(
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.6, 49.3),
+                    Position(11.6, 49.4),
+                    Position(11.5, 49.4),
+                    Position(11.5, 49.3)
+                )
+            )
+        )
+        val multiPolygon = MultiPolygon(
+            listOf(
+                listOf(  // overlapping polygon
+                    listOf(
+                        Position(11.55, 49.35),
+                        Position(11.65, 49.35),
+                        Position(11.65, 49.45),
+                        Position(11.55, 49.45),
+                        Position(11.55, 49.35)
+                    )
+                ),
+                listOf(  // far polygon
+                    listOf(
+                        Position(12.0, 50.0),
+                        Position(12.1, 50.0),
+                        Position(12.1, 50.1),
+                        Position(12.0, 50.1),
+                        Position(12.0, 50.0)
+                    )
+                )
+            )
+        )
+
+        //when
+        val approximateDistance = ApproximateDistanceCalculator.calculate(polygon, multiPolygon)
+
+        //then
+        approximateDistance shouldBe 0.0
+    }
+
+    test("Polygon to MultiPolygon distance - polygon fully inside one polygon in MultiPolygon") {
+        //given
+        val polygon = Polygon(
+            listOf(
+                listOf(
+                    Position(11.55, 49.35),
+                    Position(11.65, 49.35),
+                    Position(11.65, 49.45),
+                    Position(11.55, 49.45),
+                    Position(11.55, 49.35)
+                )
+            )
+        )
+        val multiPolygon = MultiPolygon(
+            listOf(
+                listOf(  // containing polygon
+                    listOf(
+                        Position(11.5, 49.3),
+                        Position(11.7, 49.3),
+                        Position(11.7, 49.5),
+                        Position(11.5, 49.5),
+                        Position(11.5, 49.3)
+                    )
+                ),
+                listOf(  // far polygon
+                    listOf(
+                        Position(12.0, 50.0),
+                        Position(12.1, 50.0),
+                        Position(12.1, 50.1),
+                        Position(12.0, 50.1),
+                        Position(12.0, 50.0)
+                    )
+                )
+            )
+        )
+
+        //when
+        val approximateDistance = ApproximateDistanceCalculator.calculate(polygon, multiPolygon)
+
+        //then
+        approximateDistance shouldBe 0.0
+    }
+
+    test("Polygon to MultiPolygon distance - one polygon in MultiPolygon fully inside test polygon") {
+        //given
+        val polygon = Polygon(
+            listOf(
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.7, 49.3),
+                    Position(11.7, 49.5),
+                    Position(11.5, 49.5),
+                    Position(11.5, 49.3)
+                )
+            )
+        )
+        val multiPolygon = MultiPolygon(
+            listOf(
+                listOf(  // contained polygon
+                    listOf(
+                        Position(11.55, 49.35),
+                        Position(11.65, 49.35),
+                        Position(11.65, 49.45),
+                        Position(11.55, 49.45),
+                        Position(11.55, 49.35)
+                    )
+                ),
+                listOf(  // far polygon
+                    listOf(
+                        Position(12.0, 50.0),
+                        Position(12.1, 50.0),
+                        Position(12.1, 50.1),
+                        Position(12.0, 50.1),
+                        Position(12.0, 50.0)
+                    )
+                )
+            )
+        )
+
+        //when
+        val approximateDistance = ApproximateDistanceCalculator.calculate(polygon, multiPolygon)
+
+        //then
+        approximateDistance shouldBe 0.0
+    }
+
+    test("Polygon to MultiPolygon distance - single polygon in MultiPolygon") {
+        //given
+        val polygon = Polygon(
+            listOf(
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.6, 49.3),
+                    Position(11.6, 49.4),
+                    Position(11.5, 49.4),
+                    Position(11.5, 49.3)
+                )
+            )
+        )
+        val multiPolygon = MultiPolygon(
+            listOf(
+                listOf(
+                    listOf(
+                        Position(11.7, 49.3),
+                        Position(11.8, 49.3),
+                        Position(11.8, 49.4),
+                        Position(11.7, 49.4),
+                        Position(11.7, 49.3)
+                    )
+                )
+            )
+        )
+
+        //when
+        val approximateDistance = ApproximateDistanceCalculator.calculate(polygon, multiPolygon)
+
+        //then
+        // Same result as the Polygon-to-Polygon disjoint test with a single polygon
+        approximateDistance shouldBe 7236.288600808812
+    }
+
+    test("Polygon to MultiPolygon distance - empty MultiPolygon throws exception") {
+        //given
+        val polygon = Polygon(
+            listOf(
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.6, 49.3),
+                    Position(11.6, 49.4),
+                    Position(11.5, 49.4),
+                    Position(11.5, 49.3)
+                )
+            )
+        )
+        val emptyMultiPolygon = MultiPolygon(emptyList())
+
+        //when & then
+        val exception = shouldThrow<IllegalArgumentException> {
+            ApproximateDistanceCalculator.calculate(polygon, emptyMultiPolygon)
+        }
+        exception.message shouldBe "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
+    }
 })
