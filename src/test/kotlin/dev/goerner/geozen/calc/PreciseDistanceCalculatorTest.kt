@@ -1442,6 +1442,136 @@ class PreciseDistanceCalculatorTest : FunSpec({
         exception.message shouldBe "MultiPoint must contain at least one point to calculate distance, but contained 0"
     }
 
+    test("Polygon to MultiPoint distance - returns minimum distance to closest point") {
+        //given
+        val polygon = Polygon(
+            listOf(
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.6, 49.3),
+                    Position(11.6, 49.4),
+                    Position(11.5, 49.4),
+                    Position(11.5, 49.3)
+                )
+            )
+        )
+        val multiPoint = MultiPoint(
+            listOf(
+                Position(11.4694, 49.2965), // closest – same as in "Point to Polygon distance - point outside polygon"
+                Position(11.7, 49.7)        // farther point
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(polygon, multiPoint)
+
+        //then
+        // Same result as the Point to Polygon test with the same point and polygon
+        preciseDistance shouldBe 2259.4399787892717
+    }
+
+    test("Polygon to MultiPoint distance - one point inside polygon returns 0.0") {
+        //given
+        val polygon = Polygon(
+            listOf(
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.6, 49.3),
+                    Position(11.6, 49.4),
+                    Position(11.5, 49.4),
+                    Position(11.5, 49.3)
+                )
+            )
+        )
+        val multiPoint = MultiPoint(
+            listOf(
+                Position(11.7, 49.7),        // far point
+                Position(11.55, 49.35)       // inside polygon
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(polygon, multiPoint)
+
+        //then
+        preciseDistance shouldBe 0.0
+    }
+
+    test("Polygon to MultiPoint distance - point on polygon boundary returns 0.0") {
+        //given
+        val polygon = Polygon(
+            listOf(
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.6, 49.3),
+                    Position(11.6, 49.4),
+                    Position(11.5, 49.4),
+                    Position(11.5, 49.3)
+                )
+            )
+        )
+        val multiPoint = MultiPoint(
+            listOf(
+                Position(11.7, 49.7),        // far point
+                Position(11.5, 49.3)         // exactly on a polygon vertex
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(polygon, multiPoint)
+
+        //then
+        preciseDistance shouldBe 0.0
+    }
+
+    test("Polygon to MultiPoint distance - single point in MultiPoint") {
+        //given
+        val polygon = Polygon(
+            listOf(
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.6, 49.3),
+                    Position(11.6, 49.4),
+                    Position(11.5, 49.4),
+                    Position(11.5, 49.3)
+                )
+            )
+        )
+        val multiPoint = MultiPoint(
+            listOf(
+                Position(11.4694, 49.2965)  // same as in "Point to Polygon distance - point outside polygon"
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(polygon, multiPoint)
+
+        //then
+        preciseDistance shouldBe 2259.4399787892717
+    }
+
+    test("Polygon to MultiPoint distance - empty MultiPoint throws exception") {
+        //given
+        val polygon = Polygon(
+            listOf(
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.6, 49.3),
+                    Position(11.6, 49.4),
+                    Position(11.5, 49.4),
+                    Position(11.5, 49.3)
+                )
+            )
+        )
+        val emptyMultiPoint = MultiPoint(emptyList())
+
+        //when & then
+        val exception = shouldThrow<IllegalArgumentException> {
+            PreciseDistanceCalculator.calculate(polygon, emptyMultiPoint)
+        }
+        exception.message shouldBe "MultiPoint must contain at least one point to calculate distance, but contained 0"
+    }
+
     test("LineString to MultiLineString distance - returns minimum distance to closest LineString") {
         //given
         val lineString = LineString(
