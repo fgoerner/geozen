@@ -329,6 +329,67 @@ object PreciseDistanceCalculator {
     }
 
     /**
+     * Calculates a precise distance between a LineString and a MultiPoint.
+     *
+     * This method iterates through all points in the MultiPoint, calculates the distance from
+     * the LineString to each point using Karney's algorithm, and returns the minimum distance found.
+     *
+     * @param lineString the line string
+     * @param multiPoint the multi-point geometry
+     * @return the precise minimum distance in meters
+     */
+    fun calculate(lineString: LineString, multiPoint: MultiPoint): Double {
+        require(multiPoint.coordinates.isNotEmpty()) {
+            "MultiPoint must contain at least one point to calculate distance, but contained 0"
+        }
+        return multiPoint.coordinates.minOf { calculate(Point(it), lineString) }
+    }
+
+    fun calculate(lineString: LineString, multiLineString: MultiLineString): Double {
+        TODO()
+    }
+
+    fun calculate(lineString: LineString, multiPolygon: MultiPolygon): Double {
+        TODO()
+    }
+
+    fun calculate(polygon: Polygon, multiPoint: MultiPoint): Double {
+        TODO()
+    }
+
+    fun calculate(polygon: Polygon, multiLineString: MultiLineString): Double {
+        TODO()
+    }
+
+    fun calculate(polygon: Polygon, multiPolygon: MultiPolygon): Double {
+        TODO()
+    }
+
+    fun calculate(multiPoint1: MultiPoint, multiPoint2: MultiPoint): Double {
+        TODO()
+    }
+
+    fun calculate(multiPoint: MultiPoint, multiLineString: MultiLineString): Double {
+        TODO()
+    }
+
+    fun calculate(multiPoint: MultiPoint, multiPolygon: MultiPolygon): Double {
+        TODO()
+    }
+
+    fun calculate(multiLineString1: MultiLineString, multiLineString2: MultiLineString): Double {
+        TODO()
+    }
+
+    fun calculate(multiLineString: MultiLineString, multiPolygon: MultiPolygon): Double {
+        TODO()
+    }
+
+    fun calculate(multiPolygon1: MultiPolygon, multiPolygon2: MultiPolygon): Double {
+        TODO()
+    }
+
+    /**
      * Calculates the minimum distance from a point to a sequence of positions.
      *
      * This method iterates through consecutive pairs of positions, treating them as line segments,

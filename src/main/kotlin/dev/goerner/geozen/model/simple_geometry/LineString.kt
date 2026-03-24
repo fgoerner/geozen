@@ -5,6 +5,7 @@ import dev.goerner.geozen.calc.PreciseDistanceCalculator
 import dev.goerner.geozen.model.CoordinateReferenceSystem
 import dev.goerner.geozen.model.Geometry
 import dev.goerner.geozen.model.Position
+import dev.goerner.geozen.model.multi_geometry.MultiPoint
 
 /**
  * A [LineString] is a [Geometry] that represents a sequence of [Positions][Position] in space. It is
@@ -30,6 +31,7 @@ data class LineString(
             is Point -> ApproximateDistanceCalculator.calculate(other, this)
             is LineString -> ApproximateDistanceCalculator.calculate(other, this)
             is Polygon -> ApproximateDistanceCalculator.calculate(this, other)
+            is MultiPoint -> ApproximateDistanceCalculator.calculate(this, other)
             else -> throw UnsupportedOperationException("Fast distance calculation is not supported for geometry type: ${other::class.simpleName}")
         }
     }
@@ -39,6 +41,7 @@ data class LineString(
             is Point -> PreciseDistanceCalculator.calculate(other, this)
             is LineString -> PreciseDistanceCalculator.calculate(other, this)
             is Polygon -> PreciseDistanceCalculator.calculate(this, other)
+            is MultiPoint -> PreciseDistanceCalculator.calculate(this, other)
             else -> throw UnsupportedOperationException("Exact distance calculation is not supported for geometry type: ${other::class.simpleName}")
         }
     }

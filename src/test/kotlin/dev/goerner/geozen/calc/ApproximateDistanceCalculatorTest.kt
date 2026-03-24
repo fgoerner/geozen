@@ -1379,4 +1379,66 @@ class ApproximateDistanceCalculatorTest : FunSpec({
         }
         exception.message shouldBe "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
     }
+
+    test("LineString to MultiPoint distance - returns minimum distance to closest point") {
+        //given
+        val lineString = LineString(
+            listOf(
+                Position(11.4432, 49.3429),
+                Position(11.4463, 49.1877),
+                Position(11.5161, 49.1239)
+            )
+        )
+        val multiPoint = MultiPoint(
+            listOf(
+                Position(11.4694, 49.2965), // closest point – same as in "Point to LineString distance" test
+                Position(11.6, 49.4)        // farther point
+            )
+        )
+
+        //when
+        val approximateDistance = ApproximateDistanceCalculator.calculate(lineString, multiPoint)
+
+        //then
+        approximateDistance shouldBe 1832.5414860629317
+    }
+
+    test("LineString to MultiPoint distance - point coinciding with LineString vertex returns 0") {
+        //given
+        val lineString = LineString(
+            listOf(
+                Position(11.4432, 49.3429),
+                Position(11.4463, 49.1877)
+            )
+        )
+        val multiPoint = MultiPoint(
+            listOf(
+                Position(11.4432, 49.3429), // exactly on the first vertex of the LineString
+                Position(11.6, 49.4)
+            )
+        )
+
+        //when
+        val approximateDistance = ApproximateDistanceCalculator.calculate(lineString, multiPoint)
+
+        //then
+        approximateDistance shouldBe 0.0
+    }
+
+    test("LineString to MultiPoint distance - empty MultiPoint throws exception") {
+        //given
+        val lineString = LineString(
+            listOf(
+                Position(11.4432, 49.3429),
+                Position(11.4463, 49.1877)
+            )
+        )
+        val emptyMultiPoint = MultiPoint(emptyList())
+
+        //when & then
+        val exception = shouldThrow<IllegalArgumentException> {
+            ApproximateDistanceCalculator.calculate(lineString, emptyMultiPoint)
+        }
+        exception.message shouldBe "MultiPoint must contain at least one point to calculate distance, but contained 0"
+    }
 })

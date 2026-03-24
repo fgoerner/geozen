@@ -251,6 +251,69 @@ object ApproximateDistanceCalculator {
             }
         }
     }
+    
+    /**
+     * Calculates an approximate distance between a LineString and a MultiPoint.
+     *
+     * This method iterates through all points in the MultiPoint, calculates the distance from
+     * the LineString to each point using the same approach as point-to-linestring distance
+     * calculation, and returns the minimum distance found. This is faster but less accurate
+     * than the precise method, especially over large distances or near poles.
+     *
+     * @param lineString the line string
+     * @param multiPoint the multi-point geometry
+     * @return the approximate minimum distance in meters
+     */
+    fun calculate(lineString: LineString, multiPoint: MultiPoint): Double {
+        require(multiPoint.coordinates.isNotEmpty()) {
+            "MultiPoint must contain at least one point to calculate distance, but contained 0"
+        }
+        return multiPoint.coordinates.minOf { calculate(Point(it), lineString) }
+    }
+    
+    fun calculate(lineString: LineString, multiLineString: MultiLineString): Double {
+        TODO()
+    }
+    
+    fun calculate(lineString: LineString, multiPolygon: MultiPolygon): Double {
+        TODO()
+    }
+    
+    fun calculate(polygon: Polygon, multiPoint: MultiPoint): Double {
+        TODO()
+    }
+    
+    fun calculate(polygon: Polygon, multiLineString: MultiLineString): Double {
+        TODO()
+    }
+    
+    fun calculate(polygon: Polygon, multiPolygon: MultiPolygon): Double {
+        TODO()
+    }
+    
+    fun calculate(multiPoint1: MultiPoint, multiPoint2: MultiPoint): Double {
+        TODO()
+    }
+    
+    fun calculate(multiPoint: MultiPoint, multiLineString: MultiLineString): Double {
+        TODO()
+    }
+    
+    fun calculate(multiPoint: MultiPoint, multiPolygon: MultiPolygon): Double {
+        TODO()
+    }
+    
+    fun calculate(multiLineString1: MultiLineString, multiLineString2: MultiLineString): Double {
+        TODO()
+    }
+    
+    fun calculate(multiLineString: MultiLineString, multiPolygon: MultiPolygon): Double {
+        TODO()
+    }
+    
+    fun calculate(multiPolygon1: MultiPolygon, multiPolygon2: MultiPolygon): Double {
+        TODO()
+    }
 
     /**
      * Calculates an approximate distance between two Polygon geometries.

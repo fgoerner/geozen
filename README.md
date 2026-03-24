@@ -26,7 +26,7 @@ and utilities for geometric calculations.
 - Kotlin 2.3.0 or higher (if using Kotlin)
 
 ## Installation
-
+[README.md](README.md)
 GeoZen is available on Maven Central. Add the following dependency to your project:
 
 ### Maven
@@ -112,15 +112,16 @@ The following matrix shows which geometry type combinations support distance cal
 | From ↓ / To →          | Point | LineString | Polygon | MultiPoint | MultiLineString | MultiPolygon | GeometryCollection |
 |------------------------|-------|------------|---------|------------|-----------------|--------------|--------------------|
 | **Point**              | ✅     | ✅          | ✅       | ✅          | ✅               | ✅            | ❌                  |
-| **LineString**         | ✅     | ✅          | ✅       | ❌          | ❌               | ❌            | ❌                  |
-| **Polygon**            | ✅     | ✅          | ✅       | ❌          | ❌               | ❌            | ❌                  |
-| **MultiPoint**         | ✅     | ❌          | ❌       | ❌          | ❌               | ❌            | ❌                  |
-| **MultiLineString**    | ✅     | ❌          | ❌       | ❌          | ❌               | ❌            | ❌                  |
-| **MultiPolygon**       | ✅     | ❌          | ❌       | ❌          | ❌               | ❌            | ❌                  |
+| **LineString**         | ✅     | ✅          | ✅       | ✅          | 🔄              | 🔄           | ❌                  |
+| **Polygon**            | ✅     | ✅          | ✅       | 🔄         | 🔄              | 🔄           | ❌                  |
+| **MultiPoint**         | ✅     | ✅          | 🔄      | 🔄         | 🔄              | 🔄           | ❌                  |
+| **MultiLineString**    | ✅     | 🔄         | 🔄      | 🔄         | 🔄              | 🔄           | ❌                  |
+| **MultiPolygon**       | ✅     | 🔄         | 🔄      | 🔄         | 🔄              | 🔄           | ❌                  |
 | **GeometryCollection** | ❌     | ❌          | ❌       | ❌          | ❌               | ❌            | ❌                  |
 
 **Legend:**
 - ✅ Supported for both precise (Karney's algorithm) and approximate (Haversine formula) distance calculations
+- 🔄 In progress — stubs exist but not yet implemented
 - ❌ Not yet supported
 
 **Note:** Distance calculations are commutative - if `A.distanceTo(B)` is supported, then `B.distanceTo(A)` is also supported and will return the same result.
