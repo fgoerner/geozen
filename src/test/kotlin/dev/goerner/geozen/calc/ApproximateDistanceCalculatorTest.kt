@@ -1542,4 +1542,166 @@ class ApproximateDistanceCalculatorTest : FunSpec({
         }
         exception.message shouldBe "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
     }
+
+    test("LineString to MultiPolygon distance - returns minimum distance to closest polygon") {
+        //given
+        val lineString = LineString(
+            listOf(
+                Position(11.4, 49.3),
+                Position(11.45, 49.35)
+            )
+        )
+        val multiPolygon = MultiPolygon(
+            listOf(
+                listOf(   // far polygon
+                    listOf(
+                        Position(11.7, 49.5),
+                        Position(11.8, 49.5),
+                        Position(11.8, 49.6),
+                        Position(11.7, 49.6),
+                        Position(11.7, 49.5)
+                    )
+                ),
+                listOf(   // close polygon – same as in "LineString to Polygon distance - LineString outside polygon"
+                    listOf(
+                        Position(11.5, 49.3),
+                        Position(11.6, 49.3),
+                        Position(11.6, 49.4),
+                        Position(11.5, 49.4),
+                        Position(11.5, 49.3)
+                    )
+                )
+            )
+        )
+
+        //when
+        val approximateDistance = ApproximateDistanceCalculator.calculate(lineString, multiPolygon)
+
+        //then
+        // Distance to the closer polygon, same result as the LineString-to-Polygon test
+        approximateDistance shouldBe 3621.8269538835966
+    }
+
+    test("LineString to MultiPolygon distance - LineString intersects one of the member polygons") {
+        //given
+        val lineString = LineString(
+            listOf(
+                Position(11.45, 49.35),
+                Position(11.55, 49.35)   // crosses into the first polygon
+            )
+        )
+        val multiPolygon = MultiPolygon(
+            listOf(
+                listOf(   // intersected polygon
+                    listOf(
+                        Position(11.5, 49.3),
+                        Position(11.6, 49.3),
+                        Position(11.6, 49.4),
+                        Position(11.5, 49.4),
+                        Position(11.5, 49.3)
+                    )
+                ),
+                listOf(   // far polygon
+                    listOf(
+                        Position(11.7, 49.5),
+                        Position(11.8, 49.5),
+                        Position(11.8, 49.6),
+                        Position(11.7, 49.6),
+                        Position(11.7, 49.5)
+                    )
+                )
+            )
+        )
+
+        //when
+        val approximateDistance = ApproximateDistanceCalculator.calculate(lineString, multiPolygon)
+
+        //then
+        approximateDistance shouldBe 0.0
+    }
+
+    test("LineString to MultiPolygon distance - LineString fully contained in one polygon") {
+        //given
+        val lineString = LineString(
+            listOf(
+                Position(11.52, 49.32),
+                Position(11.58, 49.38)
+            )
+        )
+        val multiPolygon = MultiPolygon(
+            listOf(
+                listOf(   // containing polygon
+                    listOf(
+                        Position(11.5, 49.3),
+                        Position(11.6, 49.3),
+                        Position(11.6, 49.4),
+                        Position(11.5, 49.4),
+                        Position(11.5, 49.3)
+                    )
+                ),
+                listOf(   // far polygon
+                    listOf(
+                        Position(11.7, 49.5),
+                        Position(11.8, 49.5),
+                        Position(11.8, 49.6),
+                        Position(11.7, 49.6),
+                        Position(11.7, 49.5)
+                    )
+                )
+            )
+        )
+
+        //when
+        val approximateDistance = ApproximateDistanceCalculator.calculate(lineString, multiPolygon)
+
+        //then
+        approximateDistance shouldBe 0.0
+    }
+
+    test("LineString to MultiPolygon distance - single polygon in MultiPolygon") {
+        //given
+        val lineString = LineString(
+            listOf(
+                Position(11.4, 49.3),
+                Position(11.45, 49.35)
+            )
+        )
+        val multiPolygon = MultiPolygon(
+            listOf(
+                listOf(
+                    listOf(
+                        Position(11.5, 49.3),
+                        Position(11.6, 49.3),
+                        Position(11.6, 49.4),
+                        Position(11.5, 49.4),
+                        Position(11.5, 49.3)
+                    )
+                )
+            )
+        )
+
+        //when
+        val approximateDistance = ApproximateDistanceCalculator.calculate(lineString, multiPolygon)
+
+        //then
+        // Same result as the LineString-to-Polygon test with a single polygon
+        approximateDistance shouldBe 3621.8269538835966
+    }
+
+    test("LineString to MultiPolygon distance - empty MultiPolygon throws exception") {
+        //given
+        val lineString = LineString(
+            listOf(
+                Position(11.4432, 49.3429),
+                Position(11.4463, 49.1877)
+            )
+        )
+        val emptyMultiPolygon = MultiPolygon(emptyList())
+
+        //when & then
+        val exception = shouldThrow<IllegalArgumentException> {
+            ApproximateDistanceCalculator.calculate(lineString, emptyMultiPolygon)
+        }
+        exception.message shouldBe "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
+    }
 })

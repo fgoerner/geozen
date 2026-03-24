@@ -363,8 +363,22 @@ object PreciseDistanceCalculator {
         return multiLineString.coordinates.minOf { calculate(lineString, LineString(it)) }
     }
 
+    /**
+     * Calculates a precise distance between a LineString and a MultiPolygon.
+     *
+     * This method iterates through all Polygons in the MultiPolygon, calculates the
+     * distance from the LineString to each Polygon using the precise
+     * linestring-to-polygon distance calculation, and returns the minimum distance found.
+     *
+     * @param lineString   the line string
+     * @param multiPolygon the multi-polygon geometry
+     * @return the precise minimum distance in meters
+     */
     fun calculate(lineString: LineString, multiPolygon: MultiPolygon): Double {
-        TODO()
+        require(multiPolygon.coordinates.isNotEmpty()) {
+            "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
+        }
+        return multiPolygon.coordinates.minOf { calculate(lineString, Polygon(it)) }
     }
 
     fun calculate(polygon: Polygon, multiPoint: MultiPoint): Double {

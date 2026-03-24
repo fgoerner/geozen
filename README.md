@@ -112,11 +112,11 @@ The following matrix shows which geometry type combinations support distance cal
 | From ↓ / To →          | Point | LineString | Polygon | MultiPoint | MultiLineString | MultiPolygon | GeometryCollection |
 |------------------------|-------|------------|---------|------------|-----------------|--------------|--------------------|
 | **Point**              | ✅     | ✅          | ✅       | ✅          | ✅               | ✅            | ❌                  |
-| **LineString**         | ✅     | ✅          | ✅       | ✅          | 🔄              | 🔄           | ❌                  |
+| **LineString**         | ✅     | ✅          | ✅       | ✅          | ✅               | ✅            | ❌                  |
 | **Polygon**            | ✅     | ✅          | ✅       | 🔄         | 🔄              | 🔄           | ❌                  |
 | **MultiPoint**         | ✅     | ✅          | 🔄      | 🔄         | 🔄              | 🔄           | ❌                  |
-| **MultiLineString**    | ✅     | 🔄         | 🔄      | 🔄         | 🔄              | 🔄           | ❌                  |
-| **MultiPolygon**       | ✅     | 🔄         | 🔄      | 🔄         | 🔄              | 🔄           | ❌                  |
+| **MultiLineString**    | ✅     | ✅          | 🔄      | 🔄         | 🔄              | 🔄           | ❌                  |
+| **MultiPolygon**       | ✅     | ✅          | 🔄      | 🔄         | 🔄              | 🔄           | ❌                  |
 | **GeometryCollection** | ❌     | ❌          | ❌       | ❌          | ❌               | ❌            | ❌                  |
 
 **Legend:**
