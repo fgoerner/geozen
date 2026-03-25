@@ -2475,4 +2475,179 @@ class ApproximateDistanceCalculatorTest : FunSpec({
         }
         exception.message shouldBe "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
     }
+
+    test("MultiPoint to MultiPolygon distance - single point to single polygon") {
+        //given
+        val multiPoint = MultiPoint(
+            listOf(
+                Position(11.4694, 49.2965)
+            )
+        )
+        val multiPolygon = MultiPolygon(
+            listOf(
+                listOf(
+                    listOf(
+                        Position(11.5, 49.3),
+                        Position(11.6, 49.3),
+                        Position(11.6, 49.4),
+                        Position(11.5, 49.4),
+                        Position(11.5, 49.3)
+                    )
+                )
+            )
+        )
+
+        //when
+        val approximateDistance = ApproximateDistanceCalculator.calculate(multiPoint, multiPolygon)
+
+        //then
+        approximateDistance shouldBe 2252.7607736674404
+    }
+
+    test("MultiPoint to MultiPolygon distance - point inside polygon returns 0.0") {
+        //given
+        val multiPoint = MultiPoint(
+            listOf(
+                Position(11.55, 49.35)
+            )
+        )
+        val multiPolygon = MultiPolygon(
+            listOf(
+                listOf(
+                    listOf(
+                        Position(11.5, 49.3),
+                        Position(11.6, 49.3),
+                        Position(11.6, 49.4),
+                        Position(11.5, 49.4),
+                        Position(11.5, 49.3)
+                    )
+                )
+            )
+        )
+
+        //when
+        val approximateDistance = ApproximateDistanceCalculator.calculate(multiPoint, multiPolygon)
+
+        //then
+        approximateDistance shouldBe 0.0
+    }
+
+    test("MultiPoint to MultiPolygon distance - returns minimum distance across all points and polygons") {
+        //given
+        val multiPoint = MultiPoint(
+            listOf(
+                Position(11.4694, 49.2965), // outside both polygons
+                Position(11.55, 49.35)      // inside the second polygon
+            )
+        )
+        val multiPolygon = MultiPolygon(
+            listOf(
+                // polygon1 - far away from both points
+                listOf(
+                    listOf(
+                        Position(10.0, 48.0),
+                        Position(10.1, 48.0),
+                        Position(10.1, 48.1),
+                        Position(10.0, 48.1),
+                        Position(10.0, 48.0)
+                    )
+                ),
+                // polygon2 - contains the second point
+                listOf(
+                    listOf(
+                        Position(11.5, 49.3),
+                        Position(11.6, 49.3),
+                        Position(11.6, 49.4),
+                        Position(11.5, 49.4),
+                        Position(11.5, 49.3)
+                    )
+                )
+            )
+        )
+
+        //when
+        val approximateDistance = ApproximateDistanceCalculator.calculate(multiPoint, multiPolygon)
+
+        //then
+        approximateDistance shouldBe 0.0
+    }
+
+    test("MultiPoint to MultiPolygon distance - symmetric result via geometry dispatch") {
+        //given
+        val multiPoint = MultiPoint(
+            listOf(
+                Position(11.4694, 49.2965),
+                Position(11.4, 49.2)
+            )
+        )
+        val multiPolygon = MultiPolygon(
+            listOf(
+                listOf(
+                    listOf(
+                        Position(11.5, 49.3),
+                        Position(11.6, 49.3),
+                        Position(11.6, 49.4),
+                        Position(11.5, 49.4),
+                        Position(11.5, 49.3)
+                    )
+                ),
+                listOf(
+                    listOf(
+                        Position(10.0, 48.0),
+                        Position(10.1, 48.0),
+                        Position(10.1, 48.1),
+                        Position(10.0, 48.1),
+                        Position(10.0, 48.0)
+                    )
+                )
+            )
+        )
+
+        //when
+        val forwardDistance = multiPoint.fastDistanceTo(multiPolygon)
+        val reverseDistance = multiPolygon.fastDistanceTo(multiPoint)
+
+        //then
+        forwardDistance shouldBe reverseDistance
+    }
+
+    test("MultiPoint to MultiPolygon distance - empty MultiPoint throws exception") {
+        //given
+        val emptyMultiPoint = MultiPoint(emptyList())
+        val multiPolygon = MultiPolygon(
+            listOf(
+                listOf(
+                    listOf(
+                        Position(11.5, 49.3),
+                        Position(11.6, 49.3),
+                        Position(11.6, 49.4),
+                        Position(11.5, 49.4),
+                        Position(11.5, 49.3)
+                    )
+                )
+            )
+        )
+
+        //when & then
+        val exception = shouldThrow<IllegalArgumentException> {
+            ApproximateDistanceCalculator.calculate(emptyMultiPoint, multiPolygon)
+        }
+        exception.message shouldBe "MultiPoint must contain at least one point to calculate distance, but contained 0"
+    }
+
+    test("MultiPoint to MultiPolygon distance - empty MultiPolygon throws exception") {
+        //given
+        val multiPoint = MultiPoint(
+            listOf(
+                Position(11.5, 49.3)
+            )
+        )
+        val emptyMultiPolygon = MultiPolygon(emptyList())
+
+        //when & then
+        val exception = shouldThrow<IllegalArgumentException> {
+            ApproximateDistanceCalculator.calculate(multiPoint, emptyMultiPolygon)
+        }
+        exception.message shouldBe "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
+    }
 })

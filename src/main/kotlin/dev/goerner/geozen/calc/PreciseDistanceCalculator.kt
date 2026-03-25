@@ -479,8 +479,26 @@ object PreciseDistanceCalculator {
         return multiPoint.coordinates.minOf { calculate(Point(it), multiLineString) }
     }
 
+    /**
+     * Calculates a precise distance between a MultiPoint and a MultiPolygon.
+     *
+     *
+     * This method iterates through all points in the MultiPoint, calculates the distance from
+     * each point to the MultiPolygon using the precise point-to-multipolygon distance calculation
+     * (Karney's algorithm), and returns the minimum distance found.
+     *
+     * @param multiPoint   the multi-point geometry
+     * @param multiPolygon the multi-polygon geometry
+     * @return the precise minimum distance in meters
+     */
     fun calculate(multiPoint: MultiPoint, multiPolygon: MultiPolygon): Double {
-        TODO()
+        require(multiPoint.coordinates.isNotEmpty()) {
+            "MultiPoint must contain at least one point to calculate distance, but contained 0"
+        }
+        require(multiPolygon.coordinates.isNotEmpty()) {
+            "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
+        }
+        return multiPoint.coordinates.minOf { calculate(Point(it), multiPolygon) }
     }
 
     fun calculate(multiLineString1: MultiLineString, multiLineString2: MultiLineString): Double {

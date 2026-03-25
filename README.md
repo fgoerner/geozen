@@ -114,9 +114,9 @@ The following matrix shows which geometry type combinations support distance cal
 | **Point**              | ✅     | ✅          | ✅       | ✅          | ✅               | ✅            | ❌                  |
 | **LineString**         | ✅     | ✅          | ✅       | ✅          | ✅               | ✅            | ❌                  |
 | **Polygon**            | ✅     | ✅          | ✅       | ✅          | ✅               | ✅            | ❌                  |
-| **MultiPoint**         | ✅     | ✅          | ✅       | ✅          | ✅               | 🔄           | ❌                  |
+| **MultiPoint**         | ✅     | ✅          | ✅       | ✅          | ✅               | ✅            | ❌                  |
 | **MultiLineString**    | ✅     | ✅          | ✅       | ✅          | 🔄              | 🔄           | ❌                  |
-| **MultiPolygon**       | ✅     | ✅          | ✅       | 🔄         | 🔄              | 🔄           | ❌                  |
+| **MultiPolygon**       | ✅     | ✅          | ✅       | ✅          | 🔄              | 🔄           | ❌                  |
 | **GeometryCollection** | ❌     | ❌          | ❌       | ❌          | ❌               | ❌            | ❌                  |
 
 **Legend:**

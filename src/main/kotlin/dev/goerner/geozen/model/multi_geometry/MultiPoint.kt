@@ -25,6 +25,7 @@ data class MultiPoint(
             is Polygon -> ApproximateDistanceCalculator.calculate(other, this)
             is MultiPoint -> ApproximateDistanceCalculator.calculate(this, other)
             is MultiLineString -> ApproximateDistanceCalculator.calculate(this, other)
+            is MultiPolygon -> ApproximateDistanceCalculator.calculate(this, other)
             else -> throw UnsupportedOperationException("Fast distance calculation is not supported for geometry type: ${other::class.simpleName}")
         }
     }
@@ -36,6 +37,7 @@ data class MultiPoint(
             is Polygon -> PreciseDistanceCalculator.calculate(other, this)
             is MultiPoint -> PreciseDistanceCalculator.calculate(this, other)
             is MultiLineString -> PreciseDistanceCalculator.calculate(this, other)
+            is MultiPolygon -> PreciseDistanceCalculator.calculate(this, other)
             else -> throw UnsupportedOperationException("Exact distance calculation is not supported for geometry type: ${other::class.simpleName}")
         }
     }
