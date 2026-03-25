@@ -372,8 +372,27 @@ object ApproximateDistanceCalculator {
         return multiPolygon.coordinates.minOf { calculate(polygon, Polygon(it)) }
     }
     
+    /**
+     * Calculates an approximate distance between two MultiPoint geometries.
+     *
+     *
+     * This method iterates through all points in the first MultiPoint, calculates the distance from
+     * each point to the second MultiPoint using the point-to-multipoint approach, and returns the
+     * minimum distance found. This is faster but less accurate than the precise method, especially
+     * over large distances or near poles.
+     *
+     * @param multiPoint1 the first multi-point geometry
+     * @param multiPoint2 the second multi-point geometry
+     * @return the approximate minimum distance in meters between any point in multiPoint1 and any point in multiPoint2
+     */
     fun calculate(multiPoint1: MultiPoint, multiPoint2: MultiPoint): Double {
-        TODO()
+        require(multiPoint1.coordinates.isNotEmpty()) {
+            "MultiPoint must contain at least one point to calculate distance, but contained 0"
+        }
+        require(multiPoint2.coordinates.isNotEmpty()) {
+            "MultiPoint must contain at least one point to calculate distance, but contained 0"
+        }
+        return multiPoint1.coordinates.minOf { calculate(Point(it), multiPoint2) }
     }
     
     fun calculate(multiPoint: MultiPoint, multiLineString: MultiLineString): Double {

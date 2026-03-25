@@ -2216,4 +2216,125 @@ class PreciseDistanceCalculatorTest : FunSpec({
         }
         exception.message shouldBe "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
     }
+
+    test("MultiPoint to MultiPoint distance - two single-point MultiPoints") {
+        //given
+        val multiPoint1 = MultiPoint(
+            listOf(
+                Position(11.5, 49.3)
+            )
+        )
+        val multiPoint2 = MultiPoint(
+            listOf(
+                Position(11.6, 49.4)
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(multiPoint1, multiPoint2)
+
+        //then
+        // Same as Point(11.5, 49.3) to MultiPoint([Position(11.6, 49.4)])
+        preciseDistance shouldBe 13284.671121936399
+    }
+
+    test("MultiPoint to MultiPoint distance - shared point returns 0.0") {
+        //given
+        val multiPoint1 = MultiPoint(
+            listOf(
+                Position(11.5, 49.3),
+                Position(11.7, 49.5)
+            )
+        )
+        val multiPoint2 = MultiPoint(
+            listOf(
+                Position(11.4, 49.2),
+                Position(11.5, 49.3)  // Same as one point in multiPoint1
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(multiPoint1, multiPoint2)
+
+        //then
+        preciseDistance shouldBe 0.0
+    }
+
+    test("MultiPoint to MultiPoint distance - returns minimum pairwise distance") {
+        //given
+        val multiPoint1 = MultiPoint(
+            listOf(
+                Position(11.5, 49.3),   // Closest pair: (11.5, 49.3) <-> (11.51, 49.31)
+                Position(11.4, 49.2)
+            )
+        )
+        val multiPoint2 = MultiPoint(
+            listOf(
+                Position(11.6, 49.4),
+                Position(11.51, 49.31)  // Closest to (11.5, 49.3)
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(multiPoint1, multiPoint2)
+
+        //then
+        // Same minimum as Point(11.5, 49.3) to MultiPoint([..., Position(11.51, 49.31), ...])
+        preciseDistance shouldBe 1328.8225628740156
+    }
+
+    test("MultiPoint to MultiPoint distance - symmetric result") {
+        //given
+        val multiPoint1 = MultiPoint(
+            listOf(
+                Position(11.5, 49.3),
+                Position(11.4, 49.2)
+            )
+        )
+        val multiPoint2 = MultiPoint(
+            listOf(
+                Position(11.6, 49.4),
+                Position(11.51, 49.31)
+            )
+        )
+
+        //when
+        val distanceAtoB = PreciseDistanceCalculator.calculate(multiPoint1, multiPoint2)
+        val distanceBtoA = PreciseDistanceCalculator.calculate(multiPoint2, multiPoint1)
+
+        //then
+        distanceAtoB shouldBe distanceBtoA
+    }
+
+    test("MultiPoint to MultiPoint distance - empty first MultiPoint throws exception") {
+        //given
+        val emptyMultiPoint = MultiPoint(emptyList())
+        val multiPoint = MultiPoint(
+            listOf(
+                Position(11.5, 49.3)
+            )
+        )
+
+        //when & then
+        val exception = shouldThrow<IllegalArgumentException> {
+            PreciseDistanceCalculator.calculate(emptyMultiPoint, multiPoint)
+        }
+        exception.message shouldBe "MultiPoint must contain at least one point to calculate distance, but contained 0"
+    }
+
+    test("MultiPoint to MultiPoint distance - empty second MultiPoint throws exception") {
+        //given
+        val multiPoint = MultiPoint(
+            listOf(
+                Position(11.5, 49.3)
+            )
+        )
+        val emptyMultiPoint = MultiPoint(emptyList())
+
+        //when & then
+        val exception = shouldThrow<IllegalArgumentException> {
+            PreciseDistanceCalculator.calculate(multiPoint, emptyMultiPoint)
+        }
+        exception.message shouldBe "MultiPoint must contain at least one point to calculate distance, but contained 0"
+    }
 })
