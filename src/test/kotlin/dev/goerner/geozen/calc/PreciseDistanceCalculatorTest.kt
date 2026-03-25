@@ -2476,6 +2476,166 @@ class PreciseDistanceCalculatorTest : FunSpec({
         exception.message shouldBe "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
     }
 
+    test("MultiLineString to MultiLineString distance - single LineString in each MultiLineString") {
+        //given
+        val multiLineString1 = MultiLineString(
+            listOf(
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.6, 49.3)
+                )
+            )
+        )
+        val multiLineString2 = MultiLineString(
+            listOf(
+                listOf(
+                    Position(11.5, 49.31),
+                    Position(11.6, 49.31)
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(multiLineString1, multiLineString2)
+
+        //then
+        preciseDistance shouldBe 1112.156186547148
+    }
+
+    test("MultiLineString to MultiLineString distance - intersecting linestrings return 0.0") {
+        //given
+        val multiLineString1 = MultiLineString(
+            listOf(
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.5, 49.4)
+                )
+            )
+        )
+        val multiLineString2 = MultiLineString(
+            listOf(
+                listOf(
+                    Position(11.4, 49.35),
+                    Position(11.6, 49.35)
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(multiLineString1, multiLineString2)
+
+        //then
+        preciseDistance shouldBe 0.0
+    }
+
+    test("MultiLineString to MultiLineString distance - returns minimum distance across all line string combinations") {
+        //given
+        // Minimum distance is between LS_A and LS_C (≈ 1112 m apart); all other pairs are much further
+        val multiLineString1 = MultiLineString(
+            listOf(
+                listOf(   // LS_A – close to LS_C
+                    Position(11.5, 49.3),
+                    Position(11.6, 49.3)
+                ),
+                listOf(   // LS_B – far from both LS_C and LS_D
+                    Position(10.0, 48.0),
+                    Position(10.1, 48.0)
+                )
+            )
+        )
+        val multiLineString2 = MultiLineString(
+            listOf(
+                listOf(   // LS_C – 0.01° north of LS_A
+                    Position(11.5, 49.31),
+                    Position(11.6, 49.31)
+                ),
+                listOf(   // LS_D – far from LS_A and LS_B
+                    Position(10.0, 47.0),
+                    Position(10.1, 47.0)
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(multiLineString1, multiLineString2)
+
+        //then
+        preciseDistance shouldBe 1112.156186547148
+    }
+
+    test("MultiLineString to MultiLineString distance - symmetric result via geometry dispatch") {
+        //given
+        val multiLineString1 = MultiLineString(
+            listOf(
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.6, 49.3)
+                ),
+                listOf(
+                    Position(11.4, 49.2),
+                    Position(11.5, 49.2)
+                )
+            )
+        )
+        val multiLineString2 = MultiLineString(
+            listOf(
+                listOf(
+                    Position(11.51, 49.31),
+                    Position(11.52, 49.32)
+                ),
+                listOf(
+                    Position(11.6, 49.4),
+                    Position(11.7, 49.4)
+                )
+            )
+        )
+
+        //when
+        val forwardDistance = multiLineString1.exactDistanceTo(multiLineString2)
+        val reverseDistance = multiLineString2.exactDistanceTo(multiLineString1)
+
+        //then
+        forwardDistance shouldBe reverseDistance
+    }
+
+    test("MultiLineString to MultiLineString distance - empty first MultiLineString throws exception") {
+        //given
+        val emptyMultiLineString = MultiLineString(emptyList())
+        val multiLineString = MultiLineString(
+            listOf(
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.6, 49.4)
+                )
+            )
+        )
+
+        //when & then
+        val exception = shouldThrow<IllegalArgumentException> {
+            PreciseDistanceCalculator.calculate(emptyMultiLineString, multiLineString)
+        }
+        exception.message shouldBe "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
+    }
+
+    test("MultiLineString to MultiLineString distance - empty second MultiLineString throws exception") {
+        //given
+        val multiLineString = MultiLineString(
+            listOf(
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.6, 49.4)
+                )
+            )
+        )
+        val emptyMultiLineString = MultiLineString(emptyList())
+
+        //when & then
+        val exception = shouldThrow<IllegalArgumentException> {
+            PreciseDistanceCalculator.calculate(multiLineString, emptyMultiLineString)
+        }
+        exception.message shouldBe "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
+    }
+
     test("MultiPoint to MultiPolygon distance - single point to single polygon") {
         //given
         val multiPoint = MultiPoint(

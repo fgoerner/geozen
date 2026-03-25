@@ -501,8 +501,26 @@ object PreciseDistanceCalculator {
         return multiPoint.coordinates.minOf { calculate(Point(it), multiPolygon) }
     }
 
+    /**
+     * Calculates a precise distance between two MultiLineString geometries.
+     *
+     * This method iterates through all LineStrings in the first MultiLineString, calculates
+     * the distance from each LineString to the second MultiLineString using Karney's algorithm
+     * via the precise linestring-to-multilinestring distance calculation, and returns the
+     * minimum distance found.
+     *
+     * @param multiLineString1 the first multi-line string geometry
+     * @param multiLineString2 the second multi-line string geometry
+     * @return the precise minimum distance in meters
+     */
     fun calculate(multiLineString1: MultiLineString, multiLineString2: MultiLineString): Double {
-        TODO()
+        require(multiLineString1.coordinates.isNotEmpty()) {
+            "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
+        }
+        require(multiLineString2.coordinates.isNotEmpty()) {
+            "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
+        }
+        return multiLineString1.coordinates.minOf { calculate(LineString(it), multiLineString2) }
     }
 
     fun calculate(multiLineString: MultiLineString, multiPolygon: MultiPolygon): Double {
