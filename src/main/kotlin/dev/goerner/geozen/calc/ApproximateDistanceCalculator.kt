@@ -395,8 +395,27 @@ object ApproximateDistanceCalculator {
         return multiPoint1.coordinates.minOf { calculate(Point(it), multiPoint2) }
     }
     
+    /**
+     * Calculates an approximate distance between a MultiPoint and a MultiLineString.
+     *
+     *
+     * This method iterates through all points in the MultiPoint, calculates the distance from
+     * each point to the MultiLineString using the same approach as point-to-multilinestring
+     * distance calculation, and returns the minimum distance found. This is faster but less
+     * accurate than the precise method, especially over large distances or near poles.
+     *
+     * @param multiPoint      the multi-point geometry
+     * @param multiLineString the multi-line string geometry
+     * @return the approximate minimum distance in meters
+     */
     fun calculate(multiPoint: MultiPoint, multiLineString: MultiLineString): Double {
-        TODO()
+        require(multiPoint.coordinates.isNotEmpty()) {
+            "MultiPoint must contain at least one point to calculate distance, but contained 0"
+        }
+        require(multiLineString.coordinates.isNotEmpty()) {
+            "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
+        }
+        return multiPoint.coordinates.minOf { calculate(Point(it), multiLineString) }
     }
     
     fun calculate(multiPoint: MultiPoint, multiPolygon: MultiPolygon): Double {

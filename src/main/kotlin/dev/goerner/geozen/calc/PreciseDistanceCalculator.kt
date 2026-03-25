@@ -457,8 +457,26 @@ object PreciseDistanceCalculator {
         return multiPoint1.coordinates.minOf { calculate(Point(it), multiPoint2) }
     }
 
+    /**
+     * Calculates a precise distance between a MultiPoint and a MultiLineString.
+     *
+     *
+     * This method iterates through all points in the MultiPoint, calculates the distance from
+     * each point to the MultiLineString using the precise point-to-multilinestring distance
+     * calculation, and returns the minimum distance found.
+     *
+     * @param multiPoint      the multi-point geometry
+     * @param multiLineString the multi-line string geometry
+     * @return the precise minimum distance in meters
+     */
     fun calculate(multiPoint: MultiPoint, multiLineString: MultiLineString): Double {
-        TODO()
+        require(multiPoint.coordinates.isNotEmpty()) {
+            "MultiPoint must contain at least one point to calculate distance, but contained 0"
+        }
+        require(multiLineString.coordinates.isNotEmpty()) {
+            "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
+        }
+        return multiPoint.coordinates.minOf { calculate(Point(it), multiLineString) }
     }
 
     fun calculate(multiPoint: MultiPoint, multiPolygon: MultiPolygon): Double {

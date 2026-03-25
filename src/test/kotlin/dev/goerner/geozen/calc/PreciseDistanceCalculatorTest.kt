@@ -2337,4 +2337,142 @@ class PreciseDistanceCalculatorTest : FunSpec({
         }
         exception.message shouldBe "MultiPoint must contain at least one point to calculate distance, but contained 0"
     }
+
+    test("MultiPoint to MultiLineString distance - single point to single linestring") {
+        //given
+        val multiPoint = MultiPoint(
+            listOf(
+                Position(11.5, 49.3)
+            )
+        )
+        val multiLineString = MultiLineString(
+            listOf(
+                listOf(
+                    Position(11.6, 49.3),
+                    Position(11.6, 49.4)
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(multiPoint, multiLineString)
+
+        //then
+        preciseDistance shouldBe 7273.130052841674
+    }
+
+    test("MultiPoint to MultiLineString distance - point at vertex returns 0.0") {
+        //given
+        val multiPoint = MultiPoint(
+            listOf(
+                Position(11.6, 49.3)
+            )
+        )
+        val multiLineString = MultiLineString(
+            listOf(
+                listOf(
+                    Position(11.6, 49.3),
+                    Position(11.6, 49.4)
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(multiPoint, multiLineString)
+
+        //then
+        preciseDistance shouldBe 0.0
+    }
+
+    test("MultiPoint to MultiLineString distance - returns minimum distance across all points and linestrings") {
+        //given
+        val multiPoint = MultiPoint(
+            listOf(
+                Position(11.5, 49.3),
+                Position(11.59, 49.39)   // This point is closest to the first linestring
+            )
+        )
+        val multiLineString = MultiLineString(
+            listOf(
+                listOf(
+                    Position(11.6, 49.3),
+                    Position(11.6, 49.4)
+                ),
+                listOf(
+                    Position(11.4, 49.1),
+                    Position(11.3, 49.0)
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(multiPoint, multiLineString)
+
+        //then
+        preciseDistance shouldBe 725.987873116243
+    }
+
+    test("MultiPoint to MultiLineString distance - symmetric result via geometry dispatch") {
+        //given
+        val multiPoint = MultiPoint(
+            listOf(
+                Position(11.5, 49.3),
+                Position(11.4, 49.2)
+            )
+        )
+        val multiLineString = MultiLineString(
+            listOf(
+                listOf(
+                    Position(11.6, 49.3),
+                    Position(11.6, 49.4)
+                ),
+                listOf(
+                    Position(11.51, 49.31),
+                    Position(11.52, 49.32)
+                )
+            )
+        )
+
+        //when
+        val forwardDistance = multiPoint.exactDistanceTo(multiLineString)
+        val reverseDistance = multiLineString.exactDistanceTo(multiPoint)
+
+        //then
+        forwardDistance shouldBe reverseDistance
+    }
+
+    test("MultiPoint to MultiLineString distance - empty MultiPoint throws exception") {
+        //given
+        val emptyMultiPoint = MultiPoint(emptyList())
+        val multiLineString = MultiLineString(
+            listOf(
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.6, 49.4)
+                )
+            )
+        )
+
+        //when & then
+        val exception = shouldThrow<IllegalArgumentException> {
+            PreciseDistanceCalculator.calculate(emptyMultiPoint, multiLineString)
+        }
+        exception.message shouldBe "MultiPoint must contain at least one point to calculate distance, but contained 0"
+    }
+
+    test("MultiPoint to MultiLineString distance - empty MultiLineString throws exception") {
+        //given
+        val multiPoint = MultiPoint(
+            listOf(
+                Position(11.5, 49.3)
+            )
+        )
+        val emptyMultiLineString = MultiLineString(emptyList())
+
+        //when & then
+        val exception = shouldThrow<IllegalArgumentException> {
+            PreciseDistanceCalculator.calculate(multiPoint, emptyMultiLineString)
+        }
+        exception.message shouldBe "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
+    }
 })
