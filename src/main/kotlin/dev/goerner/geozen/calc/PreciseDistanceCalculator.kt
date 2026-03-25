@@ -523,12 +523,48 @@ object PreciseDistanceCalculator {
         return multiLineString1.coordinates.minOf { calculate(LineString(it), multiLineString2) }
     }
 
+    /**
+     * Calculates a precise distance between a MultiLineString and a MultiPolygon.
+     *
+     * This method iterates through all LineStrings in the MultiLineString, calculates the
+     * distance from each LineString to the MultiPolygon using the precise
+     * linestring-to-multipolygon distance calculation (Karney's algorithm), and returns
+     * the minimum distance found.
+     *
+     * @param multiLineString the multi-line string geometry
+     * @param multiPolygon    the multi-polygon geometry
+     * @return the precise minimum distance in meters
+     */
     fun calculate(multiLineString: MultiLineString, multiPolygon: MultiPolygon): Double {
-        TODO()
+        require(multiLineString.coordinates.isNotEmpty()) {
+            "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
+        }
+        require(multiPolygon.coordinates.isNotEmpty()) {
+            "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
+        }
+        return multiLineString.coordinates.minOf { calculate(LineString(it), multiPolygon) }
     }
 
+    /**
+     * Calculates a precise distance between two MultiPolygon geometries.
+     *
+     * This method iterates through all Polygons in the first MultiPolygon, calculates the
+     * distance from each Polygon to the second MultiPolygon using the precise
+     * polygon-to-multipolygon distance calculation (Karney's algorithm), and returns
+     * the minimum distance found.
+     *
+     * @param multiPolygon1 the first multi-polygon geometry
+     * @param multiPolygon2 the second multi-polygon geometry
+     * @return the precise minimum distance in meters
+     */
     fun calculate(multiPolygon1: MultiPolygon, multiPolygon2: MultiPolygon): Double {
-        TODO()
+        require(multiPolygon1.coordinates.isNotEmpty()) {
+            "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
+        }
+        require(multiPolygon2.coordinates.isNotEmpty()) {
+            "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
+        }
+        return multiPolygon1.coordinates.minOf { calculate(Polygon(it), multiPolygon2) }
     }
 
     /**

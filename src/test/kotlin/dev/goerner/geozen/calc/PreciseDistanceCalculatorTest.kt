@@ -2810,4 +2810,496 @@ class PreciseDistanceCalculatorTest : FunSpec({
         }
         exception.message shouldBe "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
     }
+
+    test("MultiLineString to MultiPolygon distance - single LineString to single polygon") {
+        //given
+        val multiLineString = MultiLineString(
+            listOf(
+                listOf(
+                    Position(11.4, 49.3),
+                    Position(11.45, 49.35)
+                )
+            )
+        )
+        val multiPolygon = MultiPolygon(
+            listOf(
+                listOf(
+                    listOf(
+                        Position(11.5, 49.3),
+                        Position(11.6, 49.3),
+                        Position(11.6, 49.4),
+                        Position(11.5, 49.4),
+                        Position(11.5, 49.3)
+                    )
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(multiLineString, multiPolygon)
+
+        //then
+        preciseDistance shouldBe 3632.8854322075017
+    }
+
+    test("MultiLineString to MultiPolygon distance - LineString inside polygon returns 0.0") {
+        //given
+        val multiLineString = MultiLineString(
+            listOf(
+                listOf(
+                    Position(11.52, 49.32),
+                    Position(11.58, 49.38)
+                )
+            )
+        )
+        val multiPolygon = MultiPolygon(
+            listOf(
+                listOf(
+                    listOf(
+                        Position(11.5, 49.3),
+                        Position(11.6, 49.3),
+                        Position(11.6, 49.4),
+                        Position(11.5, 49.4),
+                        Position(11.5, 49.3)
+                    )
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(multiLineString, multiPolygon)
+
+        //then
+        preciseDistance shouldBe 0.0
+    }
+
+    test("MultiLineString to MultiPolygon distance - LineString intersects polygon returns 0.0") {
+        //given
+        val multiLineString = MultiLineString(
+            listOf(
+                listOf(
+                    Position(11.45, 49.35),
+                    Position(11.55, 49.35)
+                )
+            )
+        )
+        val multiPolygon = MultiPolygon(
+            listOf(
+                listOf(
+                    listOf(
+                        Position(11.5, 49.3),
+                        Position(11.6, 49.3),
+                        Position(11.6, 49.4),
+                        Position(11.5, 49.4),
+                        Position(11.5, 49.3)
+                    )
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(multiLineString, multiPolygon)
+
+        //then
+        preciseDistance shouldBe 0.0
+    }
+
+    test("MultiLineString to MultiPolygon distance - returns minimum distance across all line string and polygon combinations") {
+        //given
+        // Minimum is between LS_A (close) and P1 (close); LS_B and P2 are far
+        val multiLineString = MultiLineString(
+            listOf(
+                listOf(   // LS_A – close to P1
+                    Position(11.4, 49.3),
+                    Position(11.45, 49.35)
+                ),
+                listOf(   // LS_B – far from both polygons
+                    Position(10.0, 48.0),
+                    Position(10.1, 48.0)
+                )
+            )
+        )
+        val multiPolygon = MultiPolygon(
+            listOf(
+                listOf(   // P1 – close to LS_A
+                    listOf(
+                        Position(11.5, 49.3),
+                        Position(11.6, 49.3),
+                        Position(11.6, 49.4),
+                        Position(11.5, 49.4),
+                        Position(11.5, 49.3)
+                    )
+                ),
+                listOf(   // P2 – far from both line strings
+                    listOf(
+                        Position(12.0, 50.0),
+                        Position(12.1, 50.0),
+                        Position(12.1, 50.1),
+                        Position(12.0, 50.1),
+                        Position(12.0, 50.0)
+                    )
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(multiLineString, multiPolygon)
+
+        //then
+        preciseDistance shouldBe 3632.8854322075017
+    }
+
+    test("MultiLineString to MultiPolygon distance - symmetric result via geometry dispatch") {
+        //given
+        val multiLineString = MultiLineString(
+            listOf(
+                listOf(
+                    Position(11.4, 49.3),
+                    Position(11.45, 49.35)
+                ),
+                listOf(
+                    Position(11.4, 49.2),
+                    Position(11.45, 49.25)
+                )
+            )
+        )
+        val multiPolygon = MultiPolygon(
+            listOf(
+                listOf(
+                    listOf(
+                        Position(11.5, 49.3),
+                        Position(11.6, 49.3),
+                        Position(11.6, 49.4),
+                        Position(11.5, 49.4),
+                        Position(11.5, 49.3)
+                    )
+                ),
+                listOf(
+                    listOf(
+                        Position(10.0, 48.0),
+                        Position(10.1, 48.0),
+                        Position(10.1, 48.1),
+                        Position(10.0, 48.1),
+                        Position(10.0, 48.0)
+                    )
+                )
+            )
+        )
+
+        //when
+        val forwardDistance = multiLineString.exactDistanceTo(multiPolygon)
+        val reverseDistance = multiPolygon.exactDistanceTo(multiLineString)
+
+        //then
+        forwardDistance shouldBe reverseDistance
+    }
+
+    test("MultiLineString to MultiPolygon distance - empty MultiLineString throws exception") {
+        //given
+        val emptyMultiLineString = MultiLineString(emptyList())
+        val multiPolygon = MultiPolygon(
+            listOf(
+                listOf(
+                    listOf(
+                        Position(11.5, 49.3),
+                        Position(11.6, 49.3),
+                        Position(11.6, 49.4),
+                        Position(11.5, 49.4),
+                        Position(11.5, 49.3)
+                    )
+                )
+            )
+        )
+
+        //when & then
+        val exception = shouldThrow<IllegalArgumentException> {
+            PreciseDistanceCalculator.calculate(emptyMultiLineString, multiPolygon)
+        }
+        exception.message shouldBe "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
+    }
+
+    test("MultiLineString to MultiPolygon distance - empty MultiPolygon throws exception") {
+        //given
+        val multiLineString = MultiLineString(
+            listOf(
+                listOf(
+                    Position(11.4, 49.3),
+                    Position(11.45, 49.35)
+                )
+            )
+        )
+        val emptyMultiPolygon = MultiPolygon(emptyList())
+
+        //when & then
+        val exception = shouldThrow<IllegalArgumentException> {
+            PreciseDistanceCalculator.calculate(multiLineString, emptyMultiPolygon)
+        }
+        exception.message shouldBe "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
+    }
+
+    test("MultiPolygon to MultiPolygon distance - single polygon in each MultiPolygon") {
+        //given
+        val multiPolygon1 = MultiPolygon(
+            listOf(
+                listOf(
+                    listOf(
+                        Position(11.5, 49.3),
+                        Position(11.6, 49.3),
+                        Position(11.6, 49.4),
+                        Position(11.5, 49.4),
+                        Position(11.5, 49.3)
+                    )
+                )
+            )
+        )
+        val multiPolygon2 = MultiPolygon(
+            listOf(
+                listOf(
+                    listOf(
+                        Position(11.7, 49.3),
+                        Position(11.8, 49.3),
+                        Position(11.8, 49.4),
+                        Position(11.7, 49.4),
+                        Position(11.7, 49.3)
+                    )
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(multiPolygon1, multiPolygon2)
+
+        //then
+        preciseDistance shouldBe 7258.404502774052
+    }
+
+    test("MultiPolygon to MultiPolygon distance - intersecting polygons return 0.0") {
+        //given
+        val multiPolygon1 = MultiPolygon(
+            listOf(
+                listOf(
+                    listOf(
+                        Position(11.5, 49.3),
+                        Position(11.6, 49.3),
+                        Position(11.6, 49.4),
+                        Position(11.5, 49.4),
+                        Position(11.5, 49.3)
+                    )
+                )
+            )
+        )
+        val multiPolygon2 = MultiPolygon(
+            listOf(
+                listOf(
+                    listOf(
+                        Position(11.55, 49.35),
+                        Position(11.65, 49.35),
+                        Position(11.65, 49.45),
+                        Position(11.55, 49.45),
+                        Position(11.55, 49.35)
+                    )
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(multiPolygon1, multiPolygon2)
+
+        //then
+        preciseDistance shouldBe 0.0
+    }
+
+    test("MultiPolygon to MultiPolygon distance - one polygon fully inside another returns 0.0") {
+        //given
+        val multiPolygon1 = MultiPolygon(
+            listOf(
+                listOf(
+                    listOf(
+                        Position(11.5, 49.3),
+                        Position(11.7, 49.3),
+                        Position(11.7, 49.5),
+                        Position(11.5, 49.5),
+                        Position(11.5, 49.3)
+                    )
+                )
+            )
+        )
+        val multiPolygon2 = MultiPolygon(
+            listOf(
+                listOf(
+                    listOf(
+                        Position(11.55, 49.35),
+                        Position(11.65, 49.35),
+                        Position(11.65, 49.45),
+                        Position(11.55, 49.45),
+                        Position(11.55, 49.35)
+                    )
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(multiPolygon1, multiPolygon2)
+
+        //then
+        preciseDistance shouldBe 0.0
+    }
+
+    test("MultiPolygon to MultiPolygon distance - returns minimum distance across all polygon combinations") {
+        //given
+        // Minimum is between P_A and P_C (close pair); P_B and P_D are far
+        val multiPolygon1 = MultiPolygon(
+            listOf(
+                listOf(   // P_A – close to P_C
+                    listOf(
+                        Position(11.5, 49.3),
+                        Position(11.6, 49.3),
+                        Position(11.6, 49.4),
+                        Position(11.5, 49.4),
+                        Position(11.5, 49.3)
+                    )
+                ),
+                listOf(   // P_B – far from both P_C and P_D
+                    listOf(
+                        Position(10.0, 48.0),
+                        Position(10.1, 48.0),
+                        Position(10.1, 48.1),
+                        Position(10.0, 48.1),
+                        Position(10.0, 48.0)
+                    )
+                )
+            )
+        )
+        val multiPolygon2 = MultiPolygon(
+            listOf(
+                listOf(   // P_C – close to P_A
+                    listOf(
+                        Position(11.7, 49.3),
+                        Position(11.8, 49.3),
+                        Position(11.8, 49.4),
+                        Position(11.7, 49.4),
+                        Position(11.7, 49.3)
+                    )
+                ),
+                listOf(   // P_D – far from P_A and P_B
+                    listOf(
+                        Position(12.0, 50.0),
+                        Position(12.1, 50.0),
+                        Position(12.1, 50.1),
+                        Position(12.0, 50.1),
+                        Position(12.0, 50.0)
+                    )
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(multiPolygon1, multiPolygon2)
+
+        //then
+        preciseDistance shouldBe 7258.404502774052
+    }
+
+    test("MultiPolygon to MultiPolygon distance - symmetric result via geometry dispatch") {
+        //given
+        val multiPolygon1 = MultiPolygon(
+            listOf(
+                listOf(
+                    listOf(
+                        Position(11.5, 49.3),
+                        Position(11.6, 49.3),
+                        Position(11.6, 49.4),
+                        Position(11.5, 49.4),
+                        Position(11.5, 49.3)
+                    )
+                ),
+                listOf(
+                    listOf(
+                        Position(10.0, 48.0),
+                        Position(10.1, 48.0),
+                        Position(10.1, 48.1),
+                        Position(10.0, 48.1),
+                        Position(10.0, 48.0)
+                    )
+                )
+            )
+        )
+        val multiPolygon2 = MultiPolygon(
+            listOf(
+                listOf(
+                    listOf(
+                        Position(11.7, 49.3),
+                        Position(11.8, 49.3),
+                        Position(11.8, 49.4),
+                        Position(11.7, 49.4),
+                        Position(11.7, 49.3)
+                    )
+                ),
+                listOf(
+                    listOf(
+                        Position(12.0, 50.0),
+                        Position(12.1, 50.0),
+                        Position(12.1, 50.1),
+                        Position(12.0, 50.1),
+                        Position(12.0, 50.0)
+                    )
+                )
+            )
+        )
+
+        //when
+        val forwardDistance = multiPolygon1.exactDistanceTo(multiPolygon2)
+        val reverseDistance = multiPolygon2.exactDistanceTo(multiPolygon1)
+
+        //then
+        forwardDistance shouldBe reverseDistance
+    }
+
+    test("MultiPolygon to MultiPolygon distance - empty first MultiPolygon throws exception") {
+        //given
+        val emptyMultiPolygon = MultiPolygon(emptyList())
+        val multiPolygon = MultiPolygon(
+            listOf(
+                listOf(
+                    listOf(
+                        Position(11.5, 49.3),
+                        Position(11.6, 49.3),
+                        Position(11.6, 49.4),
+                        Position(11.5, 49.4),
+                        Position(11.5, 49.3)
+                    )
+                )
+            )
+        )
+
+        //when & then
+        val exception = shouldThrow<IllegalArgumentException> {
+            PreciseDistanceCalculator.calculate(emptyMultiPolygon, multiPolygon)
+        }
+        exception.message shouldBe "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
+    }
+
+    test("MultiPolygon to MultiPolygon distance - empty second MultiPolygon throws exception") {
+        //given
+        val multiPolygon = MultiPolygon(
+            listOf(
+                listOf(
+                    listOf(
+                        Position(11.5, 49.3),
+                        Position(11.6, 49.3),
+                        Position(11.6, 49.4),
+                        Position(11.5, 49.4),
+                        Position(11.5, 49.3)
+                    )
+                )
+            )
+        )
+        val emptyMultiPolygon = MultiPolygon(emptyList())
+
+        //when & then
+        val exception = shouldThrow<IllegalArgumentException> {
+            PreciseDistanceCalculator.calculate(multiPolygon, emptyMultiPolygon)
+        }
+        exception.message shouldBe "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
+    }
 })

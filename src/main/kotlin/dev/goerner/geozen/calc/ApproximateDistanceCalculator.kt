@@ -464,12 +464,50 @@ object ApproximateDistanceCalculator {
         return multiLineString1.coordinates.minOf { calculate(LineString(it), multiLineString2) }
     }
     
+    /**
+     * Calculates an approximate distance between a MultiLineString and a MultiPolygon.
+     *
+     * This method iterates through all LineStrings in the MultiLineString, calculates the
+     * distance from each LineString to the MultiPolygon using the same approach as
+     * linestring-to-multipolygon distance calculation, and returns the minimum distance found.
+     * This is faster but less accurate than the precise method, especially over large distances
+     * or near poles.
+     *
+     * @param multiLineString the multi-line string geometry
+     * @param multiPolygon    the multi-polygon geometry
+     * @return the approximate minimum distance in meters
+     */
     fun calculate(multiLineString: MultiLineString, multiPolygon: MultiPolygon): Double {
-        TODO()
+        require(multiLineString.coordinates.isNotEmpty()) {
+            "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
+        }
+        require(multiPolygon.coordinates.isNotEmpty()) {
+            "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
+        }
+        return multiLineString.coordinates.minOf { calculate(LineString(it), multiPolygon) }
     }
-    
+
+    /**
+     * Calculates an approximate distance between two MultiPolygon geometries.
+     *
+     * This method iterates through all Polygons in the first MultiPolygon, calculates the
+     * distance from each Polygon to the second MultiPolygon using the same approach as
+     * polygon-to-multipolygon distance calculation, and returns the minimum distance found.
+     * This is faster but less accurate than the precise method, especially over large distances
+     * or near poles.
+     *
+     * @param multiPolygon1 the first multi-polygon geometry
+     * @param multiPolygon2 the second multi-polygon geometry
+     * @return the approximate minimum distance in meters
+     */
     fun calculate(multiPolygon1: MultiPolygon, multiPolygon2: MultiPolygon): Double {
-        TODO()
+        require(multiPolygon1.coordinates.isNotEmpty()) {
+            "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
+        }
+        require(multiPolygon2.coordinates.isNotEmpty()) {
+            "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
+        }
+        return multiPolygon1.coordinates.minOf { calculate(Polygon(it), multiPolygon2) }
     }
 
     /**
