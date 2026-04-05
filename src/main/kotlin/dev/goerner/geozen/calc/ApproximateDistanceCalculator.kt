@@ -149,7 +149,7 @@ object ApproximateDistanceCalculator {
         require(multiLineString.coordinates.isNotEmpty()) {
             "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
         }
-        return multiLineString.coordinates.minOf { calculate(point, LineString(it)) }
+        return multiLineString.coordinates.minOf { calculate(point, LineString(it, multiLineString.coordinateReferenceSystem)) }
     }
 
     /**
@@ -169,7 +169,7 @@ object ApproximateDistanceCalculator {
         require(multiPolygon.coordinates.isNotEmpty()) {
             "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
         }
-        return multiPolygon.coordinates.minOf { calculate(point, Polygon(it)) }
+        return multiPolygon.coordinates.minOf { calculate(point, Polygon(it, multiPolygon.coordinateReferenceSystem)) }
     }
 
     /**
@@ -268,7 +268,7 @@ object ApproximateDistanceCalculator {
         require(multiPoint.coordinates.isNotEmpty()) {
             "MultiPoint must contain at least one point to calculate distance, but contained 0"
         }
-        return multiPoint.coordinates.minOf { calculate(Point(it), lineString) }
+        return multiPoint.coordinates.minOf { calculate(Point(it, multiPoint.coordinateReferenceSystem), lineString) }
     }
     
     /**
@@ -289,7 +289,7 @@ object ApproximateDistanceCalculator {
         require(multiLineString.coordinates.isNotEmpty()) {
             "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
         }
-        return multiLineString.coordinates.minOf { calculate(lineString, LineString(it)) }
+        return multiLineString.coordinates.minOf { calculate(lineString, LineString(it, multiLineString.coordinateReferenceSystem)) }
     }
     
     /**
@@ -310,7 +310,7 @@ object ApproximateDistanceCalculator {
         require(multiPolygon.coordinates.isNotEmpty()) {
             "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
         }
-        return multiPolygon.coordinates.minOf { calculate(lineString, Polygon(it)) }
+        return multiPolygon.coordinates.minOf { calculate(lineString, Polygon(it, multiPolygon.coordinateReferenceSystem)) }
     }
     
     /**
@@ -329,7 +329,7 @@ object ApproximateDistanceCalculator {
         require(multiPoint.coordinates.isNotEmpty()) {
             "MultiPoint must contain at least one point to calculate distance, but contained 0"
         }
-        return multiPoint.coordinates.minOf { calculate(Point(it), polygon) }
+        return multiPoint.coordinates.minOf { calculate(Point(it, multiPoint.coordinateReferenceSystem), polygon) }
     }
     
     /**
@@ -349,7 +349,7 @@ object ApproximateDistanceCalculator {
         require(multiLineString.coordinates.isNotEmpty()) {
             "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
         }
-        return multiLineString.coordinates.minOf { calculate(LineString(it), polygon) }
+        return multiLineString.coordinates.minOf { calculate(LineString(it, multiLineString.coordinateReferenceSystem), polygon) }
     }
     
     /**
@@ -369,7 +369,7 @@ object ApproximateDistanceCalculator {
         require(multiPolygon.coordinates.isNotEmpty()) {
             "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
         }
-        return multiPolygon.coordinates.minOf { calculate(polygon, Polygon(it)) }
+        return multiPolygon.coordinates.minOf { calculate(polygon, Polygon(it, multiPolygon.coordinateReferenceSystem)) }
     }
     
     /**
@@ -392,7 +392,7 @@ object ApproximateDistanceCalculator {
         require(multiPoint2.coordinates.isNotEmpty()) {
             "MultiPoint must contain at least one point to calculate distance, but contained 0"
         }
-        return multiPoint1.coordinates.minOf { calculate(Point(it), multiPoint2) }
+        return multiPoint1.coordinates.minOf { calculate(Point(it, multiPoint1.coordinateReferenceSystem), multiPoint2) }
     }
     
     /**
@@ -415,7 +415,7 @@ object ApproximateDistanceCalculator {
         require(multiLineString.coordinates.isNotEmpty()) {
             "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
         }
-        return multiPoint.coordinates.minOf { calculate(Point(it), multiLineString) }
+        return multiPoint.coordinates.minOf { calculate(Point(it, multiPoint.coordinateReferenceSystem), multiLineString) }
     }
     
     /**
@@ -438,7 +438,7 @@ object ApproximateDistanceCalculator {
         require(multiPolygon.coordinates.isNotEmpty()) {
             "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
         }
-        return multiPoint.coordinates.minOf { calculate(Point(it), multiPolygon) }
+        return multiPoint.coordinates.minOf { calculate(Point(it, multiPoint.coordinateReferenceSystem), multiPolygon) }
     }
     
     /**
@@ -461,7 +461,7 @@ object ApproximateDistanceCalculator {
         require(multiLineString2.coordinates.isNotEmpty()) {
             "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
         }
-        return multiLineString1.coordinates.minOf { calculate(LineString(it), multiLineString2) }
+        return multiLineString1.coordinates.minOf { calculate(LineString(it, multiLineString1.coordinateReferenceSystem), multiLineString2) }
     }
     
     /**
@@ -484,7 +484,7 @@ object ApproximateDistanceCalculator {
         require(multiPolygon.coordinates.isNotEmpty()) {
             "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
         }
-        return multiLineString.coordinates.minOf { calculate(LineString(it), multiPolygon) }
+        return multiLineString.coordinates.minOf { calculate(LineString(it, multiLineString.coordinateReferenceSystem), multiPolygon) }
     }
 
     /**
@@ -507,7 +507,7 @@ object ApproximateDistanceCalculator {
         require(multiPolygon2.coordinates.isNotEmpty()) {
             "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
         }
-        return multiPolygon1.coordinates.minOf { calculate(Polygon(it), multiPolygon2) }
+        return multiPolygon1.coordinates.minOf { calculate(Polygon(it, multiPolygon1.coordinateReferenceSystem), multiPolygon2) }
     }
 
     /**
