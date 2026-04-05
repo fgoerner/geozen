@@ -26,7 +26,6 @@ and utilities for geometric calculations.
 - Kotlin 2.3.0 or higher (if using Kotlin)
 
 ## Installation
-[README.md](README.md)
 GeoZen is available on Maven Central. Add the following dependency to your project:
 
 ### Maven
