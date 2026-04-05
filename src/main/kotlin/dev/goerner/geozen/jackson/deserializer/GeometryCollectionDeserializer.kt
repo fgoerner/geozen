@@ -16,7 +16,7 @@ class GeometryCollectionDeserializer : AbstractGeometryDeserializer<GeometryColl
         val geometriesNode = rootNode["geometries"]
         require(geometriesNode != null && geometriesNode.isArray) { "Invalid or missing 'geometries' field for GeometryCollection." }
 
-        val geometries = geometriesNode.map {
+        val geometries = (geometriesNode as Iterable<JsonNode>).map {
             ctxt.readValue(it.traverse(ctxt), Geometry::class.java)
         }
 

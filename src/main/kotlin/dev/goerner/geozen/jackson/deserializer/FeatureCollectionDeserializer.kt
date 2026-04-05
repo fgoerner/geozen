@@ -20,7 +20,7 @@ class FeatureCollectionDeserializer : ValueDeserializer<FeatureCollection>() {
         val featuresNode = rootNode["features"]
         require(featuresNode != null && featuresNode.isArray) { "Missing or invalid 'features' field in FeatureCollection." }
 
-        val features = featuresNode.map {
+        val features = (featuresNode as Iterable<JsonNode>).map {
             ctxt.readValue(it.traverse(ctxt), Feature::class.java)
         }
 

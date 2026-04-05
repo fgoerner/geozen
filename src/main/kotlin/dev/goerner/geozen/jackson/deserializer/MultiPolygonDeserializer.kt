@@ -14,11 +14,11 @@ class MultiPolygonDeserializer : AbstractGeometryDeserializer<MultiPolygon>() {
 
         val coordinatesNode = rootNode["coordinates"]
         require(coordinatesNode != null && coordinatesNode.isArray) { "Invalid or missing 'coordinates' field for MultiPolygon geometry." }
-        val coordinates = coordinatesNode.map { polygonNode ->
-            require(polygonNode != null && polygonNode.isArray) { "Invalid Polygon in 'coordinates' field for MultiPolygon geometry." }
-            polygonNode.map { ringNode ->
-                require(ringNode != null && ringNode.isArray) { "Invalid linear ring in 'coordinates' field for MultiPolygon geometry." }
-                ringNode.map { parsePosition(it) }
+        val coordinates = (coordinatesNode as Iterable<JsonNode>).map { polygonNode ->
+            require(polygonNode.isArray) { "Invalid Polygon in 'coordinates' field for MultiPolygon geometry." }
+            (polygonNode as Iterable<JsonNode>).map { ringNode ->
+                require(ringNode.isArray) { "Invalid linear ring in 'coordinates' field for MultiPolygon geometry." }
+                (ringNode as Iterable<JsonNode>).map { parsePosition(it) }
             }
         }
 
