@@ -5,7 +5,9 @@ import dev.goerner.geozen.calc.PreciseDistanceCalculator
 import dev.goerner.geozen.model.CoordinateReferenceSystem
 import dev.goerner.geozen.model.Geometry
 import dev.goerner.geozen.model.Position
+import dev.goerner.geozen.model.simple_geometry.LineString
 import dev.goerner.geozen.model.simple_geometry.Point
+import dev.goerner.geozen.model.simple_geometry.Polygon
 
 /**
  * A [MultiPoint] is a [Geometry] that represents a collection of [Positions][Position] in space. It is
@@ -19,6 +21,11 @@ data class MultiPoint(
     override fun fastDistanceTo(other: Geometry): Double {
         return when (other) {
             is Point -> ApproximateDistanceCalculator.calculate(other, this)
+            is LineString -> ApproximateDistanceCalculator.calculate(other, this)
+            is Polygon -> ApproximateDistanceCalculator.calculate(other, this)
+            is MultiPoint -> ApproximateDistanceCalculator.calculate(this, other)
+            is MultiLineString -> ApproximateDistanceCalculator.calculate(this, other)
+            is MultiPolygon -> ApproximateDistanceCalculator.calculate(this, other)
             else -> throw UnsupportedOperationException("Fast distance calculation is not supported for geometry type: ${other::class.simpleName}")
         }
     }
@@ -26,6 +33,11 @@ data class MultiPoint(
     override fun exactDistanceTo(other: Geometry): Double {
         return when (other) {
             is Point -> PreciseDistanceCalculator.calculate(other, this)
+            is LineString -> PreciseDistanceCalculator.calculate(other, this)
+            is Polygon -> PreciseDistanceCalculator.calculate(other, this)
+            is MultiPoint -> PreciseDistanceCalculator.calculate(this, other)
+            is MultiLineString -> PreciseDistanceCalculator.calculate(this, other)
+            is MultiPolygon -> PreciseDistanceCalculator.calculate(this, other)
             else -> throw UnsupportedOperationException("Exact distance calculation is not supported for geometry type: ${other::class.simpleName}")
         }
     }

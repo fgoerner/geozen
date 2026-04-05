@@ -5,6 +5,9 @@ import dev.goerner.geozen.calc.PreciseDistanceCalculator
 import dev.goerner.geozen.model.CoordinateReferenceSystem
 import dev.goerner.geozen.model.Geometry
 import dev.goerner.geozen.model.Position
+import dev.goerner.geozen.model.multi_geometry.MultiLineString
+import dev.goerner.geozen.model.multi_geometry.MultiPoint
+import dev.goerner.geozen.model.multi_geometry.MultiPolygon
 
 /**
  * A [Polygon] is a [Geometry] that represents an area in space. It is defined by a list of
@@ -51,6 +54,9 @@ data class Polygon(
             is Point -> ApproximateDistanceCalculator.calculate(other, this)
             is LineString -> ApproximateDistanceCalculator.calculate(other, this)
             is Polygon -> ApproximateDistanceCalculator.calculate(other, this)
+            is MultiPoint -> ApproximateDistanceCalculator.calculate(this, other)
+            is MultiLineString -> ApproximateDistanceCalculator.calculate(this, other)
+            is MultiPolygon -> ApproximateDistanceCalculator.calculate(this, other)
             else -> throw UnsupportedOperationException("Fast distance calculation is not supported for geometry type: ${other::class.simpleName}")
         }
     }
@@ -60,6 +66,9 @@ data class Polygon(
             is Point -> PreciseDistanceCalculator.calculate(other, this)
             is LineString -> PreciseDistanceCalculator.calculate(other, this)
             is Polygon -> PreciseDistanceCalculator.calculate(other, this)
+            is MultiPoint -> PreciseDistanceCalculator.calculate(this, other)
+            is MultiLineString -> PreciseDistanceCalculator.calculate(this, other)
+            is MultiPolygon -> PreciseDistanceCalculator.calculate(this, other)
             else -> throw UnsupportedOperationException("Exact distance calculation is not supported for geometry type: ${other::class.simpleName}")
         }
     }

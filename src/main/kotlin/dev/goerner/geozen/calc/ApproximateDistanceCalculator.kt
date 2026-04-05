@@ -149,7 +149,7 @@ object ApproximateDistanceCalculator {
         require(multiLineString.coordinates.isNotEmpty()) {
             "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
         }
-        return multiLineString.coordinates.minOf { calculate(point, LineString(it)) }
+        return multiLineString.coordinates.minOf { calculate(point, LineString(it, multiLineString.coordinateReferenceSystem)) }
     }
 
     /**
@@ -169,7 +169,7 @@ object ApproximateDistanceCalculator {
         require(multiPolygon.coordinates.isNotEmpty()) {
             "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
         }
-        return multiPolygon.coordinates.minOf { calculate(point, Polygon(it)) }
+        return multiPolygon.coordinates.minOf { calculate(point, Polygon(it, multiPolygon.coordinateReferenceSystem)) }
     }
 
     /**
@@ -250,6 +250,264 @@ object ApproximateDistanceCalculator {
                 )
             }
         }
+    }
+    
+    /**
+     * Calculates an approximate distance between a LineString and a MultiPoint.
+     *
+     * This method iterates through all points in the MultiPoint, calculates the distance from
+     * the LineString to each point using the same approach as point-to-linestring distance
+     * calculation, and returns the minimum distance found. This is faster but less accurate
+     * than the precise method, especially over large distances or near poles.
+     *
+     * @param lineString the line string
+     * @param multiPoint the multi-point geometry
+     * @return the approximate minimum distance in meters
+     */
+    fun calculate(lineString: LineString, multiPoint: MultiPoint): Double {
+        require(multiPoint.coordinates.isNotEmpty()) {
+            "MultiPoint must contain at least one point to calculate distance, but contained 0"
+        }
+        return multiPoint.coordinates.minOf { calculate(Point(it, multiPoint.coordinateReferenceSystem), lineString) }
+    }
+    
+    /**
+     * Calculates an approximate distance between a LineString and a MultiLineString.
+     *
+     *
+     * This method iterates through all LineStrings in the MultiLineString, calculates the
+     * distance from the LineString to each member LineString using the same approach as
+     * linestring-to-linestring distance calculation, and returns the minimum distance found.
+     * This is faster but less accurate than the precise method, especially over large
+     * distances or near poles.
+     *
+     * @param lineString      the line string
+     * @param multiLineString the multi-line string geometry
+     * @return the approximate minimum distance in meters
+     */
+    fun calculate(lineString: LineString, multiLineString: MultiLineString): Double {
+        require(multiLineString.coordinates.isNotEmpty()) {
+            "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
+        }
+        return multiLineString.coordinates.minOf { calculate(lineString, LineString(it, multiLineString.coordinateReferenceSystem)) }
+    }
+    
+    /**
+     * Calculates an approximate distance between a LineString and a MultiPolygon.
+     *
+     *
+     * This method iterates through all Polygons in the MultiPolygon, calculates the
+     * distance from the LineString to each Polygon using the same approach as
+     * linestring-to-polygon distance calculation, and returns the minimum distance found.
+     * This is faster but less accurate than the precise method, especially over large
+     * distances or near poles.
+     *
+     * @param lineString   the line string
+     * @param multiPolygon the multi-polygon geometry
+     * @return the approximate minimum distance in meters
+     */
+    fun calculate(lineString: LineString, multiPolygon: MultiPolygon): Double {
+        require(multiPolygon.coordinates.isNotEmpty()) {
+            "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
+        }
+        return multiPolygon.coordinates.minOf { calculate(lineString, Polygon(it, multiPolygon.coordinateReferenceSystem)) }
+    }
+    
+    /**
+     * Calculates an approximate distance between a Polygon and a MultiPoint.
+     *
+     * This method iterates through all points in the MultiPoint, calculates the distance from
+     * the Polygon to each point using the same approach as point-to-polygon distance calculation,
+     * and returns the minimum distance found. This is faster but less accurate than the precise
+     * method, especially over large distances or near poles.
+     *
+     * @param polygon    the polygon
+     * @param multiPoint the multi-point geometry
+     * @return the approximate minimum distance in meters
+     */
+    fun calculate(polygon: Polygon, multiPoint: MultiPoint): Double {
+        require(multiPoint.coordinates.isNotEmpty()) {
+            "MultiPoint must contain at least one point to calculate distance, but contained 0"
+        }
+        return multiPoint.coordinates.minOf { calculate(Point(it, multiPoint.coordinateReferenceSystem), polygon) }
+    }
+    
+    /**
+     * Calculates an approximate distance between a Polygon and a MultiLineString.
+     *
+     * This method iterates through all LineStrings in the MultiLineString, calculates the
+     * distance from the Polygon to each member LineString using the same approach as
+     * linestring-to-polygon distance calculation, and returns the minimum distance found.
+     * This is faster but less accurate than the precise method, especially over large
+     * distances or near poles.
+     *
+     * @param polygon         the polygon
+     * @param multiLineString the multi-line string geometry
+     * @return the approximate minimum distance in meters
+     */
+    fun calculate(polygon: Polygon, multiLineString: MultiLineString): Double {
+        require(multiLineString.coordinates.isNotEmpty()) {
+            "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
+        }
+        return multiLineString.coordinates.minOf { calculate(LineString(it, multiLineString.coordinateReferenceSystem), polygon) }
+    }
+    
+    /**
+     * Calculates an approximate distance between a Polygon and a MultiPolygon.
+     *
+     * This method iterates through all Polygons in the MultiPolygon, calculates the
+     * distance from the Polygon to each member Polygon using the same approach as
+     * polygon-to-polygon distance calculation, and returns the minimum distance found.
+     * This is faster but less accurate than the precise method, especially over large
+     * distances or near poles.
+     *
+     * @param polygon      the polygon
+     * @param multiPolygon the multi-polygon geometry
+     * @return the approximate minimum distance in meters
+     */
+    fun calculate(polygon: Polygon, multiPolygon: MultiPolygon): Double {
+        require(multiPolygon.coordinates.isNotEmpty()) {
+            "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
+        }
+        return multiPolygon.coordinates.minOf { calculate(polygon, Polygon(it, multiPolygon.coordinateReferenceSystem)) }
+    }
+    
+    /**
+     * Calculates an approximate distance between two MultiPoint geometries.
+     *
+     *
+     * This method iterates through all points in the first MultiPoint, calculates the distance from
+     * each point to the second MultiPoint using the point-to-multipoint approach, and returns the
+     * minimum distance found. This is faster but less accurate than the precise method, especially
+     * over large distances or near poles.
+     *
+     * @param multiPoint1 the first multi-point geometry
+     * @param multiPoint2 the second multi-point geometry
+     * @return the approximate minimum distance in meters between any point in multiPoint1 and any point in multiPoint2
+     */
+    fun calculate(multiPoint1: MultiPoint, multiPoint2: MultiPoint): Double {
+        require(multiPoint1.coordinates.isNotEmpty()) {
+            "MultiPoint must contain at least one point to calculate distance, but contained 0"
+        }
+        require(multiPoint2.coordinates.isNotEmpty()) {
+            "MultiPoint must contain at least one point to calculate distance, but contained 0"
+        }
+        return multiPoint1.coordinates.minOf { calculate(Point(it, multiPoint1.coordinateReferenceSystem), multiPoint2) }
+    }
+    
+    /**
+     * Calculates an approximate distance between a MultiPoint and a MultiLineString.
+     *
+     *
+     * This method iterates through all points in the MultiPoint, calculates the distance from
+     * each point to the MultiLineString using the same approach as point-to-multilinestring
+     * distance calculation, and returns the minimum distance found. This is faster but less
+     * accurate than the precise method, especially over large distances or near poles.
+     *
+     * @param multiPoint      the multi-point geometry
+     * @param multiLineString the multi-line string geometry
+     * @return the approximate minimum distance in meters
+     */
+    fun calculate(multiPoint: MultiPoint, multiLineString: MultiLineString): Double {
+        require(multiPoint.coordinates.isNotEmpty()) {
+            "MultiPoint must contain at least one point to calculate distance, but contained 0"
+        }
+        require(multiLineString.coordinates.isNotEmpty()) {
+            "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
+        }
+        return multiPoint.coordinates.minOf { calculate(Point(it, multiPoint.coordinateReferenceSystem), multiLineString) }
+    }
+    
+    /**
+     * Calculates an approximate distance between a MultiPoint and a MultiPolygon.
+     *
+     *
+     * This method iterates through all points in the MultiPoint, calculates the distance from
+     * each point to the MultiPolygon using the same approach as point-to-multipolygon distance
+     * calculation, and returns the minimum distance found. This is faster but less accurate
+     * than the precise method, especially over large distances or near poles.
+     *
+     * @param multiPoint   the multi-point geometry
+     * @param multiPolygon the multi-polygon geometry
+     * @return the approximate minimum distance in meters
+     */
+    fun calculate(multiPoint: MultiPoint, multiPolygon: MultiPolygon): Double {
+        require(multiPoint.coordinates.isNotEmpty()) {
+            "MultiPoint must contain at least one point to calculate distance, but contained 0"
+        }
+        require(multiPolygon.coordinates.isNotEmpty()) {
+            "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
+        }
+        return multiPoint.coordinates.minOf { calculate(Point(it, multiPoint.coordinateReferenceSystem), multiPolygon) }
+    }
+    
+    /**
+     * Calculates an approximate distance between two MultiLineString geometries.
+     *
+     * This method iterates through all LineStrings in the first MultiLineString, calculates
+     * the distance from each LineString to the second MultiLineString using the same approach
+     * as linestring-to-multilinestring distance calculation, and returns the minimum distance
+     * found. This is faster but less accurate than the precise method, especially over large
+     * distances or near poles.
+     *
+     * @param multiLineString1 the first multi-line string geometry
+     * @param multiLineString2 the second multi-line string geometry
+     * @return the approximate minimum distance in meters
+     */
+    fun calculate(multiLineString1: MultiLineString, multiLineString2: MultiLineString): Double {
+        require(multiLineString1.coordinates.isNotEmpty()) {
+            "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
+        }
+        require(multiLineString2.coordinates.isNotEmpty()) {
+            "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
+        }
+        return multiLineString1.coordinates.minOf { calculate(LineString(it, multiLineString1.coordinateReferenceSystem), multiLineString2) }
+    }
+    
+    /**
+     * Calculates an approximate distance between a MultiLineString and a MultiPolygon.
+     *
+     * This method iterates through all LineStrings in the MultiLineString, calculates the
+     * distance from each LineString to the MultiPolygon using the same approach as
+     * linestring-to-multipolygon distance calculation, and returns the minimum distance found.
+     * This is faster but less accurate than the precise method, especially over large distances
+     * or near poles.
+     *
+     * @param multiLineString the multi-line string geometry
+     * @param multiPolygon    the multi-polygon geometry
+     * @return the approximate minimum distance in meters
+     */
+    fun calculate(multiLineString: MultiLineString, multiPolygon: MultiPolygon): Double {
+        require(multiLineString.coordinates.isNotEmpty()) {
+            "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
+        }
+        require(multiPolygon.coordinates.isNotEmpty()) {
+            "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
+        }
+        return multiLineString.coordinates.minOf { calculate(LineString(it, multiLineString.coordinateReferenceSystem), multiPolygon) }
+    }
+
+    /**
+     * Calculates an approximate distance between two MultiPolygon geometries.
+     *
+     * This method iterates through all Polygons in the first MultiPolygon, calculates the
+     * distance from each Polygon to the second MultiPolygon using the same approach as
+     * polygon-to-multipolygon distance calculation, and returns the minimum distance found.
+     * This is faster but less accurate than the precise method, especially over large distances
+     * or near poles.
+     *
+     * @param multiPolygon1 the first multi-polygon geometry
+     * @param multiPolygon2 the second multi-polygon geometry
+     * @return the approximate minimum distance in meters
+     */
+    fun calculate(multiPolygon1: MultiPolygon, multiPolygon2: MultiPolygon): Double {
+        require(multiPolygon1.coordinates.isNotEmpty()) {
+            "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
+        }
+        require(multiPolygon2.coordinates.isNotEmpty()) {
+            "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
+        }
+        return multiPolygon1.coordinates.minOf { calculate(Polygon(it, multiPolygon1.coordinateReferenceSystem), multiPolygon2) }
     }
 
     /**
