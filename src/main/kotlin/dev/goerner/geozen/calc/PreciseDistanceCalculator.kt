@@ -11,7 +11,7 @@ import net.sf.geographiclib.Geodesic
 import net.sf.geographiclib.GeodesicMask
 import kotlin.math.abs
 
-object PreciseDistanceCalculator {
+object PreciseDistanceCalculator : DistanceCalculator {
 
     /**
      * Calculates the distance between two geographical positions using Karney's algorithm.
@@ -49,7 +49,7 @@ object PreciseDistanceCalculator {
      * @param p2 the second point, providing latitude and longitude coordinates
      * @return the precise distance between `p1` and `p2` in meters
      */
-    fun calculate(p1: Point, p2: Point): Double {
+    override fun calculate(p1: Point, p2: Point): Double {
         return karneyDistance(p1.coordinates, p2.coordinates)
     }
 
@@ -67,7 +67,7 @@ object PreciseDistanceCalculator {
      * @param lineString the line string
      * @return the precise distance in meters
      */
-    fun calculate(p: Point, lineString: LineString): Double {
+    override fun calculate(p: Point, lineString: LineString): Double {
         return calculateMinDistanceToPositions(p, lineString.coordinates)
     }
 
@@ -84,7 +84,7 @@ object PreciseDistanceCalculator {
      * @param polygon the polygon
      * @return the precise distance in meters
      */
-    fun calculate(p: Point, polygon: Polygon): Double {
+    override fun calculate(p: Point, polygon: Polygon): Double {
         val rings = polygon.coordinates
         val exteriorRing = rings[0]
         val interiorRings = rings.drop(1)
@@ -118,7 +118,7 @@ object PreciseDistanceCalculator {
      * @param multiPoint the multi-point geometry
      * @return the minimum distance in meters from the point to any point in the multi-point
      */
-    fun calculate(point: Point, multiPoint: MultiPoint): Double {
+    override fun calculate(point: Point, multiPoint: MultiPoint): Double {
         require(multiPoint.coordinates.isNotEmpty()) {
             "MultiPoint must contain at least one point to calculate distance, but contained 0"
         }
@@ -135,7 +135,7 @@ object PreciseDistanceCalculator {
      * @param multiLineString the multi-line string geometry
      * @return the minimum distance in meters from the point to any line string in the multi-line string
      */
-    fun calculate(point: Point, multiLineString: MultiLineString): Double {
+    override fun calculate(point: Point, multiLineString: MultiLineString): Double {
         require(multiLineString.coordinates.isNotEmpty()) {
             "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
         }
@@ -152,7 +152,7 @@ object PreciseDistanceCalculator {
      * @param multiPolygon the multi-polygon geometry
      * @return the minimum distance in meters from the point to any polygon in the multi-polygon
      */
-    fun calculate(point: Point, multiPolygon: MultiPolygon): Double {
+    override fun calculate(point: Point, multiPolygon: MultiPolygon): Double {
         require(multiPolygon.coordinates.isNotEmpty()) {
             "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
         }
@@ -188,7 +188,7 @@ object PreciseDistanceCalculator {
      * @param lineString2 the second line string
      * @return the precise minimum distance in meters
      */
-    fun calculate(lineString1: LineString, lineString2: LineString): Double {
+    override fun calculate(lineString1: LineString, lineString2: LineString): Double {
         val positions1 = lineString1.coordinates
         val positions2 = lineString2.coordinates
 
@@ -218,7 +218,7 @@ object PreciseDistanceCalculator {
      * @param polygon    the polygon
      * @return the precise minimum distance in meters
      */
-    fun calculate(lineString: LineString, polygon: Polygon): Double {
+    override fun calculate(lineString: LineString, polygon: Polygon): Double {
         val lineStringPositions = lineString.coordinates
         val rings = polygon.coordinates
         val exteriorRing = rings[0]
@@ -280,7 +280,7 @@ object PreciseDistanceCalculator {
      * @param polygon2 the second polygon
      * @return the precise minimum distance in meters
      */
-    fun calculate(polygon1: Polygon, polygon2: Polygon): Double {
+    override fun calculate(polygon1: Polygon, polygon2: Polygon): Double {
         val rings1 = polygon1.coordinates
         val exteriorRing1 = rings1[0]
         val interiorRings1 = rings1.drop(1)
@@ -338,7 +338,7 @@ object PreciseDistanceCalculator {
      * @param multiPoint the multi-point geometry
      * @return the precise minimum distance in meters
      */
-    fun calculate(lineString: LineString, multiPoint: MultiPoint): Double {
+    override fun calculate(lineString: LineString, multiPoint: MultiPoint): Double {
         require(multiPoint.coordinates.isNotEmpty()) {
             "MultiPoint must contain at least one point to calculate distance, but contained 0"
         }
@@ -356,7 +356,7 @@ object PreciseDistanceCalculator {
      * @param multiLineString the multi-line string geometry
      * @return the precise minimum distance in meters
      */
-    fun calculate(lineString: LineString, multiLineString: MultiLineString): Double {
+    override fun calculate(lineString: LineString, multiLineString: MultiLineString): Double {
         require(multiLineString.coordinates.isNotEmpty()) {
             "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
         }
@@ -374,7 +374,7 @@ object PreciseDistanceCalculator {
      * @param multiPolygon the multi-polygon geometry
      * @return the precise minimum distance in meters
      */
-    fun calculate(lineString: LineString, multiPolygon: MultiPolygon): Double {
+    override fun calculate(lineString: LineString, multiPolygon: MultiPolygon): Double {
         require(multiPolygon.coordinates.isNotEmpty()) {
             "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
         }
@@ -392,7 +392,7 @@ object PreciseDistanceCalculator {
      * @param multiPoint the multi-point geometry
      * @return the precise minimum distance in meters
      */
-    fun calculate(polygon: Polygon, multiPoint: MultiPoint): Double {
+    override fun calculate(polygon: Polygon, multiPoint: MultiPoint): Double {
         require(multiPoint.coordinates.isNotEmpty()) {
             "MultiPoint must contain at least one point to calculate distance, but contained 0"
         }
@@ -410,7 +410,7 @@ object PreciseDistanceCalculator {
      * @param multiLineString the multi-line string geometry
      * @return the precise minimum distance in meters
      */
-    fun calculate(polygon: Polygon, multiLineString: MultiLineString): Double {
+    override fun calculate(polygon: Polygon, multiLineString: MultiLineString): Double {
         require(multiLineString.coordinates.isNotEmpty()) {
             "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
         }
@@ -428,7 +428,7 @@ object PreciseDistanceCalculator {
      * @param multiPolygon the multi-polygon geometry
      * @return the precise minimum distance in meters
      */
-    fun calculate(polygon: Polygon, multiPolygon: MultiPolygon): Double {
+    override fun calculate(polygon: Polygon, multiPolygon: MultiPolygon): Double {
         require(multiPolygon.coordinates.isNotEmpty()) {
             "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
         }
@@ -447,7 +447,7 @@ object PreciseDistanceCalculator {
      * @param multiPoint2 the second multi-point geometry
      * @return the precise minimum distance in meters between any point in multiPoint1 and any point in multiPoint2
      */
-    fun calculate(multiPoint1: MultiPoint, multiPoint2: MultiPoint): Double {
+    override fun calculate(multiPoint1: MultiPoint, multiPoint2: MultiPoint): Double {
         require(multiPoint1.coordinates.isNotEmpty()) {
             "MultiPoint must contain at least one point to calculate distance, but contained 0"
         }
@@ -469,7 +469,7 @@ object PreciseDistanceCalculator {
      * @param multiLineString the multi-line string geometry
      * @return the precise minimum distance in meters
      */
-    fun calculate(multiPoint: MultiPoint, multiLineString: MultiLineString): Double {
+    override fun calculate(multiPoint: MultiPoint, multiLineString: MultiLineString): Double {
         require(multiPoint.coordinates.isNotEmpty()) {
             "MultiPoint must contain at least one point to calculate distance, but contained 0"
         }
@@ -491,7 +491,7 @@ object PreciseDistanceCalculator {
      * @param multiPolygon the multi-polygon geometry
      * @return the precise minimum distance in meters
      */
-    fun calculate(multiPoint: MultiPoint, multiPolygon: MultiPolygon): Double {
+    override fun calculate(multiPoint: MultiPoint, multiPolygon: MultiPolygon): Double {
         require(multiPoint.coordinates.isNotEmpty()) {
             "MultiPoint must contain at least one point to calculate distance, but contained 0"
         }
@@ -513,7 +513,7 @@ object PreciseDistanceCalculator {
      * @param multiLineString2 the second multi-line string geometry
      * @return the precise minimum distance in meters
      */
-    fun calculate(multiLineString1: MultiLineString, multiLineString2: MultiLineString): Double {
+    override fun calculate(multiLineString1: MultiLineString, multiLineString2: MultiLineString): Double {
         require(multiLineString1.coordinates.isNotEmpty()) {
             "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
         }
@@ -535,7 +535,7 @@ object PreciseDistanceCalculator {
      * @param multiPolygon    the multi-polygon geometry
      * @return the precise minimum distance in meters
      */
-    fun calculate(multiLineString: MultiLineString, multiPolygon: MultiPolygon): Double {
+    override fun calculate(multiLineString: MultiLineString, multiPolygon: MultiPolygon): Double {
         require(multiLineString.coordinates.isNotEmpty()) {
             "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
         }
@@ -557,7 +557,7 @@ object PreciseDistanceCalculator {
      * @param multiPolygon2 the second multi-polygon geometry
      * @return the precise minimum distance in meters
      */
-    fun calculate(multiPolygon1: MultiPolygon, multiPolygon2: MultiPolygon): Double {
+    override fun calculate(multiPolygon1: MultiPolygon, multiPolygon2: MultiPolygon): Double {
         require(multiPolygon1.coordinates.isNotEmpty()) {
             "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
         }
