@@ -45,63 +45,22 @@ internal object LineStringToPolygonDistanceHelper {
         interiorRings: List<List<Position>>
     ): AnalysisResult {
         // Phase 1: Check for segment intersections between LineString and any polygon ring
-        for (i in 0 until lineStringPositions.size - 1) {
-            val lsSegStart = lineStringPositions[i]
-            val lsSegEnd = lineStringPositions[i + 1]
-
-            // Check intersection with exterior ring
-            for (j in 0 until exteriorRing.size - 1) {
-                val ringSegStart = exteriorRing[j]
-                val ringSegEnd = exteriorRing[j + 1]
-
-                if (GeometricUtils.doSegmentsIntersect(lsSegStart, lsSegEnd, ringSegStart, ringSegEnd)) {
-                    return AnalysisResult.Intersection
-                }
-            }
-
-            // Check intersection with interior rings (holes)
-            for (hole in interiorRings) {
-                for (j in 0 until hole.size - 1) {
-                    val holeSegStart = hole[j]
-                    val holeSegEnd = hole[j + 1]
-
-                    if (GeometricUtils.doSegmentsIntersect(lsSegStart, lsSegEnd, holeSegStart, holeSegEnd)) {
-                        return AnalysisResult.Intersection
-                    }
-                }
+        if (GeometricUtils.doPolylineSegmentsIntersect(lineStringPositions, exteriorRing)) {
+            return AnalysisResult.Intersection
+        }
+        for (hole in interiorRings) {
+            if (GeometricUtils.doPolylineSegmentsIntersect(lineStringPositions, hole)) {
+                return AnalysisResult.Intersection
             }
         }
 
-        // Phase 2: Check containment - analyze LineString vertices
-        var allVerticesInsidePolygon = true
-        var anyVertexInHole = false
-        var holeContainingVertex: List<Position>? = null
-
-        for (position in lineStringPositions) {
-            val insideExterior = GeometricUtils.isPointInsideRing(position.longitude, position.latitude, exteriorRing)
-
-            if (!insideExterior) {
-                allVerticesInsidePolygon = false
-                break
-            }
-
-            // Check if this vertex is in any hole
-            val hole = interiorRings.firstOrNull { h ->
-                GeometricUtils.isPointInsideRing(position.longitude, position.latitude, h)
-            }
-            if (hole != null) {
-                anyVertexInHole = true
-                holeContainingVertex = hole
-                allVerticesInsidePolygon = false
-                break
-            }
-        }
-
-        // Determine the result based on containment analysis
-        return when {
-            allVerticesInsidePolygon -> AnalysisResult.FullyContained
-            anyVertexInHole && holeContainingVertex != null -> AnalysisResult.InHole(holeContainingVertex)
-            else -> AnalysisResult.NoIntersectionOrContainment
+        // Phase 2: Check containment – are all LineString vertices inside the polygon?
+        return when (val containment = GeometricUtils.checkVertexContainment(
+            lineStringPositions, exteriorRing, interiorRings
+        )) {
+            is GeometricUtils.VertexContainmentResult.FullyContained  -> AnalysisResult.FullyContained
+            is GeometricUtils.VertexContainmentResult.InHole          -> AnalysisResult.InHole(containment.holeRing)
+            is GeometricUtils.VertexContainmentResult.NotContained    -> AnalysisResult.NoIntersectionOrContainment
         }
     }
 

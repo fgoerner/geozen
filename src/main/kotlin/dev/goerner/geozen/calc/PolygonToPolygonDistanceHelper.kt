@@ -59,7 +59,7 @@ internal object PolygonToPolygonDistanceHelper {
         // Phase 1: Check for segment intersections between any rings of both polygons
         for (ring1 in rings1) {
             for (ring2 in rings2) {
-                if (doRingsIntersect(ring1, ring2)) {
+                if (GeometricUtils.doPolylineSegmentsIntersect(ring1, ring2)) {
                     return AnalysisResult.Intersection
                 }
             }
@@ -67,119 +67,22 @@ internal object PolygonToPolygonDistanceHelper {
 
         // Phase 2: Check containment relationships
         // Check if any vertex of polygon1 is contained in polygon2
-        val polygon1VerticesInPolygon2 = checkPolygonContainment(
-            exteriorRing1,
-            exteriorRing2,
-            interiorRings2
-        )
-
-        when (polygon1VerticesInPolygon2) {
-            is ContainmentCheck.FullyContained -> return AnalysisResult.Polygon1ContainedInPolygon2
-            is ContainmentCheck.InHole -> return AnalysisResult.Polygon1InHoleOfPolygon2(polygon1VerticesInPolygon2.holeRing)
-            is ContainmentCheck.NotContained -> {} // Continue checking
+        when (val r = GeometricUtils.checkVertexContainment(exteriorRing1, exteriorRing2, interiorRings2)) {
+            is GeometricUtils.VertexContainmentResult.FullyContained -> return AnalysisResult.Polygon1ContainedInPolygon2
+            is GeometricUtils.VertexContainmentResult.InHole         -> return AnalysisResult.Polygon1InHoleOfPolygon2(r.holeRing)
+            is GeometricUtils.VertexContainmentResult.NotContained   -> Unit // continue
         }
 
         // Check if any vertex of polygon2 is contained in polygon1
-        val polygon2VerticesInPolygon1 = checkPolygonContainment(
-            exteriorRing2,
-            exteriorRing1,
-            interiorRings1
-        )
-
-        when (polygon2VerticesInPolygon1) {
-            is ContainmentCheck.FullyContained -> return AnalysisResult.Polygon2ContainedInPolygon1
-            is ContainmentCheck.InHole -> return AnalysisResult.Polygon2InHoleOfPolygon1(polygon2VerticesInPolygon1.holeRing)
-            is ContainmentCheck.NotContained -> {} // Continue to general case
+        when (val r = GeometricUtils.checkVertexContainment(exteriorRing2, exteriorRing1, interiorRings1)) {
+            is GeometricUtils.VertexContainmentResult.FullyContained -> return AnalysisResult.Polygon2ContainedInPolygon1
+            is GeometricUtils.VertexContainmentResult.InHole         -> return AnalysisResult.Polygon2InHoleOfPolygon1(r.holeRing)
+            is GeometricUtils.VertexContainmentResult.NotContained   -> Unit // continue
         }
 
         return AnalysisResult.NoIntersectionOrContainment
     }
 
-    /**
-     * Result of containment check for a polygon within another polygon.
-     */
-    private sealed class ContainmentCheck {
-        /** All vertices are inside the polygon (not in any hole) */
-        object FullyContained : ContainmentCheck()
-
-        /** At least one vertex is inside a hole */
-        data class InHole(val holeRing: List<Position>) : ContainmentCheck()
-
-        /** Vertices are not contained */
-        object NotContained : ContainmentCheck()
-    }
-
-    /**
-     * Checks if any ring of one polygon intersects with another ring.
-     *
-     * @param ring1 first ring
-     * @param ring2 second ring
-     * @return true if rings intersect, false otherwise
-     */
-    private fun doRingsIntersect(ring1: List<Position>, ring2: List<Position>): Boolean {
-        for (i in 0 until ring1.size - 1) {
-            val seg1Start = ring1[i]
-            val seg1End = ring1[i + 1]
-
-            for (j in 0 until ring2.size - 1) {
-                val seg2Start = ring2[j]
-                val seg2End = ring2[j + 1]
-
-                if (GeometricUtils.doSegmentsIntersect(seg1Start, seg1End, seg2Start, seg2End)) {
-                    return true
-                }
-            }
-        }
-        return false
-    }
-
-    /**
-     * Checks containment of vertices from one polygon within another polygon.
-     *
-     * @param testRing the exterior ring of the polygon to test
-     * @param containerExteriorRing the exterior ring of the container polygon
-     * @param containerInteriorRings the holes of the container polygon
-     * @return containment check result
-     */
-    private fun checkPolygonContainment(
-        testRing: List<Position>,
-        containerExteriorRing: List<Position>,
-        containerInteriorRings: List<List<Position>>
-    ): ContainmentCheck {
-        var allVerticesInsidePolygon = true
-        var anyVertexInHole = false
-        var holeContainingVertex: List<Position>? = null
-
-        for (position in testRing) {
-            val insideExterior = GeometricUtils.isPointInsideRing(
-                position.longitude,
-                position.latitude,
-                containerExteriorRing
-            )
-
-            if (!insideExterior) {
-                allVerticesInsidePolygon = false
-                break
-            }
-
-            // Check if this vertex is in any hole
-            val hole = containerInteriorRings.firstOrNull { h ->
-                GeometricUtils.isPointInsideRing(position.longitude, position.latitude, h)
-            }
-            if (hole != null) {
-                anyVertexInHole = true
-                holeContainingVertex = hole
-                allVerticesInsidePolygon = false
-                break
-            }
-        }
-
-        return when {
-            allVerticesInsidePolygon -> ContainmentCheck.FullyContained
-            anyVertexInHole && holeContainingVertex != null -> ContainmentCheck.InHole(holeContainingVertex)
-            else -> ContainmentCheck.NotContained
-        }
-    }
 
     /**
      * Calculates distance when one polygon is inside a hole of another polygon.

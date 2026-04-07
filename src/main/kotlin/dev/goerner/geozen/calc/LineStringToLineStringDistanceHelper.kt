@@ -4,41 +4,13 @@ import dev.goerner.geozen.model.Position
 import dev.goerner.geozen.model.simple_geometry.Point
 
 /**
- * Internal helper class for LineString-to-LineString distance calculations.
+ * Internal helper for LineString-to-LineString distance calculations.
  *
- * This class encapsulates the shared intersection detection logic that is common to both
- * ApproximateDistanceCalculator and PreciseDistanceCalculator. Only the distance
- * calculation differs between the two calculators.
+ * Intersection detection is handled by [GeometricUtils.doPolylineSegmentsIntersect].
+ * This object provides only the bidirectional distance helper that is common to both
+ * [ApproximateDistanceCalculator] and [PreciseDistanceCalculator].
  */
 internal object LineStringToLineStringDistanceHelper {
-
-    /**
-     * Checks if two LineStrings have any intersecting segments.
-     *
-     * @param positions1 vertices of the first LineString
-     * @param positions2 vertices of the second LineString
-     * @return true if any segments intersect, false otherwise
-     */
-    fun doLineStringsIntersect(
-        positions1: List<Position>,
-        positions2: List<Position>
-    ): Boolean {
-        // Check for segment-segment intersections
-        for (i in 0 until positions1.size - 1) {
-            val seg1Start = positions1[i]
-            val seg1End = positions1[i + 1]
-
-            for (j in 0 until positions2.size - 1) {
-                val seg2Start = positions2[j]
-                val seg2End = positions2[j + 1]
-
-                if (GeometricUtils.doSegmentsIntersect(seg1Start, seg1End, seg2Start, seg2End)) {
-                    return true
-                }
-            }
-        }
-        return false
-    }
 
     /**
      * Calculates bidirectional distance between two LineStrings.
