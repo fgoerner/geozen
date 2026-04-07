@@ -14,6 +14,81 @@ import dev.goerner.geozen.model.Position
 internal object GeometricUtils {
 
     /**
+     * Result of checking whether a sequence of vertices lies inside a polygon
+     * (defined by an exterior ring and zero or more interior rings / holes).
+     */
+    sealed class VertexContainmentResult {
+        /** Every vertex is inside the exterior ring and outside all holes. */
+        object FullyContained : VertexContainmentResult()
+
+        /** At least one vertex is inside a hole. */
+        data class InHole(val holeRing: List<Position>) : VertexContainmentResult()
+
+        /** At least one vertex is outside the exterior ring. */
+        object NotContained : VertexContainmentResult()
+    }
+
+    /**
+     * Checks whether all vertices in [vertices] are contained within the polygon described
+     * by [exteriorRing] and [interiorRings].
+     *
+     * The check short-circuits as soon as a vertex is found outside the exterior ring or
+     * inside a hole.  Uses [isPointInsideRing] (ray-casting, planar approximation).
+     *
+     * @param vertices       the positions to test
+     * @param exteriorRing   the outer boundary of the polygon
+     * @param interiorRings  the hole rings of the polygon (may be empty)
+     * @return [VertexContainmentResult.FullyContained] if every vertex is inside the polygon
+     *         and outside all holes, [VertexContainmentResult.InHole] if a vertex falls inside
+     *         a hole (carrying that hole's ring), or [VertexContainmentResult.NotContained] if
+     *         any vertex lies outside the exterior ring.
+     */
+    fun checkVertexContainment(
+        vertices: List<Position>,
+        exteriorRing: List<Position>,
+        interiorRings: List<List<Position>>
+    ): VertexContainmentResult {
+        for (position in vertices) {
+            if (!isPointInsideRing(position.longitude, position.latitude, exteriorRing)) {
+                return VertexContainmentResult.NotContained
+            }
+            val hole = interiorRings.firstOrNull { h ->
+                isPointInsideRing(position.longitude, position.latitude, h)
+            }
+            if (hole != null) {
+                return VertexContainmentResult.InHole(hole)
+            }
+        }
+        return VertexContainmentResult.FullyContained
+    }
+
+    /**
+     * Checks if two polylines (or rings) have any pair of intersecting segments.
+     *
+     * Iterates over all consecutive pairs in [seq1] and [seq2] and delegates to
+     * [doSegmentsIntersect]. Returns `true` as soon as a single intersection is found.
+     *
+     * Both [seq1] and [seq2] must contain at least two positions (so that at least one segment
+     * exists in each); passing a single-position list always returns `false`.
+     *
+     * @param seq1 the first sequence of positions (linestring or ring)
+     * @param seq2 the second sequence of positions (linestring or ring)
+     * @return `true` if any segment from [seq1] intersects any segment from [seq2]
+     */
+    fun doPolylineSegmentsIntersect(seq1: List<Position>, seq2: List<Position>): Boolean {
+        for (i in 0 until seq1.size - 1) {
+            val seg1Start = seq1[i]
+            val seg1End   = seq1[i + 1]
+            for (j in 0 until seq2.size - 1) {
+                val seg2Start = seq2[j]
+                val seg2End   = seq2[j + 1]
+                if (doSegmentsIntersect(seg1Start, seg1End, seg2Start, seg2End)) return true
+            }
+        }
+        return false
+    }
+
+    /**
      * Checks if two line segments intersect using the cross product method.
      *
      * This method uses a planar approximation (treating lat/lon as x/y coordinates),

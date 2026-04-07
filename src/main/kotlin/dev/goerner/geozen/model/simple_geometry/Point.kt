@@ -5,9 +5,6 @@ import dev.goerner.geozen.calc.PreciseDistanceCalculator
 import dev.goerner.geozen.model.CoordinateReferenceSystem
 import dev.goerner.geozen.model.Geometry
 import dev.goerner.geozen.model.Position
-import dev.goerner.geozen.model.multi_geometry.MultiLineString
-import dev.goerner.geozen.model.multi_geometry.MultiPoint
-import dev.goerner.geozen.model.multi_geometry.MultiPolygon
 
 /**
  * A [Point] is a [Geometry] that represents a single position in space. It is defined by a single
@@ -28,29 +25,11 @@ data class Point(
         coordinateReferenceSystem
     )
 
-    override fun fastDistanceTo(other: Geometry): Double {
-        return when (other) {
-            is Point -> ApproximateDistanceCalculator.calculate(this, other)
-            is LineString -> ApproximateDistanceCalculator.calculate(this, other)
-            is Polygon -> ApproximateDistanceCalculator.calculate(this, other)
-            is MultiPoint -> ApproximateDistanceCalculator.calculate(this, other)
-            is MultiLineString -> ApproximateDistanceCalculator.calculate(this, other)
-            is MultiPolygon -> ApproximateDistanceCalculator.calculate(this, other)
-            else -> throw UnsupportedOperationException("Fast distance calculation is not supported for geometry type: ${other::class.simpleName}")
-        }
-    }
+    override fun fastDistanceTo(other: Geometry): Double =
+        ApproximateDistanceCalculator.calculate(this, other)
 
-    override fun exactDistanceTo(other: Geometry): Double {
-        return when (other) {
-            is Point -> PreciseDistanceCalculator.calculate(this, other)
-            is LineString -> PreciseDistanceCalculator.calculate(this, other)
-            is Polygon -> PreciseDistanceCalculator.calculate(this, other)
-            is MultiPoint -> PreciseDistanceCalculator.calculate(this, other)
-            is MultiLineString -> PreciseDistanceCalculator.calculate(this, other)
-            is MultiPolygon -> PreciseDistanceCalculator.calculate(this, other)
-            else -> throw UnsupportedOperationException("Exact distance calculation is not supported for geometry type: ${other::class.simpleName}")
-        }
-    }
+    override fun exactDistanceTo(other: Geometry): Double =
+        PreciseDistanceCalculator.calculate(this, other)
 
     val longitude: Double
         get() = this.coordinates.longitude
