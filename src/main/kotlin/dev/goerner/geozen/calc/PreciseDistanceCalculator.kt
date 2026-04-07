@@ -63,7 +63,7 @@ object PreciseDistanceCalculator : AbstractDistanceCalculator() {
                 GeodesicMask.DISTANCE or GeodesicMask.AZIMUTH
             )
 
-            var azDiffA = normalizeAzimuthDiff(gAP.azi1 - gAB.azi1)
+            val azDiffA = normalizeAzimuthDiff(gAP.azi1 - gAB.azi1)
 
             val dist = if (azDiffA > 90) {
                 // Closest is p1
@@ -78,7 +78,7 @@ object PreciseDistanceCalculator : AbstractDistanceCalculator() {
                     GeodesicMask.AZIMUTH
                 )
 
-                var azDiffB = normalizeAzimuthDiff(gBP.azi1 - gBA.azi1)
+                val azDiffB = normalizeAzimuthDiff(gBP.azi1 - gBA.azi1)
 
                 if (azDiffB > 90) {
                     // Closest is p2
