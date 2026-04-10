@@ -1,5 +1,7 @@
 package dev.goerner.geozen.model.collections
 
+import dev.goerner.geozen.calc.ApproximateDistanceCalculator
+import dev.goerner.geozen.calc.PreciseDistanceCalculator
 import dev.goerner.geozen.model.CoordinateReferenceSystem
 import dev.goerner.geozen.model.Geometry
 
@@ -21,11 +23,9 @@ data class GeometryCollection(
         }
     }
 
-    override fun fastDistanceTo(other: Geometry): Double {
-        throw UnsupportedOperationException("Fast distance calculation not implemented yet")
-    }
+    override fun fastDistanceTo(other: Geometry): Double =
+        ApproximateDistanceCalculator.calculate(this, other)
 
-    override fun exactDistanceTo(other: Geometry): Double {
-        throw UnsupportedOperationException("Exact distance calculation not implemented yet")
-    }
+    override fun exactDistanceTo(other: Geometry): Double =
+        PreciseDistanceCalculator.calculate(this, other)
 }

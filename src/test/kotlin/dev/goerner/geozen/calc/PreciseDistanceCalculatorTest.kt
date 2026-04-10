@@ -1,6 +1,7 @@
 package dev.goerner.geozen.calc
 
 import dev.goerner.geozen.model.Position
+import dev.goerner.geozen.model.collections.GeometryCollection
 import dev.goerner.geozen.model.multi_geometry.MultiLineString
 import dev.goerner.geozen.model.multi_geometry.MultiPoint
 import dev.goerner.geozen.model.multi_geometry.MultiPolygon
@@ -3302,4 +3303,248 @@ class PreciseDistanceCalculatorTest : FunSpec({
         }
         exception.message shouldBe "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
     }
+
+    test("GeometryCollection to Point distance - single Point member") {
+        //given
+        val gc = GeometryCollection(listOf(Point(11.4694, 49.2965)))
+        val point = Point(11.0549, 49.4532)
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(gc, point)
+
+        //then
+        // Same as Point(11.4694, 49.2965) to Point(11.0549, 49.4532)
+        preciseDistance shouldBe 34782.42347014982
+    }
+
+    test("GeometryCollection to Point distance - single LineString member") {
+        //given
+        val gc = GeometryCollection(
+            listOf(
+                LineString(
+                    listOf(
+                        Position(11.4432, 49.3429),
+                        Position(11.4463, 49.1877),
+                        Position(11.5161, 49.1239)
+                    )
+                )
+            )
+        )
+        val point = Point(11.4694, 49.2965)
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(gc, point)
+
+        //then
+        // Same as Point to LineString distance
+        preciseDistance shouldBe 1837.9808889683015
+    }
+
+    test("GeometryCollection to Point distance - single Polygon member, point outside") {
+        //given
+        val gc = GeometryCollection(
+            listOf(
+                Polygon(
+                    listOf(
+                        listOf(
+                            Position(11.5, 49.3),
+                            Position(11.6, 49.3),
+                            Position(11.6, 49.4),
+                            Position(11.5, 49.4),
+                            Position(11.5, 49.3)
+                        )
+                    )
+                )
+            )
+        )
+        val point = Point(11.4694, 49.2965)
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(gc, point)
+
+        //then
+        // Same as Point to Polygon distance - point outside polygon
+        preciseDistance shouldBe 2259.4399787892717
+    }
+
+    test("GeometryCollection to Point distance - Point member inside Polygon member, closest member wins") {
+        //given
+        val gc = GeometryCollection(
+            listOf(
+                Point(11.0, 48.0),  // far from target
+                Polygon(
+                    listOf(
+                        listOf(
+                            Position(11.5, 49.3),
+                            Position(11.6, 49.3),
+                            Position(11.6, 49.4),
+                            Position(11.5, 49.4),
+                            Position(11.5, 49.3)
+                        )
+                    )
+                )
+            )
+        )
+        val point = Point(11.55, 49.35)  // inside the polygon
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(gc, point)
+
+        //then
+        preciseDistance shouldBe 0.0
+    }
+
+    test("GeometryCollection to Polygon distance - LineString member fully inside polygon") {
+        //given
+        val gc = GeometryCollection(
+            listOf(
+                LineString(
+                    listOf(
+                        Position(11.52, 49.32),
+                        Position(11.58, 49.38)
+                    )
+                )
+            )
+        )
+        val polygon = Polygon(
+            listOf(
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.6, 49.3),
+                    Position(11.6, 49.4),
+                    Position(11.5, 49.4),
+                    Position(11.5, 49.3)
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(gc, polygon)
+
+        //then
+        preciseDistance shouldBe 0.0
+    }
+
+    test("GeometryCollection to GeometryCollection distance - single member each") {
+        //given
+        val gc1 = GeometryCollection(listOf(Point(11.4694, 49.2965)))
+        val gc2 = GeometryCollection(listOf(Point(11.0549, 49.4532)))
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(gc1, gc2)
+
+        //then
+        // Same as Point to Point distance
+        preciseDistance shouldBe 34782.42347014982
+    }
+
+    test("GeometryCollection to GeometryCollection distance - mixed members, one pair yields 0.0") {
+        //given
+        val gc1 = GeometryCollection(
+            listOf(
+                Point(11.55, 49.35),  // inside the polygon in gc2
+                LineString(listOf(Position(11.0, 48.0), Position(11.1, 48.0)))  // far
+            )
+        )
+        val gc2 = GeometryCollection(
+            listOf(
+                Polygon(
+                    listOf(
+                        listOf(
+                            Position(11.5, 49.3),
+                            Position(11.6, 49.3),
+                            Position(11.6, 49.4),
+                            Position(11.5, 49.4),
+                            Position(11.5, 49.3)
+                        )
+                    )
+                )
+            )
+        )
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(gc1, gc2)
+
+        //then
+        preciseDistance shouldBe 0.0
+    }
+
+    test("GeometryCollection distance - symmetric result via exactDistanceTo") {
+        //given
+        val gc = GeometryCollection(
+            listOf(
+                Point(11.4694, 49.2965),
+                LineString(listOf(Position(11.4432, 49.3429), Position(11.4463, 49.1877)))
+            )
+        )
+        val polygon = Polygon(
+            listOf(
+                listOf(
+                    Position(11.5, 49.3),
+                    Position(11.6, 49.3),
+                    Position(11.6, 49.4),
+                    Position(11.5, 49.4),
+                    Position(11.5, 49.3)
+                )
+            )
+        )
+
+        //when
+        val forwardDistance = gc.exactDistanceTo(polygon)
+        val reverseDistance = polygon.exactDistanceTo(gc)
+
+        //then
+        forwardDistance shouldBe reverseDistance
+    }
+
+    test("GeometryCollection to Point distance - empty GeometryCollection throws exception") {
+        //given
+        val emptyGc = GeometryCollection(emptyList())
+        val point = Point(11.5, 49.3)
+
+        //when & then
+        val exception = shouldThrow<IllegalArgumentException> {
+            PreciseDistanceCalculator.calculate(emptyGc, point)
+        }
+        exception.message shouldBe "GeometryCollection must contain at least one geometry to calculate distance, but contained 0"
+    }
+
+    test("GeometryCollection to GeometryCollection distance - first empty throws exception") {
+        //given
+        val emptyGc = GeometryCollection(emptyList())
+        val gc = GeometryCollection(listOf(Point(11.5, 49.3)))
+
+        //when & then
+        val exception = shouldThrow<IllegalArgumentException> {
+            PreciseDistanceCalculator.calculate(emptyGc, gc)
+        }
+        exception.message shouldBe "GeometryCollection must contain at least one geometry to calculate distance, but contained 0"
+    }
+
+    test("GeometryCollection to GeometryCollection distance - second empty throws exception") {
+        //given
+        val gc = GeometryCollection(listOf(Point(11.5, 49.3)))
+        val emptyGc = GeometryCollection(emptyList())
+
+        //when & then
+        val exception = shouldThrow<IllegalArgumentException> {
+            PreciseDistanceCalculator.calculate(gc, emptyGc)
+        }
+        exception.message shouldBe "GeometryCollection must contain at least one geometry to calculate distance, but contained 0"
+    }
+
+    test("GeometryCollection to Point distance - nested GeometryCollection") {
+        //given
+        val innerGc = GeometryCollection(listOf(Point(11.4694, 49.2965)))
+        val outerGc = GeometryCollection(listOf(innerGc))
+        val point = Point(11.0549, 49.4532)
+
+        //when
+        val preciseDistance = PreciseDistanceCalculator.calculate(outerGc, point)
+
+        //then
+        // Nested GC containing a single Point - same distance as Point to Point
+        preciseDistance shouldBe 34782.42347014982
+    }
+
 })

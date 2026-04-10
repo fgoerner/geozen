@@ -2,6 +2,7 @@ package dev.goerner.geozen.calc
 
 import dev.goerner.geozen.model.Geometry
 import dev.goerner.geozen.model.Position
+import dev.goerner.geozen.model.collections.GeometryCollection
 import dev.goerner.geozen.model.multi_geometry.MultiLineString
 import dev.goerner.geozen.model.multi_geometry.MultiPoint
 import dev.goerner.geozen.model.multi_geometry.MultiPolygon
@@ -46,21 +47,28 @@ abstract class AbstractDistanceCalculator : DistanceCalculator {
             is Point if b is MultiPoint -> calculate(a, b)
             is Point if b is MultiLineString -> calculate(a, b)
             is Point if b is MultiPolygon -> calculate(a, b)
+            is Point if b is GeometryCollection -> calculate(a, b)
             is LineString if b is LineString -> calculate(a, b)
             is LineString if b is Polygon -> calculate(a, b)
             is LineString if b is MultiPoint -> calculate(a, b)
             is LineString if b is MultiLineString -> calculate(a, b)
             is LineString if b is MultiPolygon -> calculate(a, b)
+            is LineString if b is GeometryCollection -> calculate(a, b)
             is Polygon if b is Polygon -> calculate(a, b)
             is Polygon if b is MultiPoint -> calculate(a, b)
             is Polygon if b is MultiLineString -> calculate(a, b)
             is Polygon if b is MultiPolygon -> calculate(a, b)
+            is Polygon if b is GeometryCollection -> calculate(a, b)
             is MultiPoint if b is MultiPoint -> calculate(a, b)
             is MultiPoint if b is MultiLineString -> calculate(a, b)
             is MultiPoint if b is MultiPolygon -> calculate(a, b)
+            is MultiPoint if b is GeometryCollection -> calculate(a, b)
             is MultiLineString if b is MultiLineString -> calculate(a, b)
             is MultiLineString if b is MultiPolygon -> calculate(a, b)
+            is MultiLineString if b is GeometryCollection -> calculate(a, b)
             is MultiPolygon if b is MultiPolygon -> calculate(a, b)
+            is MultiPolygon if b is GeometryCollection -> calculate(a, b)
+            is GeometryCollection if b is GeometryCollection -> calculate(a, b)
             else -> throw UnsupportedOperationException(
                 "Distance calculation is not supported between geometry types: " +
                         "${g1::class.simpleName} and ${g2::class.simpleName}"
@@ -79,6 +87,7 @@ abstract class AbstractDistanceCalculator : DistanceCalculator {
         is MultiPoint      -> 3
         is MultiLineString -> 4
         is MultiPolygon    -> 5
+        is GeometryCollection -> 6
         else               -> Int.MAX_VALUE
     }
 
@@ -306,6 +315,23 @@ abstract class AbstractDistanceCalculator : DistanceCalculator {
             "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
         }
         return multiPolygon1.coordinates.minOf { calculate(Polygon(it, multiPolygon1.coordinateReferenceSystem), multiPolygon2) }
+    }
+
+    private fun calculate(g: Geometry, geometryCollection: GeometryCollection): Double {
+        require(geometryCollection.geometries.isNotEmpty()) {
+            "GeometryCollection must contain at least one geometry to calculate distance, but contained 0"
+        }
+        return geometryCollection.geometries.minOf { calculate(g, it) }
+    }
+
+    private fun calculate(geometryCollection1: GeometryCollection, geometryCollection2: GeometryCollection): Double {
+        require(geometryCollection1.geometries.isNotEmpty()) {
+            "GeometryCollection must contain at least one geometry to calculate distance, but contained 0"
+        }
+        require(geometryCollection2.geometries.isNotEmpty()) {
+            "GeometryCollection must contain at least one geometry to calculate distance, but contained 0"
+        }
+        return geometryCollection1.geometries.minOf { calculate(it, geometryCollection2) }
     }
 }
 
