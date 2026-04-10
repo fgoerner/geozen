@@ -82,48 +82,22 @@ val geoJsonString = objectMapper.writeValueAsString(lineString)
 ### Working with WKT/EWKT
 
 ```kotlin
-val wktSerializer = WktSerializer()
-val wktDeserializer = WktDeserializer()
-
 // Deserialize WKT
-val point: Point = wktDeserializer.deserialize("POINT (30 10)") as Point
+val point: Point = WktDeserializer.fromWkt("POINT (30 10)") as Point
 
 // Deserialize EWKT with SRID
-val pointWithCrs: Point = wktDeserializer.deserialize("SRID=4326;POINT (30 10)") as Point
+val pointWithCrs: Point = WktDeserializer.fromWkt("SRID=4326;POINT (30 10)") as Point
 
 // Serialize to WKT
-val wkt = wktSerializer.serialize(point)
+val wkt = WktSerializer.toWkt(point)
 // Result: "POINT (30 10)"
 
 // Serialize to EWKT with SRID
-val ewkt = wktSerializer.serializeWithSrid(point)
+val ewkt = WktSerializer.toEwkt(point)
 // Result: "SRID=4326;POINT (30 10)"
 ```
 
 ### Calculating Distances
-
-GeoZen provides multiple ways to calculate distances between geometries:
-
-#### Supported Distance Calculations
-
-The following matrix shows which geometry type combinations support distance calculations:
-
-| From ↓ / To →          | Point | LineString | Polygon | MultiPoint | MultiLineString | MultiPolygon | GeometryCollection |
-|------------------------|-------|------------|---------|------------|-----------------|--------------|--------------------|
-| **Point**              | ✅     | ✅          | ✅       | ✅          | ✅               | ✅            | ❌                  |
-| **LineString**         | ✅     | ✅          | ✅       | ✅          | ✅               | ✅            | ❌                  |
-| **Polygon**            | ✅     | ✅          | ✅       | ✅          | ✅               | ✅            | ❌                  |
-| **MultiPoint**         | ✅     | ✅          | ✅       | ✅          | ✅               | ✅            | ❌                  |
-| **MultiLineString**    | ✅     | ✅          | ✅       | ✅          | ✅               | ✅            | ❌                  |
-| **MultiPolygon**       | ✅     | ✅          | ✅       | ✅          | ✅               | ✅            | ❌                  |
-| **GeometryCollection** | ❌     | ❌          | ❌       | ❌          | ❌               | ❌            | ❌                  |
-
-**Legend:**
-- ✅ Supported for both precise (Karney's algorithm) and approximate (Haversine formula) distance calculations
-- 🔄 In progress — stubs exist but not yet implemented
-- ❌ Not yet supported
-
-**Note:** Distance calculations are commutative - if `A.distanceTo(B)` is supported, then `B.distanceTo(A)` is also supported and will return the same result.
 
 #### Using Distance Calculators
 
@@ -145,10 +119,10 @@ val berlin = Point(13.4050, 52.5200)
 val paris = Point(2.3522, 48.8566)
 
 // Using the exact distance method (Karney's algorithm)
-val exactDistance = berlin.getExactDistanceTo(paris)
+val exactDistance = berlin.exactDistanceTo(paris)
 
 // Using the fast approximation method (Haversine formula)
-val fastDistance = berlin.getFastDistanceTo(paris)
+val fastDistance = berlin.fastDistanceTo(paris)
 ```
 
 ### Working with Coordinate Reference Systems
