@@ -5,6 +5,7 @@ import dev.goerner.geozen.calc.PreciseDistanceCalculator
 import dev.goerner.geozen.model.CoordinateReferenceSystem
 import dev.goerner.geozen.model.Geometry
 import dev.goerner.geozen.model.Position
+import dev.goerner.geozen.model.Reprojector
 
 /**
  * A [LineString] is a [Geometry] that represents a sequence of [Positions][Position] in space. It is
@@ -30,4 +31,11 @@ data class LineString(
 
     override fun exactDistanceTo(other: Geometry): Double =
         PreciseDistanceCalculator.calculate(this, other)
+
+    override fun reprojectTo(crs: CoordinateReferenceSystem): Geometry =
+        if (coordinateReferenceSystem == crs) this
+        else LineString(
+            coordinates.map { Reprojector.reproject(it, coordinateReferenceSystem, crs) },
+            crs
+        )
 }

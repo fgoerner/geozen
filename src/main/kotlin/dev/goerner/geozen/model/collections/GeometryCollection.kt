@@ -28,4 +28,11 @@ data class GeometryCollection(
 
     override fun exactDistanceTo(other: Geometry): Double =
         PreciseDistanceCalculator.calculate(this, other)
+
+    override fun reprojectTo(crs: CoordinateReferenceSystem): Geometry =
+        if (coordinateReferenceSystem == crs) this
+        else GeometryCollection(
+            geometries.map { it.reprojectTo(crs) },
+            crs
+        )
 }
