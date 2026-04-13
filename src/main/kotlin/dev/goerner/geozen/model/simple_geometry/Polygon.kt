@@ -5,6 +5,7 @@ import dev.goerner.geozen.calc.PreciseDistanceCalculator
 import dev.goerner.geozen.model.CoordinateReferenceSystem
 import dev.goerner.geozen.model.Geometry
 import dev.goerner.geozen.model.Position
+import dev.goerner.geozen.model.Reprojector
 
 /**
  * A [Polygon] is a [Geometry] that represents an area in space. It is defined by a list of
@@ -51,6 +52,15 @@ data class Polygon(
 
     override fun exactDistanceTo(other: Geometry): Double =
         PreciseDistanceCalculator.calculate(this, other)
+
+    override fun reprojectTo(crs: CoordinateReferenceSystem): Geometry =
+        if (coordinateReferenceSystem == crs) this
+        else Polygon(
+            coordinates.map { ring ->
+                ring.map { Reprojector.reproject(it, coordinateReferenceSystem, crs) }
+            },
+            crs
+        )
 
     val exteriorRing: List<Position>
         get() = this.coordinates[0]

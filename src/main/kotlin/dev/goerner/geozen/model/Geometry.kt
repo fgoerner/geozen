@@ -32,4 +32,6 @@ abstract class Geometry(open val coordinateReferenceSystem: CoordinateReferenceS
      * @return The exact distance to the other [Geometry].
      */
     abstract fun exactDistanceTo(other: Geometry): Double
+
+    abstract fun reprojectTo(crs: CoordinateReferenceSystem): Geometry
 }

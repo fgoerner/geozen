@@ -1,5 +1,6 @@
 package dev.goerner.geozen.calc
 
+import dev.goerner.geozen.model.CoordinateReferenceSystem
 import dev.goerner.geozen.model.Geometry
 import dev.goerner.geozen.model.Position
 import dev.goerner.geozen.model.collections.GeometryCollection
@@ -39,7 +40,9 @@ abstract class AbstractDistanceCalculator : DistanceCalculator {
      * @throws UnsupportedOperationException if the geometry type combination is unsupported
      */
     override fun calculate(g1: Geometry, g2: Geometry): Double {
-        val (a, b) = if (geometryOrdinal(g1) <= geometryOrdinal(g2)) g1 to g2 else g2 to g1
+        val r1 = g1.reprojectTo(CoordinateReferenceSystem.WGS_84)
+        val r2 = g2.reprojectTo(CoordinateReferenceSystem.WGS_84)
+        val (a, b) = if (geometryOrdinal(r1) <= geometryOrdinal(r2)) r1 to r2 else r2 to r1
         return when (a) {
             is Point if b is Point -> calculate(a, b)
             is Point if b is LineString -> calculate(a, b)

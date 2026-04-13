@@ -5,6 +5,7 @@ import dev.goerner.geozen.calc.PreciseDistanceCalculator
 import dev.goerner.geozen.model.CoordinateReferenceSystem
 import dev.goerner.geozen.model.Geometry
 import dev.goerner.geozen.model.Position
+import dev.goerner.geozen.model.Reprojector
 
 /**
  * A [Point] is a [Geometry] that represents a single position in space. It is defined by a single
@@ -30,6 +31,13 @@ data class Point(
 
     override fun exactDistanceTo(other: Geometry): Double =
         PreciseDistanceCalculator.calculate(this, other)
+
+    override fun reprojectTo(crs: CoordinateReferenceSystem): Geometry =
+        if (coordinateReferenceSystem == crs) this
+        else Point(
+            Reprojector.reproject(coordinates, coordinateReferenceSystem, crs),
+            crs
+        )
 
     val longitude: Double
         get() = this.coordinates.longitude

@@ -5,7 +5,7 @@ import dev.goerner.geozen.calc.PreciseDistanceCalculator
 import dev.goerner.geozen.model.CoordinateReferenceSystem
 import dev.goerner.geozen.model.Geometry
 import dev.goerner.geozen.model.Position
-
+import dev.goerner.geozen.model.Reprojector
 
 
 /**
@@ -36,4 +36,13 @@ data class MultiLineString(
 
     override fun exactDistanceTo(other: Geometry): Double =
         PreciseDistanceCalculator.calculate(this, other)
+
+    override fun reprojectTo(crs: CoordinateReferenceSystem): Geometry =
+        if (coordinateReferenceSystem == crs) this
+        else MultiLineString(
+            coordinates.map { lineString ->
+                lineString.map { Reprojector.reproject(it, coordinateReferenceSystem, crs) }
+            },
+            crs
+        )
 }
