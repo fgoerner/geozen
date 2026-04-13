@@ -6,7 +6,6 @@ import dev.goerner.geozen.model.CoordinateReferenceSystem
 import dev.goerner.geozen.model.Geometry
 import dev.goerner.geozen.model.Position
 import dev.goerner.geozen.model.Reprojector
-import dev.goerner.geozen.model.simple_geometry.LineString
 
 /**
  * A [MultiPoint] is a [Geometry] that represents a collection of [Positions][Position] in space. It is
@@ -25,7 +24,7 @@ data class MultiPoint(
 
     override fun reprojectTo(crs: CoordinateReferenceSystem): Geometry =
         if (coordinateReferenceSystem == crs) this
-        else LineString(
+        else MultiPoint(
             coordinates.map { Reprojector.reproject(it, coordinateReferenceSystem, crs) },
             crs
         )
