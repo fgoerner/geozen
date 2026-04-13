@@ -4,6 +4,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeSameInstanceAs
 
 class ReprojectorTest : FunSpec({
 
@@ -19,7 +20,7 @@ class ReprojectorTest : FunSpec({
         val result = Reprojector.reproject(pos, CoordinateReferenceSystem.WGS_84, CoordinateReferenceSystem.WGS_84)
 
         //then
-        result shouldBe pos
+        result shouldBeSameInstanceAs pos
     }
 
     test("Web Mercator to Web Mercator returns same Position instance") {
@@ -30,7 +31,7 @@ class ReprojectorTest : FunSpec({
         val result = Reprojector.reproject(pos, CoordinateReferenceSystem.WEB_MERCATOR, CoordinateReferenceSystem.WEB_MERCATOR)
 
         //then
-        result shouldBe pos
+        result shouldBeSameInstanceAs pos
     }
 
     // ── WGS84 → Web Mercator ─────────────────────────────────────────────────
