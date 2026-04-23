@@ -2,7 +2,7 @@
 
 [![Maven Central](https://img.shields.io/maven-central/v/dev.goerner.geozen/geozen-core)](https://central.sonatype.com/artifact/dev.goerner.geozen/geozen-core)
 [![Java](https://img.shields.io/badge/Java-21%2B-blue)](https://www.oracle.com/java/technologies/javase/jdk21-archive-downloads.html)
-[![Kotlin](https://img.shields.io/badge/Kotlin-2.3.0-7F52FF)](https://kotlinlang.org/)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.3.21-7F52FF)](https://kotlinlang.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 ![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/fgoerner/geozen?utm_source=oss&utm_medium=github&utm_campaign=fgoerner%2Fgeozen&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
 
@@ -23,7 +23,7 @@ and utilities for geometric calculations.
 ## Requirements
 
 - Java 21 or higher
-- Kotlin 2.3.0 or higher (if using Kotlin)
+- Kotlin 2.3.21 or higher (if using Kotlin)
 
 ## Installation
 GeoZen is available on Maven Central. Add the following dependency to your project:
@@ -34,14 +34,14 @@ GeoZen is available on Maven Central. Add the following dependency to your proje
 <dependency>
    <groupId>dev.goerner.geozen</groupId>
    <artifactId>geozen-core</artifactId>
-   <version>0.6.0</version>
+   <version>1.0.0</version>
 </dependency>
 ```
 
 ### Gradle
 
 ```groovy
-implementation 'dev.goerner.geozen:geozen-core:0.6.0'
+implementation 'dev.goerner.geozen:geozen-core:1.0.0'
 ```
 
 ## Usage
@@ -138,6 +138,17 @@ val crs = point.coordinateReferenceSystem
 Note: Coordinates in GeoJSON follow the format `[longitude, latitude, altitude]`, where altitude is optional. If no
 altitude is provided, it defaults to 0.
 
+### Reprojecting Geometries
+
+```kotlin
+// Reproject a WGS 84 point to Web Mercator
+val wgs84Point = Point(13.4050, 52.5200, coordinateReferenceSystem = CoordinateReferenceSystem.WGS_84)
+val webMercatorPoint = wgs84Point.reprojectTo(CoordinateReferenceSystem.WEB_MERCATOR) as Point
+
+// Reproject back to WGS 84
+val reprojectedPoint = webMercatorPoint.reprojectTo(CoordinateReferenceSystem.WGS_84) as Point
+```
+
 ## Current Status
 
 GeoZen provides a comprehensive set of features for working with geospatial data:
@@ -147,7 +158,7 @@ GeoZen provides a comprehensive set of features for working with geospatial data
 - ✅ WKT/EWKT serialization and deserialization
 - ✅ Coordinate reference system support (WGS 84, Web Mercator)
 - ✅ Distance calculations (Karney's algorithm and Haversine formula)
-- 🚧 CRS conversion capabilities (planned for future releases)
+- ✅ CRS reprojection (WGS 84 ↔ Web Mercator)
 - 🚧 Additional geometric calculations (planned for future releases)
 
 ## Contributing
