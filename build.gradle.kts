@@ -1,6 +1,6 @@
 plugins {
     id("java-library")
-    id("com.vanniktech.maven.publish") version "0.34.0"
+    id("com.vanniktech.maven.publish") version "0.36.0"
     kotlin("jvm")
 }
 
@@ -20,7 +20,7 @@ repositories {
 dependencies {
     testImplementation("io.kotest:kotest-assertions-core:6.1.11")
     testImplementation("io.kotest:kotest-runner-junit5:6.1.11")
-    implementation(platform("tools.jackson:jackson-bom:3.1.1"))
+    implementation(platform("tools.jackson:jackson-bom:3.1.2"))
     implementation("tools.jackson.core:jackson-databind")
     implementation("net.sf.geographiclib:GeographicLib-Java:2.1")
     implementation(kotlin("stdlib"))
