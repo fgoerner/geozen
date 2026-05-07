@@ -34,14 +34,14 @@ GeoZen is available on Maven Central. Add the following dependency to your proje
 <dependency>
    <groupId>dev.goerner.geozen</groupId>
    <artifactId>geozen-core</artifactId>
-   <version>1.0.0</version>
+   <version>1.0.1</version>
 </dependency>
 ```
 
 ### Gradle
 
 ```groovy
-implementation 'dev.goerner.geozen:geozen-core:1.0.0'
+implementation 'dev.goerner.geozen:geozen-core:1.0.1'
 ```
 
 ## Usage

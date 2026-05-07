@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-05-07
+
+### Changed
+
+- Added `@JvmOverloads` constructor annotations to all model classes (`Position`, `Point`, `LineString`, `Polygon`, `MultiPoint`, `MultiLineString`, `MultiPolygon`, `GeometryCollection`, `Feature`) for improved Java interoperability
+
 ## [1.0.0] - 2026-04-24
 
 ### Added
@@ -32,5 +38,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated all dependencies to latest versions (Kotlin, Jackson, Kotest, GitHub Actions)
 - Removed custom CodeQL workflow and configuration
 
-[Unreleased]: https://github.com/fgoerner/geozen/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/fgoerner/geozen/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/fgoerner/geozen/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/fgoerner/geozen/compare/v0.6.0...v1.0.0
