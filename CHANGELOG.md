@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Updated Jackson BOM from 3.1.2 to 3.1.3
+- Updated Gradle wrapper from 9.4.0 to 9.5.0
+
 ## [1.0.1] - 2026-05-07
 
 ### Changed
