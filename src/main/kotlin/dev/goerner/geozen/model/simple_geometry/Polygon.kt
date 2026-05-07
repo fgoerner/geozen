@@ -22,7 +22,7 @@ import dev.goerner.geozen.model.Reprojector
  * @throws IllegalArgumentException if coordinates is empty, if any ring has fewer than 4 positions,
  *                                  or if any ring is not closed (first position != last position)
  */
-data class Polygon(
+data class Polygon @JvmOverloads constructor(
     val coordinates: List<List<Position>>,
     override val coordinateReferenceSystem: CoordinateReferenceSystem = CoordinateReferenceSystem.WGS_84
 ) : Geometry(coordinateReferenceSystem) {

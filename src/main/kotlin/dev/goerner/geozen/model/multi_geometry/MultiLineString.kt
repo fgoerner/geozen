@@ -17,7 +17,7 @@ import dev.goerner.geozen.model.Reprojector
  * @param coordinateReferenceSystem The coordinate reference system, defaults to WGS_84
  * @throws IllegalArgumentException if any inner list contains fewer than 2 positions
  */
-data class MultiLineString(
+data class MultiLineString @JvmOverloads constructor(
     val coordinates: List<List<Position>>,
     override val coordinateReferenceSystem: CoordinateReferenceSystem = CoordinateReferenceSystem.WGS_84
 ) : Geometry(coordinateReferenceSystem) {

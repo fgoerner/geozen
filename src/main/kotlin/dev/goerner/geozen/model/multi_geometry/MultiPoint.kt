@@ -11,7 +11,7 @@ import dev.goerner.geozen.model.Reprojector
  * A [MultiPoint] is a [Geometry] that represents a collection of [Positions][Position] in space. It is
  * defined by a list of [Positions][Position] and a [CoordinateReferenceSystem].
  */
-data class MultiPoint(
+data class MultiPoint @JvmOverloads constructor(
     val coordinates: List<Position>,
     override val coordinateReferenceSystem: CoordinateReferenceSystem = CoordinateReferenceSystem.WGS_84
 ) : Geometry(coordinateReferenceSystem) {

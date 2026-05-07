@@ -11,11 +11,12 @@ import dev.goerner.geozen.model.Reprojector
  * A [Point] is a [Geometry] that represents a single position in space. It is defined by a single
  * [Position] and a [CoordinateReferenceSystem].
  */
-data class Point(
+data class Point @JvmOverloads constructor(
     val coordinates: Position,
     override val coordinateReferenceSystem: CoordinateReferenceSystem = CoordinateReferenceSystem.WGS_84
 ) : Geometry(coordinateReferenceSystem) {
 
+    @JvmOverloads
     constructor(
         longitude: Double,
         latitude: Double,

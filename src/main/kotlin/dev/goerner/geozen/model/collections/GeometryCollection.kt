@@ -8,7 +8,7 @@ import dev.goerner.geozen.model.Geometry
 /**
  * A [GeometryCollection] is a collection of [Geometries][Geometry].
  */
-data class GeometryCollection(
+data class GeometryCollection @JvmOverloads constructor(
     val geometries: List<Geometry>,
     override val coordinateReferenceSystem: CoordinateReferenceSystem = CoordinateReferenceSystem.WGS_84
 ) : Geometry(coordinateReferenceSystem) {

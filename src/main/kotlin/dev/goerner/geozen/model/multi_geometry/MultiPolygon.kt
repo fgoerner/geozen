@@ -18,7 +18,7 @@ import dev.goerner.geozen.model.Reprojector
  * @throws IllegalArgumentException if any polygon has no rings, if any ring has fewer than 4 positions,
  *                                  or if any ring is not closed (first position != last position)
  */
-data class MultiPolygon(
+data class MultiPolygon @JvmOverloads constructor(
     val coordinates: List<List<List<Position>>>,
     override val coordinateReferenceSystem: CoordinateReferenceSystem = CoordinateReferenceSystem.WGS_84
 ) : Geometry(coordinateReferenceSystem) {
