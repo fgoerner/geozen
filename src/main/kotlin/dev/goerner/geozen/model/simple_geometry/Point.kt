@@ -11,9 +11,12 @@ import dev.goerner.geozen.model.Reprojector
  * A [Point] is a [Geometry] that represents a single position in space. It is defined by a single
  * [Position] and a [CoordinateReferenceSystem].
  */
-data class Point @JvmOverloads constructor(
+data class Point
+@JvmOverloads
+constructor(
     val coordinates: Position,
-    override val coordinateReferenceSystem: CoordinateReferenceSystem = CoordinateReferenceSystem.WGS_84
+    override val coordinateReferenceSystem: CoordinateReferenceSystem =
+        CoordinateReferenceSystem.WGS_84,
 ) : Geometry(coordinateReferenceSystem) {
 
     @JvmOverloads
@@ -21,10 +24,10 @@ data class Point @JvmOverloads constructor(
         longitude: Double,
         latitude: Double,
         altitude: Double = 0.0,
-        coordinateReferenceSystem: CoordinateReferenceSystem = CoordinateReferenceSystem.WGS_84
+        coordinateReferenceSystem: CoordinateReferenceSystem = CoordinateReferenceSystem.WGS_84,
     ) : this(
         Position(longitude, latitude, altitude),
-        coordinateReferenceSystem
+        coordinateReferenceSystem,
     )
 
     override fun fastDistanceTo(other: Geometry): Double =
@@ -35,10 +38,11 @@ data class Point @JvmOverloads constructor(
 
     override fun reprojectTo(crs: CoordinateReferenceSystem): Geometry =
         if (coordinateReferenceSystem == crs) this
-        else Point(
-            Reprojector.reproject(coordinates, coordinateReferenceSystem, crs),
-            crs
-        )
+        else
+            Point(
+                Reprojector.reproject(coordinates, coordinateReferenceSystem, crs),
+                crs,
+            )
 
     val longitude: Double
         get() = this.coordinates.longitude

@@ -8,16 +8,19 @@ import dev.goerner.geozen.model.Position
 import dev.goerner.geozen.model.Reprojector
 
 /**
- * A [LineString] is a [Geometry] that represents a sequence of [Positions][Position] in space. It is
- * defined by a list of [Positions][Position] and a [CoordinateReferenceSystem].
+ * A [LineString] is a [Geometry] that represents a sequence of [Positions][Position] in space. It
+ * is defined by a list of [Positions][Position] and a [CoordinateReferenceSystem].
  *
  * @param coordinates The list of positions, must contain at least 2 positions
  * @param coordinateReferenceSystem The coordinate reference system, defaults to WGS_84
  * @throws IllegalArgumentException if coordinates contains fewer than 2 positions
  */
-data class LineString @JvmOverloads constructor(
+data class LineString
+@JvmOverloads
+constructor(
     val coordinates: List<Position>,
-    override val coordinateReferenceSystem: CoordinateReferenceSystem = CoordinateReferenceSystem.WGS_84
+    override val coordinateReferenceSystem: CoordinateReferenceSystem =
+        CoordinateReferenceSystem.WGS_84,
 ) : Geometry(coordinateReferenceSystem) {
 
     init {
@@ -34,8 +37,9 @@ data class LineString @JvmOverloads constructor(
 
     override fun reprojectTo(crs: CoordinateReferenceSystem): Geometry =
         if (coordinateReferenceSystem == crs) this
-        else LineString(
-            coordinates.map { Reprojector.reproject(it, coordinateReferenceSystem, crs) },
-            crs
-        )
+        else
+            LineString(
+                coordinates.map { Reprojector.reproject(it, coordinateReferenceSystem, crs) },
+                crs,
+            )
 }

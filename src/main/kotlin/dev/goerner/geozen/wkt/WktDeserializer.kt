@@ -13,12 +13,12 @@ import dev.goerner.geozen.model.simple_geometry.Polygon
 import java.util.Locale
 
 /**
- * Deserializes WKT (Well-Known Text) and EWKT (Extended Well-Known Text) strings to [Geometry] objects.
- * 
- * 
- * WKT is a text markup language for representing vector geometry objects as defined by the Open Geospatial Consortium (OGC).
- * EWKT extends WKT by adding support for SRID (Spatial Reference System Identifier).
- * 
+ * Deserializes WKT (Well-Known Text) and EWKT (Extended Well-Known Text) strings to [Geometry]
+ * objects.
+ *
+ * WKT is a text markup language for representing vector geometry objects as defined by the Open
+ * Geospatial Consortium (OGC). EWKT extends WKT by adding support for SRID (Spatial Reference
+ * System Identifier).
  */
 object WktDeserializer {
 
@@ -30,7 +30,7 @@ object WktDeserializer {
 
     /**
      * Deserializes a WKT or EWKT string to a [Geometry] object.
-     * 
+     *
      * @param wkt The WKT or EWKT string to deserialize
      * @return The deserialized geometry
      * @throws WktException if the WKT string is invalid or contains unsupported geometry types
@@ -51,7 +51,8 @@ object WktDeserializer {
 
         val (trimmed, crs) = extractSrid(wkt)
 
-        val match = GEOMETRY_TYPE_PATTERN.matchEntire(trimmed) ?: throw WktException("Invalid WKT format")
+        val match =
+            GEOMETRY_TYPE_PATTERN.matchEntire(trimmed) ?: throw WktException("Invalid WKT format")
 
         val type = match.groupValues[1].uppercase(Locale.ROOT)
         val coordinates = match.groupValues[2].trim().uppercase(Locale.ROOT)
@@ -77,7 +78,8 @@ object WktDeserializer {
     }
 
     private fun parseGeometry(wkt: String, crs: CoordinateReferenceSystem): Geometry {
-        val match = GEOMETRY_TYPE_PATTERN.matchEntire(wkt) ?: throw WktException("Invalid WKT format")
+        val match =
+            GEOMETRY_TYPE_PATTERN.matchEntire(wkt) ?: throw WktException("Invalid WKT format")
 
         val type = match.groupValues[1].uppercase(Locale.ROOT)
         val coordinates = match.groupValues[2].trim().uppercase(Locale.ROOT)
@@ -108,7 +110,9 @@ object WktDeserializer {
     private fun parseLineString(coords: String, crs: CoordinateReferenceSystem): LineString {
         var coords = coords
         if (coords == "EMPTY") {
-            throw WktException("LINESTRING EMPTY is not supported. GeoJSON does not allow empty linestrings.")
+            throw WktException(
+                "LINESTRING EMPTY is not supported. GeoJSON does not allow empty linestrings."
+            )
         }
 
         coords = stripParentheses(coords)
@@ -119,7 +123,9 @@ object WktDeserializer {
     private fun parsePolygon(coords: String, crs: CoordinateReferenceSystem): Polygon {
         var coords = coords
         if (coords == "EMPTY") {
-            throw WktException("POLYGON EMPTY is not supported. GeoJSON does not allow empty polygons.")
+            throw WktException(
+                "POLYGON EMPTY is not supported. GeoJSON does not allow empty polygons."
+            )
         }
 
         coords = stripParentheses(coords)
@@ -130,7 +136,9 @@ object WktDeserializer {
     private fun parseMultiPoint(coords: String, crs: CoordinateReferenceSystem): MultiPoint {
         var coords = coords
         if (coords == "EMPTY") {
-            throw WktException("MULTIPOINT EMPTY is not supported. GeoJSON does not allow empty multipoints.")
+            throw WktException(
+                "MULTIPOINT EMPTY is not supported. GeoJSON does not allow empty multipoints."
+            )
         }
 
         coords = stripParentheses(coords)
@@ -138,10 +146,15 @@ object WktDeserializer {
         return MultiPoint(positions, crs)
     }
 
-    private fun parseMultiLineString(coords: String, crs: CoordinateReferenceSystem): MultiLineString {
+    private fun parseMultiLineString(
+        coords: String,
+        crs: CoordinateReferenceSystem,
+    ): MultiLineString {
         var coords = coords
         if (coords == "EMPTY") {
-            throw WktException("MULTILINESTRING EMPTY is not supported. GeoJSON does not allow empty multilinestrings.")
+            throw WktException(
+                "MULTILINESTRING EMPTY is not supported. GeoJSON does not allow empty multilinestrings."
+            )
         }
 
         coords = stripParentheses(coords)
@@ -152,7 +165,9 @@ object WktDeserializer {
     private fun parseMultiPolygon(coords: String, crs: CoordinateReferenceSystem): MultiPolygon {
         var coords = coords
         if (coords == "EMPTY") {
-            throw WktException("MULTIPOLYGON EMPTY is not supported. GeoJSON does not allow empty multipolygons.")
+            throw WktException(
+                "MULTIPOLYGON EMPTY is not supported. GeoJSON does not allow empty multipolygons."
+            )
         }
 
         coords = stripParentheses(coords)
@@ -160,16 +175,22 @@ object WktDeserializer {
         return MultiPolygon(polygons, crs)
     }
 
-    private fun parseGeometryCollection(coords: String, crs: CoordinateReferenceSystem): GeometryCollection {
+    private fun parseGeometryCollection(
+        coords: String,
+        crs: CoordinateReferenceSystem,
+    ): GeometryCollection {
         var coords = coords
         if (coords == "EMPTY") {
-            throw WktException("GEOMETRYCOLLECTION EMPTY is not supported. GeoJSON does not allow empty geometry collections.")
+            throw WktException(
+                "GEOMETRYCOLLECTION EMPTY is not supported. GeoJSON does not allow empty geometry collections."
+            )
         }
 
         coords = stripParentheses(coords)
-        val geometries = splitByCommaRespectingParentheses(coords).map {
-            parseGeometry(it.trim(), crs)
-        }
+        val geometries =
+            splitByCommaRespectingParentheses(coords).map {
+                parseGeometry(it.trim(), crs)
+            }
 
         return GeometryCollection(geometries, crs)
     }
@@ -236,10 +257,11 @@ object WktDeserializer {
             when (c) {
                 '(' -> depth++
                 ')' -> depth--
-                ',' -> if (depth == 0) {
-                    add(input.substring(start, i))
-                    start = i + 1
-                }
+                ',' ->
+                    if (depth == 0) {
+                        add(input.substring(start, i))
+                        start = i + 1
+                    }
             }
         }
 

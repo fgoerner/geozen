@@ -12,12 +12,12 @@ import dev.goerner.geozen.model.simple_geometry.Point
 import dev.goerner.geozen.model.simple_geometry.Polygon
 
 /**
- * Serializes [Geometry] objects to WKT (Well-Known Text) and EWKT (Extended Well-Known Text) format.
- * 
- * 
- * WKT is a text markup language for representing vector geometry objects as defined by the Open Geospatial Consortium (OGC).
- * EWKT extends WKT by adding support for SRID (Spatial Reference System Identifier).
- * 
+ * Serializes [Geometry] objects to WKT (Well-Known Text) and EWKT (Extended Well-Known Text)
+ * format.
+ *
+ * WKT is a text markup language for representing vector geometry objects as defined by the Open
+ * Geospatial Consortium (OGC). EWKT extends WKT by adding support for SRID (Spatial Reference
+ * System Identifier).
  */
 object WktSerializer {
 
@@ -49,7 +49,8 @@ object WktSerializer {
      * @return WKT representation of the geometry collection
      * @throws WktException if any geometry type is not supported
      */
-    fun toWkt(collection: GeometryCollection): String = serialize(collection, includeExtended = false)
+    fun toWkt(collection: GeometryCollection): String =
+        serialize(collection, includeExtended = false)
 
     /**
      * Serializes a [GeometryCollection] to EWKT format (including SRID).
@@ -58,19 +59,22 @@ object WktSerializer {
      * @return EWKT representation of the geometry collection
      * @throws WktException if any geometry type is not supported
      */
-    fun toEwkt(collection: GeometryCollection): String = serialize(collection, includeExtended = true)
+    fun toEwkt(collection: GeometryCollection): String =
+        serialize(collection, includeExtended = true)
 
     private fun serialize(geometry: Geometry, includeExtended: Boolean): String {
-        val wkt = when (geometry) {
-            is Point -> serializePoint(geometry)
-            is LineString -> serializeLineString(geometry)
-            is Polygon -> serializePolygon(geometry)
-            is MultiPoint -> serializeMultiPoint(geometry)
-            is MultiLineString -> serializeMultiLineString(geometry)
-            is MultiPolygon -> serializeMultiPolygon(geometry)
-            is GeometryCollection -> serializeGeometryCollection(geometry)
-            else -> throw WktException("Unsupported geometry type: ${geometry::class.simpleName}")
-        }
+        val wkt =
+            when (geometry) {
+                is Point -> serializePoint(geometry)
+                is LineString -> serializeLineString(geometry)
+                is Polygon -> serializePolygon(geometry)
+                is MultiPoint -> serializeMultiPoint(geometry)
+                is MultiLineString -> serializeMultiLineString(geometry)
+                is MultiPolygon -> serializeMultiPolygon(geometry)
+                is GeometryCollection -> serializeGeometryCollection(geometry)
+                else ->
+                    throw WktException("Unsupported geometry type: ${geometry::class.simpleName}")
+            }
 
         return if (includeExtended) {
             "SRID=${getSrid(geometry.coordinateReferenceSystem)};$wkt"
@@ -86,7 +90,9 @@ object WktSerializer {
     private fun serializeLineString(lineString: LineString): String {
         val coords = lineString.coordinates
         if (coords.isEmpty()) {
-            throw WktException("Cannot serialize empty LineString. GeoJSON does not allow empty linestrings.")
+            throw WktException(
+                "Cannot serialize empty LineString. GeoJSON does not allow empty linestrings."
+            )
         }
         return "LINESTRING (${coords.joinToString(", ") { formatPosition(it) }})"
     }
@@ -94,7 +100,9 @@ object WktSerializer {
     private fun serializePolygon(polygon: Polygon): String {
         val coords = polygon.coordinates
         if (coords.isEmpty()) {
-            throw WktException("Cannot serialize empty Polygon. GeoJSON does not allow empty polygons.")
+            throw WktException(
+                "Cannot serialize empty Polygon. GeoJSON does not allow empty polygons."
+            )
         }
         return "POLYGON (${coords.joinToString(", ") { ring ->
             "(${ring.joinToString(", ") { formatPosition(it) }})"
@@ -104,7 +112,9 @@ object WktSerializer {
     private fun serializeMultiPoint(multiPoint: MultiPoint): String {
         val coords = multiPoint.coordinates
         if (coords.isEmpty()) {
-            throw WktException("Cannot serialize empty MultiPoint. GeoJSON does not allow empty multipoints.")
+            throw WktException(
+                "Cannot serialize empty MultiPoint. GeoJSON does not allow empty multipoints."
+            )
         }
         return "MULTIPOINT (${coords.joinToString(", ") { "(${formatPosition(it)})" }})"
     }
@@ -112,7 +122,9 @@ object WktSerializer {
     private fun serializeMultiLineString(multiLineString: MultiLineString): String {
         val coords = multiLineString.coordinates
         if (coords.isEmpty()) {
-            throw WktException("Cannot serialize empty MultiLineString. GeoJSON does not allow empty multilinestrings.")
+            throw WktException(
+                "Cannot serialize empty MultiLineString. GeoJSON does not allow empty multilinestrings."
+            )
         }
         return "MULTILINESTRING (${coords.joinToString(", ") { line ->
             "(${line.joinToString(", ") { formatPosition(it) }})"
@@ -122,7 +134,9 @@ object WktSerializer {
     private fun serializeMultiPolygon(multiPolygon: MultiPolygon): String {
         val coords = multiPolygon.coordinates
         if (coords.isEmpty()) {
-            throw WktException("Cannot serialize empty MultiPolygon. GeoJSON does not allow empty multipolygons.")
+            throw WktException(
+                "Cannot serialize empty MultiPolygon. GeoJSON does not allow empty multipolygons."
+            )
         }
         return "MULTIPOLYGON (${coords.joinToString(", ") { polygon ->
             "(${polygon.joinToString(", ") { ring ->
@@ -133,7 +147,9 @@ object WktSerializer {
 
     private fun serializeGeometryCollection(collection: GeometryCollection): String {
         if (collection.geometries.isEmpty()) {
-            throw WktException("Cannot serialize empty GeometryCollection. GeoJSON does not allow empty geometry collections.")
+            throw WktException(
+                "Cannot serialize empty GeometryCollection. GeoJSON does not allow empty geometry collections."
+            )
         }
         return "GEOMETRYCOLLECTION (${collection.geometries.joinToString(", ") { serialize(it, false) }})"
     }

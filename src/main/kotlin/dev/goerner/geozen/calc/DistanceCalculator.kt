@@ -5,8 +5,8 @@ import dev.goerner.geozen.model.Position
 
 /**
  * A [DistanceCalculator] defines a contract for computing distances between pairs of geometry
- * objects. Implementations may use different algorithms, e.g. Haversine (fast approximation)
- * or Karney's geodesic method (precise).
+ * objects. Implementations may use different algorithms, e.g. Haversine (fast approximation) or
+ * Karney's geodesic method (precise).
  *
  * The primary entry points are:
  * - [calculate] (Position, Position) – the raw geodesic primitive used internally
@@ -36,4 +36,3 @@ interface DistanceCalculator {
      */
     fun calculate(g1: Geometry, g2: Geometry): Double
 }
-

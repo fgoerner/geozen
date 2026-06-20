@@ -8,12 +8,15 @@ import dev.goerner.geozen.model.Position
 import dev.goerner.geozen.model.Reprojector
 
 /**
- * A [MultiPoint] is a [Geometry] that represents a collection of [Positions][Position] in space. It is
- * defined by a list of [Positions][Position] and a [CoordinateReferenceSystem].
+ * A [MultiPoint] is a [Geometry] that represents a collection of [Positions][Position] in space. It
+ * is defined by a list of [Positions][Position] and a [CoordinateReferenceSystem].
  */
-data class MultiPoint @JvmOverloads constructor(
+data class MultiPoint
+@JvmOverloads
+constructor(
     val coordinates: List<Position>,
-    override val coordinateReferenceSystem: CoordinateReferenceSystem = CoordinateReferenceSystem.WGS_84
+    override val coordinateReferenceSystem: CoordinateReferenceSystem =
+        CoordinateReferenceSystem.WGS_84,
 ) : Geometry(coordinateReferenceSystem) {
 
     override fun fastDistanceTo(other: Geometry): Double =
@@ -24,8 +27,9 @@ data class MultiPoint @JvmOverloads constructor(
 
     override fun reprojectTo(crs: CoordinateReferenceSystem): Geometry =
         if (coordinateReferenceSystem == crs) this
-        else MultiPoint(
-            coordinates.map { Reprojector.reproject(it, coordinateReferenceSystem, crs) },
-            crs
-        )
+        else
+            MultiPoint(
+                coordinates.map { Reprojector.reproject(it, coordinateReferenceSystem, crs) },
+                crs,
+            )
 }

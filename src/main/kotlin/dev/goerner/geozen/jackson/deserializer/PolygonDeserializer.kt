@@ -13,11 +13,16 @@ class PolygonDeserializer : AbstractGeometryDeserializer<Polygon>() {
         checkType(rootNode, "Polygon")
 
         val coordinatesNode = rootNode["coordinates"]
-        require(coordinatesNode != null && coordinatesNode.isArray) { "Invalid or missing 'coordinates' field for Polygon geometry." }
-        val coordinates = (coordinatesNode as Iterable<JsonNode>).map { ringNode ->
-            require(ringNode.isArray) { "Invalid linear ring in 'coordinates' field for Polygon geometry." }
-            (ringNode as Iterable<JsonNode>).map { parsePosition(it) }
+        require(coordinatesNode != null && coordinatesNode.isArray) {
+            "Invalid or missing 'coordinates' field for Polygon geometry."
         }
+        val coordinates =
+            (coordinatesNode as Iterable<JsonNode>).map { ringNode ->
+                require(ringNode.isArray) {
+                    "Invalid linear ring in 'coordinates' field for Polygon geometry."
+                }
+                (ringNode as Iterable<JsonNode>).map { parsePosition(it) }
+            }
 
         return Polygon(coordinates)
     }

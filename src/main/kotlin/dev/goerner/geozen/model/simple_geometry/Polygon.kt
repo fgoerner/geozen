@@ -11,20 +11,23 @@ import dev.goerner.geozen.model.Reprojector
  * A [Polygon] is a [Geometry] that represents an area in space. It is defined by a list of
  * [linear rings](https://datatracker.ietf.org/doc/html/rfc7946#section-3.1.6) and a
  * [CoordinateReferenceSystem].
- * 
- * 
- * The first ring is the exterior ring, defining the outer boundary of the polygon. Any subsequent rings are interior
- * rings, defining holes within the polygon.
+ *
+ * The first ring is the exterior ring, defining the outer boundary of the polygon. Any subsequent
+ * rings are interior rings, defining holes within the polygon.
  *
  * @param coordinates The list of linear rings. At least one ring (exterior ring) must be provided.
- *                    Each ring must contain at least 4 positions and be closed (first position equals last position).
+ *   Each ring must contain at least 4 positions and be closed (first position equals last
+ *   position).
  * @param coordinateReferenceSystem The coordinate reference system, defaults to WGS_84
  * @throws IllegalArgumentException if coordinates is empty, if any ring has fewer than 4 positions,
- *                                  or if any ring is not closed (first position != last position)
+ *   or if any ring is not closed (first position != last position)
  */
-data class Polygon @JvmOverloads constructor(
+data class Polygon
+@JvmOverloads
+constructor(
     val coordinates: List<List<Position>>,
-    override val coordinateReferenceSystem: CoordinateReferenceSystem = CoordinateReferenceSystem.WGS_84
+    override val coordinateReferenceSystem: CoordinateReferenceSystem =
+        CoordinateReferenceSystem.WGS_84,
 ) : Geometry(coordinateReferenceSystem) {
 
     init {
@@ -36,13 +39,13 @@ data class Polygon @JvmOverloads constructor(
             require(ring.size >= 4) {
                 val ringType = if (index == 0) "exterior ring" else "interior ring at index $index"
                 "Each ring in Polygon must contain at least 4 positions, " +
-                        "but $ringType contained ${ring.size}"
+                    "but $ringType contained ${ring.size}"
             }
 
             require(ring.first() == ring.last()) {
                 val ringType = if (index == 0) "exterior ring" else "interior ring at index $index"
                 "Each ring in Polygon must be closed (first position must equal last position), " +
-                        "but $ringType is not closed"
+                    "but $ringType is not closed"
             }
         }
     }
@@ -55,12 +58,13 @@ data class Polygon @JvmOverloads constructor(
 
     override fun reprojectTo(crs: CoordinateReferenceSystem): Geometry =
         if (coordinateReferenceSystem == crs) this
-        else Polygon(
-            coordinates.map { ring ->
-                ring.map { Reprojector.reproject(it, coordinateReferenceSystem, crs) }
-            },
-            crs
-        )
+        else
+            Polygon(
+                coordinates.map { ring ->
+                    ring.map { Reprojector.reproject(it, coordinateReferenceSystem, crs) }
+                },
+                crs,
+            )
 
     val exteriorRing: List<Position>
         get() = this.coordinates[0]

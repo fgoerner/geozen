@@ -7,7 +7,11 @@ import tools.jackson.databind.ValueSerializer
 
 class FeatureCollectionSerializer : ValueSerializer<FeatureCollection>() {
 
-    override fun serialize(value: FeatureCollection, gen: JsonGenerator, ctxt: SerializationContext) {
+    override fun serialize(
+        value: FeatureCollection,
+        gen: JsonGenerator,
+        ctxt: SerializationContext,
+    ) {
         gen.writeStartObject()
 
         gen.writeStringProperty("type", "FeatureCollection")

@@ -6,14 +6,12 @@ import dev.goerner.geozen.model.Position
  * Internal helper class for Point-to-Polygon distance calculations.
  *
  * This class encapsulates the shared containment logic that is common to both
- * ApproximateDistanceCalculator and PreciseDistanceCalculator. Only the distance
- * calculation differs between the two calculators.
+ * ApproximateDistanceCalculator and PreciseDistanceCalculator. Only the distance calculation
+ * differs between the two calculators.
  */
 internal object PointToPolygonDistanceHelper {
 
-    /**
-     * Result of containment analysis for Point-to-Polygon.
-     */
+    /** Result of containment analysis for Point-to-Polygon. */
     sealed class ContainmentResult {
         /** Point is inside polygon (not in any hole) - distance is 0.0 */
         object InsidePolygon : ContainmentResult()
@@ -38,7 +36,7 @@ internal object PointToPolygonDistanceHelper {
         px: Double,
         py: Double,
         exteriorRing: List<Position>,
-        interiorRings: List<List<Position>>
+        interiorRings: List<List<Position>>,
     ): ContainmentResult {
         // Check if point is inside the exterior ring
         val insideExterior = GeometricUtils.isPointInsideRing(px, py, exteriorRing)
@@ -59,5 +57,3 @@ internal object PointToPolygonDistanceHelper {
         return ContainmentResult.OutsidePolygon
     }
 }
-
-
