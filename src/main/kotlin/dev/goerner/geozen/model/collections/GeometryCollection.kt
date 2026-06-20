@@ -5,20 +5,21 @@ import dev.goerner.geozen.calc.PreciseDistanceCalculator
 import dev.goerner.geozen.model.CoordinateReferenceSystem
 import dev.goerner.geozen.model.Geometry
 
-/**
- * A [GeometryCollection] is a collection of [Geometries][Geometry].
- */
-data class GeometryCollection @JvmOverloads constructor(
+/** A [GeometryCollection] is a collection of [Geometries][Geometry]. */
+data class GeometryCollection
+@JvmOverloads
+constructor(
     val geometries: List<Geometry>,
-    override val coordinateReferenceSystem: CoordinateReferenceSystem = CoordinateReferenceSystem.WGS_84
+    override val coordinateReferenceSystem: CoordinateReferenceSystem =
+        CoordinateReferenceSystem.WGS_84,
 ) : Geometry(coordinateReferenceSystem) {
 
     init {
         geometries.forEachIndexed { index, geometry ->
             require(geometry.coordinateReferenceSystem == coordinateReferenceSystem) {
                 "The coordinate reference system of each geometry (${geometry.coordinateReferenceSystem}) " +
-                        "must match the coordinate reference system of the geometry collection ($coordinateReferenceSystem), " +
-                        "but geometry at index $index had a different coordinate reference system"
+                    "must match the coordinate reference system of the geometry collection ($coordinateReferenceSystem), " +
+                    "but geometry at index $index had a different coordinate reference system"
             }
         }
     }
@@ -31,8 +32,9 @@ data class GeometryCollection @JvmOverloads constructor(
 
     override fun reprojectTo(crs: CoordinateReferenceSystem): Geometry =
         if (coordinateReferenceSystem == crs) this
-        else GeometryCollection(
-            geometries.map { it.reprojectTo(crs) },
-            crs
-        )
+        else
+            GeometryCollection(
+                geometries.map { it.reprojectTo(crs) },
+                crs,
+            )
 }

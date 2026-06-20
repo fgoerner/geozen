@@ -19,12 +19,12 @@ import dev.goerner.geozen.model.simple_geometry.Polygon
  * calls [calculate] (Position, Position) or [calculateMinDistanceToPositions].
  *
  * Subclasses only need to provide:
- *  - [calculate] (Position, Position) – the geodesic primitive (Haversine or Karney)
- *  - [calculateMinDistanceToPositions] – the point-to-polyline primitive
+ * - [calculate] (Position, Position) – the geodesic primitive (Haversine or Karney)
+ * - [calculateMinDistanceToPositions] – the point-to-polyline primitive
  *
  * Adding a new geometry type requires:
- *  1. New typed overloads in this class for each combination with existing types.
- *  2. New branches in [calculate] (Geometry, Geometry) and [geometryOrdinal].
+ * 1. New typed overloads in this class for each combination with existing types.
+ * 2. New branches in [calculate] (Geometry, Geometry) and [geometryOrdinal].
  */
 abstract class AbstractDistanceCalculator : DistanceCalculator {
 
@@ -72,40 +72,44 @@ abstract class AbstractDistanceCalculator : DistanceCalculator {
             is MultiPolygon if b is MultiPolygon -> calculate(a, b)
             is MultiPolygon if b is GeometryCollection -> calculate(a, b)
             is GeometryCollection if b is GeometryCollection -> calculate(a, b)
-            else -> throw UnsupportedOperationException(
-                "Distance calculation is not supported between geometry types: " +
+            else ->
+                throw UnsupportedOperationException(
+                    "Distance calculation is not supported between geometry types: " +
                         "${g1::class.simpleName} and ${g2::class.simpleName}"
-            )
+                )
         }
     }
 
     /**
-     * Returns an ordinal that defines the canonical argument order used by
-     * [calculate] (Geometry, Geometry). Lower ordinal types are always placed first.
+     * Returns an ordinal that defines the canonical argument order used by [calculate] (Geometry,
+     * Geometry). Lower ordinal types are always placed first.
      */
-    private fun geometryOrdinal(g: Geometry): Int = when (g) {
-        is Point           -> 0
-        is LineString      -> 1
-        is Polygon         -> 2
-        is MultiPoint      -> 3
-        is MultiLineString -> 4
-        is MultiPolygon    -> 5
-        is GeometryCollection -> 6
-        else               -> Int.MAX_VALUE
-    }
+    private fun geometryOrdinal(g: Geometry): Int =
+        when (g) {
+            is Point -> 0
+            is LineString -> 1
+            is Polygon -> 2
+            is MultiPoint -> 3
+            is MultiLineString -> 4
+            is MultiPolygon -> 5
+            is GeometryCollection -> 6
+            else -> Int.MAX_VALUE
+        }
 
     /**
      * Calculates the minimum distance from a [Point] to a sequence of [Position]s, treating
      * consecutive pairs as line segments. The algorithm used is implementation-specific.
      *
-     * @param p         the reference point
+     * @param p the reference point
      * @param positions the sequence of positions forming a linestring or ring
      * @return the minimum distance in meters
      */
-    protected abstract fun calculateMinDistanceToPositions(p: Point, positions: List<Position>): Double
+    protected abstract fun calculateMinDistanceToPositions(
+        p: Point,
+        positions: List<Position>,
+    ): Double
 
-    private fun calculate(p1: Point, p2: Point): Double =
-        calculate(p1.coordinates, p2.coordinates)
+    private fun calculate(p1: Point, p2: Point): Double = calculate(p1.coordinates, p2.coordinates)
 
     private fun calculate(p: Point, lineString: LineString): Double =
         calculateMinDistanceToPositions(p, lineString.coordinates)
@@ -115,9 +119,13 @@ abstract class AbstractDistanceCalculator : DistanceCalculator {
         val exteriorRing = rings[0]
         val interiorRings = rings.drop(1)
 
-        val containmentResult = PointToPolygonDistanceHelper.analyzePointPolygonContainment(
-            p.longitude, p.latitude, exteriorRing, interiorRings
-        )
+        val containmentResult =
+            PointToPolygonDistanceHelper.analyzePointPolygonContainment(
+                p.longitude,
+                p.latitude,
+                exteriorRing,
+                interiorRings,
+            )
 
         return when (containmentResult) {
             is PointToPolygonDistanceHelper.ContainmentResult.InsidePolygon -> 0.0
@@ -132,21 +140,27 @@ abstract class AbstractDistanceCalculator : DistanceCalculator {
         require(multiPoint.coordinates.isNotEmpty()) {
             "MultiPoint must contain at least one point to calculate distance, but contained 0"
         }
-        return multiPoint.coordinates.minOf { calculate(point, Point(it, multiPoint.coordinateReferenceSystem)) }
+        return multiPoint.coordinates.minOf {
+            calculate(point, Point(it, multiPoint.coordinateReferenceSystem))
+        }
     }
 
     private fun calculate(point: Point, multiLineString: MultiLineString): Double {
         require(multiLineString.coordinates.isNotEmpty()) {
             "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
         }
-        return multiLineString.coordinates.minOf { calculate(point, LineString(it, multiLineString.coordinateReferenceSystem)) }
+        return multiLineString.coordinates.minOf {
+            calculate(point, LineString(it, multiLineString.coordinateReferenceSystem))
+        }
     }
 
     private fun calculate(point: Point, multiPolygon: MultiPolygon): Double {
         require(multiPolygon.coordinates.isNotEmpty()) {
             "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
         }
-        return multiPolygon.coordinates.minOf { calculate(point, Polygon(it, multiPolygon.coordinateReferenceSystem)) }
+        return multiPolygon.coordinates.minOf {
+            calculate(point, Polygon(it, multiPolygon.coordinateReferenceSystem))
+        }
     }
 
     private fun calculate(lineString1: LineString, lineString2: LineString): Double {
@@ -158,7 +172,9 @@ abstract class AbstractDistanceCalculator : DistanceCalculator {
         }
 
         return LineStringToLineStringDistanceHelper.calculateBidirectionalDistance(
-            positions1, positions2, ::calculateMinDistanceToPositions
+            positions1,
+            positions2,
+            ::calculateMinDistanceToPositions,
         )
     }
 
@@ -168,20 +184,29 @@ abstract class AbstractDistanceCalculator : DistanceCalculator {
         val exteriorRing = rings[0]
         val interiorRings = rings.drop(1)
 
-        val analysisResult = LineStringToPolygonDistanceHelper.analyzeLineStringPolygonRelationship(
-            lineStringPositions, exteriorRing, interiorRings
-        )
+        val analysisResult =
+            LineStringToPolygonDistanceHelper.analyzeLineStringPolygonRelationship(
+                lineStringPositions,
+                exteriorRing,
+                interiorRings,
+            )
 
         return when (analysisResult) {
             is LineStringToPolygonDistanceHelper.AnalysisResult.Intersection -> 0.0
             is LineStringToPolygonDistanceHelper.AnalysisResult.FullyContained -> 0.0
             is LineStringToPolygonDistanceHelper.AnalysisResult.InHole ->
                 LineStringToPolygonDistanceHelper.calculateDistanceForHoleCase(
-                    lineStringPositions, analysisResult.holeContainingVertex, ::calculateMinDistanceToPositions
+                    lineStringPositions,
+                    analysisResult.holeContainingVertex,
+                    ::calculateMinDistanceToPositions,
                 )
             is LineStringToPolygonDistanceHelper.AnalysisResult.NoIntersectionOrContainment ->
                 LineStringToPolygonDistanceHelper.calculateDistanceForGeneralCase(
-                    lineStringPositions, rings, exteriorRing, interiorRings, ::calculateMinDistanceToPositions
+                    lineStringPositions,
+                    rings,
+                    exteriorRing,
+                    interiorRings,
+                    ::calculateMinDistanceToPositions,
                 )
         }
     }
@@ -195,9 +220,15 @@ abstract class AbstractDistanceCalculator : DistanceCalculator {
         val exteriorRing2 = rings2[0]
         val interiorRings2 = rings2.drop(1)
 
-        val analysisResult = PolygonToPolygonDistanceHelper.analyzePolygonPolygonRelationship(
-            rings1, rings2, exteriorRing1, interiorRings1, exteriorRing2, interiorRings2
-        )
+        val analysisResult =
+            PolygonToPolygonDistanceHelper.analyzePolygonPolygonRelationship(
+                rings1,
+                rings2,
+                exteriorRing1,
+                interiorRings1,
+                exteriorRing2,
+                interiorRings2,
+            )
 
         return when (analysisResult) {
             is PolygonToPolygonDistanceHelper.AnalysisResult.Intersection -> 0.0
@@ -205,15 +236,21 @@ abstract class AbstractDistanceCalculator : DistanceCalculator {
             is PolygonToPolygonDistanceHelper.AnalysisResult.Polygon2ContainedInPolygon1 -> 0.0
             is PolygonToPolygonDistanceHelper.AnalysisResult.Polygon1InHoleOfPolygon2 ->
                 PolygonToPolygonDistanceHelper.calculateDistanceForHoleCase(
-                    rings1, analysisResult.holeRing, ::calculateMinDistanceToPositions
+                    rings1,
+                    analysisResult.holeRing,
+                    ::calculateMinDistanceToPositions,
                 )
             is PolygonToPolygonDistanceHelper.AnalysisResult.Polygon2InHoleOfPolygon1 ->
                 PolygonToPolygonDistanceHelper.calculateDistanceForHoleCase(
-                    rings2, analysisResult.holeRing, ::calculateMinDistanceToPositions
+                    rings2,
+                    analysisResult.holeRing,
+                    ::calculateMinDistanceToPositions,
                 )
             is PolygonToPolygonDistanceHelper.AnalysisResult.NoIntersectionOrContainment ->
                 PolygonToPolygonDistanceHelper.calculateDistanceForGeneralCase(
-                    rings1, rings2, ::calculateMinDistanceToPositions
+                    rings1,
+                    rings2,
+                    ::calculateMinDistanceToPositions,
                 )
         }
     }
@@ -222,42 +259,54 @@ abstract class AbstractDistanceCalculator : DistanceCalculator {
         require(multiPoint.coordinates.isNotEmpty()) {
             "MultiPoint must contain at least one point to calculate distance, but contained 0"
         }
-        return multiPoint.coordinates.minOf { calculate(Point(it, multiPoint.coordinateReferenceSystem), lineString) }
+        return multiPoint.coordinates.minOf {
+            calculate(Point(it, multiPoint.coordinateReferenceSystem), lineString)
+        }
     }
 
     private fun calculate(lineString: LineString, multiLineString: MultiLineString): Double {
         require(multiLineString.coordinates.isNotEmpty()) {
             "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
         }
-        return multiLineString.coordinates.minOf { calculate(lineString, LineString(it, multiLineString.coordinateReferenceSystem)) }
+        return multiLineString.coordinates.minOf {
+            calculate(lineString, LineString(it, multiLineString.coordinateReferenceSystem))
+        }
     }
 
     private fun calculate(lineString: LineString, multiPolygon: MultiPolygon): Double {
         require(multiPolygon.coordinates.isNotEmpty()) {
             "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
         }
-        return multiPolygon.coordinates.minOf { calculate(lineString, Polygon(it, multiPolygon.coordinateReferenceSystem)) }
+        return multiPolygon.coordinates.minOf {
+            calculate(lineString, Polygon(it, multiPolygon.coordinateReferenceSystem))
+        }
     }
 
     private fun calculate(polygon: Polygon, multiPoint: MultiPoint): Double {
         require(multiPoint.coordinates.isNotEmpty()) {
             "MultiPoint must contain at least one point to calculate distance, but contained 0"
         }
-        return multiPoint.coordinates.minOf { calculate(Point(it, multiPoint.coordinateReferenceSystem), polygon) }
+        return multiPoint.coordinates.minOf {
+            calculate(Point(it, multiPoint.coordinateReferenceSystem), polygon)
+        }
     }
 
     private fun calculate(polygon: Polygon, multiLineString: MultiLineString): Double {
         require(multiLineString.coordinates.isNotEmpty()) {
             "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
         }
-        return multiLineString.coordinates.minOf { calculate(LineString(it, multiLineString.coordinateReferenceSystem), polygon) }
+        return multiLineString.coordinates.minOf {
+            calculate(LineString(it, multiLineString.coordinateReferenceSystem), polygon)
+        }
     }
 
     private fun calculate(polygon: Polygon, multiPolygon: MultiPolygon): Double {
         require(multiPolygon.coordinates.isNotEmpty()) {
             "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
         }
-        return multiPolygon.coordinates.minOf { calculate(polygon, Polygon(it, multiPolygon.coordinateReferenceSystem)) }
+        return multiPolygon.coordinates.minOf {
+            calculate(polygon, Polygon(it, multiPolygon.coordinateReferenceSystem))
+        }
     }
 
     private fun calculate(multiPoint1: MultiPoint, multiPoint2: MultiPoint): Double {
@@ -267,7 +316,9 @@ abstract class AbstractDistanceCalculator : DistanceCalculator {
         require(multiPoint2.coordinates.isNotEmpty()) {
             "MultiPoint must contain at least one point to calculate distance, but contained 0"
         }
-        return multiPoint1.coordinates.minOf { calculate(Point(it, multiPoint1.coordinateReferenceSystem), multiPoint2) }
+        return multiPoint1.coordinates.minOf {
+            calculate(Point(it, multiPoint1.coordinateReferenceSystem), multiPoint2)
+        }
     }
 
     private fun calculate(multiPoint: MultiPoint, multiLineString: MultiLineString): Double {
@@ -277,7 +328,9 @@ abstract class AbstractDistanceCalculator : DistanceCalculator {
         require(multiLineString.coordinates.isNotEmpty()) {
             "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
         }
-        return multiPoint.coordinates.minOf { calculate(Point(it, multiPoint.coordinateReferenceSystem), multiLineString) }
+        return multiPoint.coordinates.minOf {
+            calculate(Point(it, multiPoint.coordinateReferenceSystem), multiLineString)
+        }
     }
 
     private fun calculate(multiPoint: MultiPoint, multiPolygon: MultiPolygon): Double {
@@ -287,17 +340,24 @@ abstract class AbstractDistanceCalculator : DistanceCalculator {
         require(multiPolygon.coordinates.isNotEmpty()) {
             "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
         }
-        return multiPoint.coordinates.minOf { calculate(Point(it, multiPoint.coordinateReferenceSystem), multiPolygon) }
+        return multiPoint.coordinates.minOf {
+            calculate(Point(it, multiPoint.coordinateReferenceSystem), multiPolygon)
+        }
     }
 
-    private fun calculate(multiLineString1: MultiLineString, multiLineString2: MultiLineString): Double {
+    private fun calculate(
+        multiLineString1: MultiLineString,
+        multiLineString2: MultiLineString,
+    ): Double {
         require(multiLineString1.coordinates.isNotEmpty()) {
             "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
         }
         require(multiLineString2.coordinates.isNotEmpty()) {
             "MultiLineString must contain at least one LineString to calculate distance, but contained 0"
         }
-        return multiLineString1.coordinates.minOf { calculate(LineString(it, multiLineString1.coordinateReferenceSystem), multiLineString2) }
+        return multiLineString1.coordinates.minOf {
+            calculate(LineString(it, multiLineString1.coordinateReferenceSystem), multiLineString2)
+        }
     }
 
     private fun calculate(multiLineString: MultiLineString, multiPolygon: MultiPolygon): Double {
@@ -307,7 +367,9 @@ abstract class AbstractDistanceCalculator : DistanceCalculator {
         require(multiPolygon.coordinates.isNotEmpty()) {
             "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
         }
-        return multiLineString.coordinates.minOf { calculate(LineString(it, multiLineString.coordinateReferenceSystem), multiPolygon) }
+        return multiLineString.coordinates.minOf {
+            calculate(LineString(it, multiLineString.coordinateReferenceSystem), multiPolygon)
+        }
     }
 
     private fun calculate(multiPolygon1: MultiPolygon, multiPolygon2: MultiPolygon): Double {
@@ -317,7 +379,9 @@ abstract class AbstractDistanceCalculator : DistanceCalculator {
         require(multiPolygon2.coordinates.isNotEmpty()) {
             "MultiPolygon must contain at least one Polygon to calculate distance, but contained 0"
         }
-        return multiPolygon1.coordinates.minOf { calculate(Polygon(it, multiPolygon1.coordinateReferenceSystem), multiPolygon2) }
+        return multiPolygon1.coordinates.minOf {
+            calculate(Polygon(it, multiPolygon1.coordinateReferenceSystem), multiPolygon2)
+        }
     }
 
     private fun calculate(g: Geometry, geometryCollection: GeometryCollection): Double {
@@ -327,7 +391,10 @@ abstract class AbstractDistanceCalculator : DistanceCalculator {
         return geometryCollection.geometries.minOf { calculate(g, it) }
     }
 
-    private fun calculate(geometryCollection1: GeometryCollection, geometryCollection2: GeometryCollection): Double {
+    private fun calculate(
+        geometryCollection1: GeometryCollection,
+        geometryCollection2: GeometryCollection,
+    ): Double {
         require(geometryCollection1.geometries.isNotEmpty()) {
             "GeometryCollection must contain at least one geometry to calculate distance, but contained 0"
         }
@@ -337,4 +404,3 @@ abstract class AbstractDistanceCalculator : DistanceCalculator {
         return geometryCollection1.geometries.minOf { calculate(it, geometryCollection2) }
     }
 }
-

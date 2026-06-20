@@ -7,7 +7,11 @@ import tools.jackson.databind.ValueSerializer
 
 class GeometryCollectionSerializer : ValueSerializer<GeometryCollection>() {
 
-    override fun serialize(value: GeometryCollection, gen: JsonGenerator, ctxt: SerializationContext) {
+    override fun serialize(
+        value: GeometryCollection,
+        gen: JsonGenerator,
+        ctxt: SerializationContext,
+    ) {
         gen.writeStartObject()
 
         gen.writeStringProperty("type", "GeometryCollection")

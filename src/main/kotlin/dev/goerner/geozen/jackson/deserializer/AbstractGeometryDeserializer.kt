@@ -9,7 +9,9 @@ abstract class AbstractGeometryDeserializer<T : Geometry> : ValueDeserializer<T>
 
     protected fun checkType(rootNode: JsonNode, expectedType: String) {
         val typeNode = rootNode["type"]
-        require(typeNode != null && typeNode.isString) { "Missing or invalid 'type' field in GeoJSON object." }
+        require(typeNode != null && typeNode.isString) {
+            "Missing or invalid 'type' field in GeoJSON object."
+        }
         val type = typeNode.asString()
         require(expectedType == type) { "Invalid GeoJSON type: $type. Expected '$expectedType'." }
     }

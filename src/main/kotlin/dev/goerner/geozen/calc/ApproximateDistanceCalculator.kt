@@ -18,7 +18,8 @@ object ApproximateDistanceCalculator : AbstractDistanceCalculator() {
      *
      * This method converts the latitude and longitude of the provided `Position` objects from
      * degrees to radians, computes the differences in latitude and longitude, and calculates the
-     * distance based on the Haversine formula. The Earth's radius is assumed to be 6,371,008.8 meters.
+     * distance based on the Haversine formula. The Earth's radius is assumed to be 6,371,008.8
+     * meters.
      *
      * @param p1 the first geographical position, with latitude and longitude in degrees
      * @param p2 the second geographical position, with latitude and longitude in degrees
@@ -34,7 +35,8 @@ object ApproximateDistanceCalculator : AbstractDistanceCalculator() {
         val deltaLat = lat2 - lat1
         val deltaLon = lon2 - lon1
 
-        val distanceFactor: Double = 1.0 - cos(deltaLat) + cos(lat1) * cos(lat2) * (1.0 - cos(deltaLon))
+        val distanceFactor: Double =
+            1.0 - cos(deltaLat) + cos(lat1) * cos(lat2) * (1.0 - cos(deltaLon))
 
         return 2.0 * 6371008.8 * asin(sqrt(distanceFactor / 2.0))
     }
@@ -46,7 +48,7 @@ object ApproximateDistanceCalculator : AbstractDistanceCalculator() {
      * and finds the closest point on each segment to the given point using an equirectangular
      * projection approximation. The minimum distance across all segments is returned.
      *
-     * @param p         the point
+     * @param p the point
      * @param positions the sequence of positions (linestring or ring)
      * @return the minimum distance in meters
      */
@@ -55,36 +57,38 @@ object ApproximateDistanceCalculator : AbstractDistanceCalculator() {
             return calculate(p.coordinates, positions[0])
         }
 
-        return positions.zipWithNext { p1, p2 ->
-            val projectionFactor = getSegmentProjectionFactor(p, p1, p2)
+        return positions
+            .zipWithNext { p1, p2 ->
+                val projectionFactor = getSegmentProjectionFactor(p, p1, p2)
 
-            val closestLat: Double
-            val closestLon: Double
+                val closestLat: Double
+                val closestLon: Double
 
-            if (projectionFactor < 0) {
-                closestLat = p1.latitude
-                closestLon = p1.longitude
-            } else if (projectionFactor > 1) {
-                closestLat = p2.latitude
-                closestLon = p2.longitude
-            } else {
-                closestLat = p1.latitude + projectionFactor * (p2.latitude - p1.latitude)
-                closestLon = p1.longitude + projectionFactor * (p2.longitude - p1.longitude)
+                if (projectionFactor < 0) {
+                    closestLat = p1.latitude
+                    closestLon = p1.longitude
+                } else if (projectionFactor > 1) {
+                    closestLat = p2.latitude
+                    closestLon = p2.longitude
+                } else {
+                    closestLat = p1.latitude + projectionFactor * (p2.latitude - p1.latitude)
+                    closestLon = p1.longitude + projectionFactor * (p2.longitude - p1.longitude)
+                }
+
+                calculate(p.coordinates, Position(closestLon, closestLat))
             }
-
-            calculate(p.coordinates, Position(closestLon, closestLat))
-        }.min()
+            .min()
     }
 
     /**
      * Calculates the projection factor for projecting a point onto a line segment.
      *
-     * The projection factor indicates where on the segment (p1 to p2) the perpendicular
-     * from point p intersects. A value of 0 means the closest point is p1, a value of 1
-     * means the closest point is p2, and values between 0 and 1 indicate a point along
-     * the segment. Values outside [0,1] indicate the closest point is beyond the segment ends.
+     * The projection factor indicates where on the segment (p1 to p2) the perpendicular from point
+     * p intersects. A value of 0 means the closest point is p1, a value of 1 means the closest
+     * point is p2, and values between 0 and 1 indicate a point along the segment. Values outside
+     * [0,1] indicate the closest point is beyond the segment ends.
      *
-     * @param p  the point to project
+     * @param p the point to project
      * @param p1 the start of the segment
      * @param p2 the end of the segment
      * @return the projection factor

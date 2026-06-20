@@ -1,45 +1,41 @@
-name: Publish to Maven Central
-
-on:
+---
+name: "Publish to Maven Central"
+"on":
   release:
-    types: [ created ]
-
+    types:
+    - "created"
 jobs:
   build:
-
-    runs-on: ubuntu-latest
+    runs-on: "ubuntu-latest"
     permissions:
-      contents: read
-      packages: write
-
+      contents: "read"
+      packages: "write"
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-
-      - name: Get version from tag
-        run: echo "SOURCE_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
-
-      - name: Validate version format
-        run: |
-          if [[ ! "$SOURCE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "❌ Invalid version format: $SOURCE_TAG"
-            echo "Please use tags in the format vX.Y.Z (e.g., v1.0.0)"
-            exit 1
-          fi
-          echo "SOURCE_VERSION=${SOURCE_TAG#v}" >> $GITHUB_ENV
-
-      - name: Set up JDK 21
-        uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12 # v4.7.0
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@94baf225fe0a508e581a564467443d0e2379123b # v4.3.0
-
-      - name: Publish with Gradle
-        run: ./gradlew publishToMavenCentral -Pversion=${{ env.SOURCE_VERSION }} --no-configuration-cache
-        env:
-          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.ORG_GRADLE_PROJECT_mavenCentralUsername }}
-          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.ORG_GRADLE_PROJECT_mavenCentralPassword }}
-          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.ORG_GRADLE_PROJECT_signingInMemoryKey }}
-          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingInMemoryKeyPassword }}
+    - uses: "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0"
+      with:
+        persist-credentials: false
+    - name: "Get version from tag"
+      run: "echo \"SOURCE_TAG=${GITHUB_REF#refs/tags/}\" >> $GITHUB_ENV"
+    - name: "Validate version format"
+      run: "if [[ ! \"$SOURCE_TAG\" =~ ^v[0-9]+\\.[0-9]+\\.[0-9]+$ ]]; then\n  echo\
+        \ \"❌ Invalid version format: $SOURCE_TAG\"\n  echo \"Please use tags in the\
+        \ format vX.Y.Z (e.g., v1.0.0)\"\n  exit 1\nfi\necho \"SOURCE_VERSION=${SOURCE_TAG#v}\"\
+        \ >> $GITHUB_ENV\n"
+    - name: "Set up JDK 21"
+      uses: "actions/setup-java@ad2b38190b15e4d6bdf0c97fb4fca8412226d287"
+      with:
+        java-version: "21"
+        distribution: "temurin"
+    - name: "Setup Gradle"
+      uses: "gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92"
+    - name: "Publish with Gradle"
+      run: "./gradlew publishToMavenCentral -Pversion=${{ env.SOURCE_VERSION }} --no-configuration-cache"
+      env:
+        ORG_GRADLE_PROJECT_mavenCentralUsername: "${{ secrets.ORG_GRADLE_PROJECT_mavenCentralUsername\
+          \ }}"
+        ORG_GRADLE_PROJECT_mavenCentralPassword: "${{ secrets.ORG_GRADLE_PROJECT_mavenCentralPassword\
+          \ }}"
+        ORG_GRADLE_PROJECT_signingInMemoryKey: "${{ secrets.ORG_GRADLE_PROJECT_signingInMemoryKey\
+          \ }}"
+        ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: "${{ secrets.ORG_GRADLE_PROJECT_signingInMemoryKeyPassword\
+          \ }}"

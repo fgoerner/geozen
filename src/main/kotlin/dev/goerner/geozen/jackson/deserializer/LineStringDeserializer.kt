@@ -13,7 +13,9 @@ class LineStringDeserializer : AbstractGeometryDeserializer<LineString>() {
         checkType(rootNode, "LineString")
 
         val coordinatesNode = rootNode["coordinates"]
-        require(coordinatesNode != null && coordinatesNode.isArray) { "Invalid or missing 'coordinates' field for LineString geometry." }
+        require(coordinatesNode != null && coordinatesNode.isArray) {
+            "Invalid or missing 'coordinates' field for LineString geometry."
+        }
         val coordinates = (coordinatesNode as Iterable<JsonNode>).map { parsePosition(it) }
 
         return LineString(coordinates)

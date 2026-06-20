@@ -6,17 +6,16 @@ import dev.goerner.geozen.model.simple_geometry.Point
 /**
  * Internal helper class for LineString-to-Polygon distance calculations.
  *
- * This class encapsulates the shared logic (Phase 1: intersection detection and Phase 2: containment checks)
- * that is common to both ApproximateDistanceCalculator and PreciseDistanceCalculator.
+ * This class encapsulates the shared logic (Phase 1: intersection detection and Phase 2:
+ * containment checks) that is common to both ApproximateDistanceCalculator and
+ * PreciseDistanceCalculator.
  *
  * Only Phase 3 (distance calculation) differs between the two calculators, which is handled by
  * passing different distance calculation functions.
  */
 internal object LineStringToPolygonDistanceHelper {
 
-    /**
-     * Result of Phase 1 and Phase 2 analysis.
-     */
+    /** Result of Phase 1 and Phase 2 analysis. */
     sealed class AnalysisResult {
         /** LineString intersects polygon boundary - distance is 0.0 */
         object Intersection : AnalysisResult()
@@ -24,7 +23,10 @@ internal object LineStringToPolygonDistanceHelper {
         /** All LineString vertices are inside polygon (not in any hole) - distance is 0.0 */
         object FullyContained : AnalysisResult()
 
-        /** At least one LineString vertex is inside a hole - need to calculate distance to hole boundary */
+        /**
+         * At least one LineString vertex is inside a hole - need to calculate distance to hole
+         * boundary
+         */
         data class InHole(val holeContainingVertex: List<Position>) : AnalysisResult()
 
         /** No intersection or containment - need to calculate general distance */
@@ -42,7 +44,7 @@ internal object LineStringToPolygonDistanceHelper {
     fun analyzeLineStringPolygonRelationship(
         lineStringPositions: List<Position>,
         exteriorRing: List<Position>,
-        interiorRings: List<List<Position>>
+        interiorRings: List<List<Position>>,
     ): AnalysisResult {
         // Phase 1: Check for segment intersections between LineString and any polygon ring
         if (GeometricUtils.doPolylineSegmentsIntersect(lineStringPositions, exteriorRing)) {
@@ -55,12 +57,20 @@ internal object LineStringToPolygonDistanceHelper {
         }
 
         // Phase 2: Check containment – are all LineString vertices inside the polygon?
-        return when (val containment = GeometricUtils.checkVertexContainment(
-            lineStringPositions, exteriorRing, interiorRings
-        )) {
-            is GeometricUtils.VertexContainmentResult.FullyContained  -> AnalysisResult.FullyContained
-            is GeometricUtils.VertexContainmentResult.InHole          -> AnalysisResult.InHole(containment.holeRing)
-            is GeometricUtils.VertexContainmentResult.NotContained    -> AnalysisResult.NoIntersectionOrContainment
+        return when (
+            val containment =
+                GeometricUtils.checkVertexContainment(
+                    lineStringPositions,
+                    exteriorRing,
+                    interiorRings,
+                )
+        ) {
+            is GeometricUtils.VertexContainmentResult.FullyContained ->
+                AnalysisResult.FullyContained
+            is GeometricUtils.VertexContainmentResult.InHole ->
+                AnalysisResult.InHole(containment.holeRing)
+            is GeometricUtils.VertexContainmentResult.NotContained ->
+                AnalysisResult.NoIntersectionOrContainment
         }
     }
 
@@ -69,13 +79,14 @@ internal object LineStringToPolygonDistanceHelper {
      *
      * @param lineStringPositions the LineString vertices
      * @param holeRing the hole's boundary ring
-     * @param calculateMinDistanceToPositions function to calculate minimum distance from a point to a sequence of positions
+     * @param calculateMinDistanceToPositions function to calculate minimum distance from a point to
+     *   a sequence of positions
      * @return the minimum distance
      */
     fun calculateDistanceForHoleCase(
         lineStringPositions: List<Position>,
         holeRing: List<Position>,
-        calculateMinDistanceToPositions: (Point, List<Position>) -> Double
+        calculateMinDistanceToPositions: (Point, List<Position>) -> Double,
     ): Double {
         // Calculate distance from LineString vertices to hole boundary
         val minFromLineStringToHole = lineStringPositions.minOf { position ->
@@ -91,13 +102,15 @@ internal object LineStringToPolygonDistanceHelper {
     }
 
     /**
-     * Calculates distance for the general case (Phase 3) where there's no intersection or containment.
+     * Calculates distance for the general case (Phase 3) where there's no intersection or
+     * containment.
      *
      * @param lineStringPositions the LineString vertices
      * @param rings all polygon rings (exterior + interior)
      * @param exteriorRing the polygon's exterior ring
      * @param interiorRings the polygon's interior rings (holes)
-     * @param calculateMinDistanceToPositions function to calculate minimum distance from a point to a sequence of positions
+     * @param calculateMinDistanceToPositions function to calculate minimum distance from a point to
+     *   a sequence of positions
      * @return the minimum distance
      */
     fun calculateDistanceForGeneralCase(
@@ -105,7 +118,7 @@ internal object LineStringToPolygonDistanceHelper {
         rings: List<List<Position>>,
         exteriorRing: List<Position>,
         interiorRings: List<List<Position>>,
-        calculateMinDistanceToPositions: (Point, List<Position>) -> Double
+        calculateMinDistanceToPositions: (Point, List<Position>) -> Double,
     ): Double {
         // Calculate minimum distance from all LineString vertices to all polygon rings
         val minFromLineStringToPolygon = lineStringPositions.minOf { position ->
@@ -126,5 +139,3 @@ internal object LineStringToPolygonDistanceHelper {
         return minOf(minFromLineStringToPolygon, minFromPolygonToLineString)
     }
 }
-
-

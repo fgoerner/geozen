@@ -3,5 +3,5 @@ pluginManagement {
         kotlin("jvm") version "2.3.21"
     }
 }
-rootProject.name = "geozen-core"
 
+rootProject.name = "geozen-core"

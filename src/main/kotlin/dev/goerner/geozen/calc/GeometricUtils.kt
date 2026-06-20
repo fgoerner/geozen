@@ -5,17 +5,16 @@ import dev.goerner.geozen.model.Position
 /**
  * Utility object for geometric calculations and predicates.
  *
- * These methods use planar approximations (treating lat/lon as x/y coordinates)
- * which are suitable for intersection detection and orientation tests over
- * small to medium distances. The planar approximation is acceptable for intersection
- * detection because segments that intersect are by definition very close together,
- * and at close range, the spheroid surface is nearly planar.
+ * These methods use planar approximations (treating lat/lon as x/y coordinates) which are suitable
+ * for intersection detection and orientation tests over small to medium distances. The planar
+ * approximation is acceptable for intersection detection because segments that intersect are by
+ * definition very close together, and at close range, the spheroid surface is nearly planar.
  */
 internal object GeometricUtils {
 
     /**
-     * Result of checking whether a sequence of vertices lies inside a polygon
-     * (defined by an exterior ring and zero or more interior rings / holes).
+     * Result of checking whether a sequence of vertices lies inside a polygon (defined by an
+     * exterior ring and zero or more interior rings / holes).
      */
     sealed class VertexContainmentResult {
         /** Every vertex is inside the exterior ring and outside all holes. */
@@ -29,24 +28,24 @@ internal object GeometricUtils {
     }
 
     /**
-     * Checks whether all vertices in [vertices] are contained within the polygon described
-     * by [exteriorRing] and [interiorRings].
+     * Checks whether all vertices in [vertices] are contained within the polygon described by
+     * [exteriorRing] and [interiorRings].
      *
-     * The check short-circuits as soon as a vertex is found outside the exterior ring or
-     * inside a hole.  Uses [isPointInsideRing] (ray-casting, planar approximation).
+     * The check short-circuits as soon as a vertex is found outside the exterior ring or inside a
+     * hole. Uses [isPointInsideRing] (ray-casting, planar approximation).
      *
-     * @param vertices       the positions to test
-     * @param exteriorRing   the outer boundary of the polygon
-     * @param interiorRings  the hole rings of the polygon (may be empty)
-     * @return [VertexContainmentResult.FullyContained] if every vertex is inside the polygon
-     *         and outside all holes, [VertexContainmentResult.InHole] if a vertex falls inside
-     *         a hole (carrying that hole's ring), or [VertexContainmentResult.NotContained] if
-     *         any vertex lies outside the exterior ring.
+     * @param vertices the positions to test
+     * @param exteriorRing the outer boundary of the polygon
+     * @param interiorRings the hole rings of the polygon (may be empty)
+     * @return [VertexContainmentResult.FullyContained] if every vertex is inside the polygon and
+     *   outside all holes, [VertexContainmentResult.InHole] if a vertex falls inside a hole
+     *   (carrying that hole's ring), or [VertexContainmentResult.NotContained] if any vertex lies
+     *   outside the exterior ring.
      */
     fun checkVertexContainment(
         vertices: List<Position>,
         exteriorRing: List<Position>,
-        interiorRings: List<List<Position>>
+        interiorRings: List<List<Position>>,
     ): VertexContainmentResult {
         for (position in vertices) {
             if (!isPointInsideRing(position.longitude, position.latitude, exteriorRing)) {
@@ -78,10 +77,10 @@ internal object GeometricUtils {
     fun doPolylineSegmentsIntersect(seq1: List<Position>, seq2: List<Position>): Boolean {
         for (i in 0 until seq1.size - 1) {
             val seg1Start = seq1[i]
-            val seg1End   = seq1[i + 1]
+            val seg1End = seq1[i + 1]
             for (j in 0 until seq2.size - 1) {
                 val seg2Start = seq2[j]
-                val seg2End   = seq2[j + 1]
+                val seg2End = seq2[j + 1]
                 if (doSegmentsIntersect(seg1Start, seg1End, seg2Start, seg2End)) return true
             }
         }
@@ -91,21 +90,24 @@ internal object GeometricUtils {
     /**
      * Checks if two line segments intersect using the cross product method.
      *
-     * This method uses a planar approximation (treating lat/lon as x/y coordinates),
-     * which is reasonable for small distances. For segments that are far apart or
-     * very long, this approximation may introduce small errors, but for intersection
-     * detection it's generally sufficient.
+     * This method uses a planar approximation (treating lat/lon as x/y coordinates), which is
+     * reasonable for small distances. For segments that are far apart or very long, this
+     * approximation may introduce small errors, but for intersection detection it's generally
+     * sufficient.
      *
      * **How the algorithm works:**
      *
-     * The algorithm is based on checking the "orientation" (clockwise, counterclockwise, or collinear)
-     * of point triplets. Two segments intersect if and only if one of these conditions is true:
+     * The algorithm is based on checking the "orientation" (clockwise, counterclockwise, or
+     * collinear) of point triplets. Two segments intersect if and only if one of these conditions
+     * is true:
      *
      * 1. **General case**: The segments "straddle" each other. This means:
-     *    - The two endpoints of segment 2 are on opposite sides of the line defined by segment 1
-     *    - AND the two endpoints of segment 1 are on opposite sides of the line defined by segment 2
+     *     - The two endpoints of segment 2 are on opposite sides of the line defined by segment 1
+     *     - AND the two endpoints of segment 1 are on opposite sides of the line defined by segment
+     *       2
      *
-     * 2. **Special case**: One segment's endpoint lies directly on the other segment (collinear case)
+     * 2. **Special case**: One segment's endpoint lies directly on the other segment (collinear
+     *    case)
      *
      * **Visual Example:**
      *
@@ -119,6 +121,7 @@ internal object GeometricUtils {
      *    \ /
      *     B
      * ```
+     *
      * Segment AB intersects segment CD because:
      * - C and D are on opposite sides of line AB (different orientations)
      * - A and B are on opposite sides of line CD (different orientations)
@@ -129,12 +132,13 @@ internal object GeometricUtils {
      *
      *       C---D
      * ```
+     *
      * Segments don't intersect because C and D are on the same side of line AB.
      *
      * **What "orientation" means:**
      *
-     * For three points P, Q, R, the orientation tells us if we turn left (counterclockwise),
-     * turn right (clockwise), or go straight (collinear) when traveling from P→Q→R.
+     * For three points P, Q, R, the orientation tells us if we turn left (counterclockwise), turn
+     * right (clockwise), or go straight (collinear) when traveling from P→Q→R.
      *
      * This is calculated using the cross product of vectors (Q-P) and (R-Q):
      * - Cross product > 0: counterclockwise turn (points are arranged counterclockwise)
@@ -142,19 +146,24 @@ internal object GeometricUtils {
      * - Cross product = 0: collinear (all three points lie on the same line)
      *
      * @param seg1Start start position of the first segment
-     * @param seg1End   end position of the first segment
+     * @param seg1End end position of the first segment
      * @param seg2Start start position of the second segment
-     * @param seg2End   end position of the second segment
+     * @param seg2End end position of the second segment
      * @return true if the segments intersect, false otherwise
      */
     fun doSegmentsIntersect(
         seg1Start: Position,
         seg1End: Position,
         seg2Start: Position,
-        seg2End: Position
+        seg2End: Position,
     ): Boolean {
         // Check if segments share an endpoint
-        if (seg1Start == seg2Start || seg1Start == seg2End || seg1End == seg2Start || seg1End == seg2End) {
+        if (
+            seg1Start == seg2Start ||
+                seg1Start == seg2End ||
+                seg1End == seg2Start ||
+                seg1End == seg2End
+        ) {
             return true
         }
 
@@ -200,9 +209,9 @@ internal object GeometricUtils {
      *
      * **Geometric interpretation:**
      * - If you walk from P to Q to R:
-     *   - Positive cross product (1): you turn RIGHT (clockwise)
-     *   - Negative cross product (2): you turn LEFT (counterclockwise)
-     *   - Zero cross product (0): you go STRAIGHT (collinear)
+     *     - Positive cross product (1): you turn RIGHT (clockwise)
+     *     - Negative cross product (2): you turn LEFT (counterclockwise)
+     *     - Zero cross product (0): you go STRAIGHT (collinear)
      *
      * **Visual examples:**
      *
@@ -241,9 +250,9 @@ internal object GeometricUtils {
 
         val epsilon = 1e-10
         return when {
-            diff in -epsilon..epsilon -> 0  // Collinear
-            diff > 0 -> 1          // Clockwise
-            else -> 2               // Counterclockwise
+            diff in -epsilon..epsilon -> 0 // Collinear
+            diff > 0 -> 1 // Clockwise
+            else -> 2 // Counterclockwise
         }
     }
 
@@ -259,20 +268,20 @@ internal object GeometricUtils {
      */
     fun onSegment(p: Position, q: Position, r: Position): Boolean {
         return q.longitude <= maxOf(p.longitude, r.longitude) &&
-                q.longitude >= minOf(p.longitude, r.longitude) &&
-                q.latitude <= maxOf(p.latitude, r.latitude) &&
-                q.latitude >= minOf(p.latitude, r.latitude)
+            q.longitude >= minOf(p.longitude, r.longitude) &&
+            q.latitude <= maxOf(p.latitude, r.latitude) &&
+            q.latitude >= minOf(p.latitude, r.latitude)
     }
 
     /**
      * Checks if a point is inside a ring using the ray casting algorithm.
      *
-     * This algorithm works by casting a ray from the point horizontally to the right
-     * and counting how many times it crosses the ring boundary. If the number of
-     * crossings is odd, the point is inside; if even, it's outside.
+     * This algorithm works by casting a ray from the point horizontally to the right and counting
+     * how many times it crosses the ring boundary. If the number of crossings is odd, the point is
+     * inside; if even, it's outside.
      *
-     * Uses a planar approximation (treating lat/lon as x/y coordinates), which is
-     * acceptable for this topology test.
+     * Uses a planar approximation (treating lat/lon as x/y coordinates), which is acceptable for
+     * this topology test.
      *
      * @param px the point's longitude
      * @param py the point's latitude
@@ -300,4 +309,3 @@ internal object GeometricUtils {
         return intersections % 2 == 1
     }
 }
-
