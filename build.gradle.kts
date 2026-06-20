@@ -39,6 +39,10 @@ spotless {
     kotlinGradle {
         ktfmt().kotlinlangStyle()
     }
+    yaml {
+        target("**/*.yml", "**/*.yaml")
+        jackson()
+    }
 }
 
 mavenPublishing {
